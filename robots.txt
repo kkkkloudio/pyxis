@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://TUO-USERNAME.github.io/il-crocevia/sitemap.xml
