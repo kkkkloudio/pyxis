@@ -1,19 +1,19 @@
-# 🌙 Adytum
+# 🏛️ Adytum
 
-> *Un luogo dove le luci si incontrano. Niente GPS, niente nomi veri: il cielo non misura le distanze.*
+> *Il santuario delle anime. Un luogo dove le luci si incontrano. Niente GPS, niente nomi veri: il cielo non misura le distanze.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-gold.svg)](LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-purple.svg)]()
 [![Deploy](https://img.shields.io/badge/deploy-GitHub%20Pages-blue.svg)](.github/workflows/deploy.yml)
 
-Una Progressive Web App (PWA) in italiano, pensata per essere **installabile** come app nativa su telefono, con tema notturno, SVG animati e un'esperienza mobile-first.
+Una Progressive Web App (PWA) in italiano, pensata per essere **installabile** come app nativa su telefono, con tema pergamena antica, SVG animati e un'esperienza mobile-first.
 
 ## ✨ Caratteristiche
 
 - 📱 **PWA completa**: installabile su iOS e Android, funziona offline
-- 🌌 **Tema notturno/stellato**: sfondo animato con stelle e nebulosa
-- 🔮 **Interfaccia SVG interattiva**: clicca sulle "luci" nel cielo per scoprire chi sono
-- 🎭 **4 archetipi**: Strega, Stregone, Sciamano, o "Nessuna via" (punto anonimo)
+- 📜 **Tema pergamena antica**: texture reale, cera, inchiostro, atmosfera da grimorio
+- 🧭 **Bussola delle Anime**: 3 lancette (utente più vicino, secondo, POI sacro)
+- 🎭 **6 archetipi**: Strega, Stregone, Sciamano, Guaritore, Veggente, Viandante
 - 🕯️ **Segnali rituali**: candele, fumo, fiamme — un linguaggio simbolico non verbale
 - 🔔 **Lettere della comunità**: annunci rituali (es. Samhain)
 - 🛡️ **Privacy by design**: niente GPS, niente nomi veri, niente tracciamento
@@ -21,9 +21,7 @@ Una Progressive Web App (PWA) in italiano, pensata per essere **installabile** c
 
 ## 🚀 Demo
 
-Apri l'app: **[https://TUO-USERNAME.github.io/adytum](https://TUO-USERNAME.github.io/adytum)**
-
-*(Sostituisci `TUO-USERNAME` con il tuo username GitHub dopo il deploy.)*
+Apri l'app: **[https://kkkkloudio.github.io/adytum](https://kkkkloudio.github.io/adytum)**
 
 ## 📲 Installazione come app
 
@@ -41,7 +39,7 @@ Apri l'app: **[https://TUO-USERNAME.github.io/adytum](https://TUO-USERNAME.githu
 
 ```bash
 # Clona il repository
-git clone https://github.com/TUO-USERNAME/adytum.git
+git clone https://github.com/kkkkloudio/adytum.git
 cd adytum
 
 # Servi con qualsiasi server statico, es:
@@ -113,7 +111,7 @@ Sostituisci i file in `icons/`. Le dimensioni minime richieste per una PWA: **19
    git add .
    git commit -m "🌙 Primo commit: Adytum v1.0"
    git branch -M main
-   git remote add origin https://github.com/TUO-USERNAME/adytum.git
+   git remote add origin https://github.com/kkkkloudio/adytum.git
    git push -u origin main
    ```
 3. **Abilita GitHub Pages**: Settings → Pages → Source: "GitHub Actions"
@@ -133,8 +131,9 @@ Sostituisci i file in `icons/`. Le dimensioni minime richieste per una PWA: **19
 
 ## 🙏 Ringraziamenti
 
-- I font di sistema (Georgia, Palatino) per l'atmosfera
+- I font antichi (Cinzel, Cormorant Garamond, IM Fell English) per l'atmosfera da grimorio
 - La tradizione dell'Almanacco Veneto per i contenuti rituali
+- La texture di pergamena reale per l'anima dell'app
 - Tutti coloro che accendono una candela da soli, a casa propria
 
 ---
