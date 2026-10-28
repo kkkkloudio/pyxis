@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Il Crocevia — V2-C: Bosco Sacro</title>
+<style>
+  /* ============================================
+     V2-C — "BOSCO SACRO"
+     Alberi, muschio, radici, ruscelli, animali antichi. Verde profondo.
+     ============================================ */
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    background:#0a120c;
+    background-image:
+      /* chioma fitta */
+      radial-gradient(ellipse 120% 40% at 50% -10%, rgba(20,50,25,.5) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 30% at 10% 30%, rgba(15,40,20,.4) 0%, transparent 50%),
+      radial-gradient(ellipse 80% 30% at 90% 30%, rgba(15,40,20,.4) 0%, transparent 50%),
+      radial-gradient(ellipse 100% 50% at 50% 110%, rgba(10,30,15,.6) 0%, transparent 60%),
+      /* luce che filtra */
+      radial-gradient(ellipse 30% 50% at 50% 20%, rgba(120,160,80,.06) 0%, transparent 70%),
+      /* muschio/grana */
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    color:#c8d4b0;
+    font-family:'Cormorant Garamond', Georgia, serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:16px 10px;
+  }
+  .frame {
+    width:min(430px, 100%);
+    border:1px solid #2a3a20;
+    border-radius:16px;
+    background:linear-gradient(180deg, #101a10 0%, #0a120c 100%);
+    box-shadow:
+      inset 0 0 80px rgba(0,0,0,.7),
+      0 12px 40px rgba(0,0,0,.6),
+      0 0 0 3px #0a0f08,
+      0 0 0 4px #1a2a15;
+    padding:24px 18px;
+    position:relative;
+    overflow:hidden;
+  }
+  /* Rampicanti decorativi agli angoli */
+  .frame .vite {
+    position:absolute; width:40px; height:40px; opacity:.3;
+  }
+  .vite-tl { top:4px; left:4px; }
+  .vite-tr { top:4px; right:4px; transform:scaleX(-1); }
+  .vite-bl { bottom:4px; left:4px; transform:scaleY(-1); }
+  .vite-br { bottom:4px; right:4px; transform:scale(-1,-1); }
+
+  .header {
+    text-align:center; margin-bottom:20px;
+    border-bottom:1px solid #1a2a15; padding-bottom:16px;
+  }
+  .title {
+    font-family:'Cinzel Decorative', serif;
+    font-size:22px; letter-spacing:4px; color:#a8c878;
+    text-shadow:0 0 15px rgba(168,200,120,.2), 1px 1px 3px rgba(0,0,0,.9);
+  }
+  .subtitle {
+    font-size:12px; color:#6a8a50; font-style:italic;
+    letter-spacing:2px; margin-top:4px;
+  }
+  .natura-row {
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin-top:10px; font-size:13px; color:#88a868; font-style:italic;
+  }
+
+  .section-title {
+    font-family:'Cinzel Decorative', serif; font-size:12px; letter-spacing:3px;
+    color:#6a8a50; text-align:center; margin-bottom:14px;
+  }
+
+  /* Archetipi come radici/alberi stilizzati */
+  .archetipi {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:14px;
+    margin-bottom:24px;
+  }
+  .archetipo { text-align:center; cursor:pointer; transition:0.3s; }
+  .radice {
+    width:56px; height:56px; margin:0 auto 6px;
+    background:radial-gradient(circle at 50% 80%, #1a2a15 0%, #0f1a0c 100%);
+    border:1px solid #2a3a20;
+    border-radius:50% 50% 40% 40% / 60% 60% 40% 40%;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    box-shadow:
+      inset 0 -8px 15px rgba(0,0,0,.5),
+      inset 0 4px 8px rgba(100,140,70,.05),
+      0 4px 10px rgba(0,0,0,.4);
+  }
+  /* Tratto "radice" sotto */
+  .radice::after {
+    content:''; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%);
+    width:2px; height:10px;
+    background:linear-gradient(180deg, #3a4a28, transparent);
+    border-radius:1px;
+  }
+  .radice::before {
+    content:''; position:absolute; bottom:-4px; left:40%; 
+    width:1px; height:6px; background:#2a3a20; transform:rotate(15deg);
+  }
+  .radice svg { width:28px; height:28px; }
+  .archetipo .nome {
+    font-family:'Cinzel Decorative', serif; font-size:10px;
+    color:#6a8a50; margin-top:10px;
+  }
+  .archetipo:hover .radice, .archetipo.sel .radice {
+    background:radial-gradient(circle at 50% 80%, #2a3a1a 0%, #152a0c 100%);
+    border-color:#a8c878;
+    box-shadow:
+      inset 0 -8px 15px rgba(0,0,0,.5),
+      0 0 15px rgba(168,200,120,.2),
+      0 4px 10px rgba(0,0,0,.4);
+  }
+  .archetipo.sel .nome { color:#c8e098; text-shadow:0 0 8px rgba(168,200,120,.3); }
+
+  /* Cerchio come radura nel bosco */
+  .cerchio-wrap { text-align:center; margin-bottom:20px; }
+  .cerchio {
+    position:relative; width:260px; height:260px; margin:0 auto;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(40,70,30,.15) 0%, rgba(20,40,15,.05) 60%, transparent 75%);
+    border:1px dashed #2a3a20;
+  }
+  /* Muschio sul bordo */
+  .cerchio::before {
+    content:''; position:absolute; inset:-4px; border-radius:50%;
+    border:3px dotted #1a2a12;
+    opacity:.6;
+  }
+  /* Piccoli alberi sul bordo (triangoli stilizzati) */
+  .albero-bordo {
+    position:absolute; width:0; height:0;
+    border-left:8px solid transparent;
+    border-right:8px solid transparent;
+    border-bottom:20px solid #1a2a12;
+    opacity:.7;
+  }
+  .ab1 { top:-6px; left:50%; transform:translateX(-50%); }
+  .ab2 { top:25%; right:-4px; transform:rotate(90deg); }
+  .ab3 { bottom:15%; right:12%; transform:rotate(140deg); width:0; border-left-width:6px; border-right-width:6px; border-bottom-width:15px; }
+  .ab4 { bottom:-6px; left:50%; transform:translateX(-50%) rotate(180deg); }
+  .ab5 { bottom:15%; left:12%; transform:rotate(-140deg); width:0; border-left-width:6px; border-right-width:6px; border-bottom-width:15px; }
+  .ab6 { top:25%; left:-4px; transform:rotate(-90deg); }
+
+  .centro {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:70px; height:70px;
+    /* Albero centrale stilizzato */
+  }
+  .albero-centro {
+    position:relative; width:100%; height:100%;
+  }
+  .albero-centro .tronco {
+    position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+    width:8px; height:24px;
+    background:linear-gradient(180deg, #3a2a1a, #241a10);
+    border-radius:2px;
+  }
+  .albero-centro .chioma {
+    position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
+    width:50px; height:40px;
+    background:radial-gradient(ellipse at 50% 70%, #2a4a1a 0%, #1a3010 60%, transparent 80%);
+    border-radius:50% 50% 40% 40% / 60% 60% 40% 40%;
+    box-shadow:0 0 20px rgba(100,150,60,.15);
+  }
+  .albero-centro svg {
+    position:absolute; bottom:22px; left:50%; transform:translateX(-50%);
+    width:28px; height:28px; z-index:2;
+    filter:drop-shadow(0 0 4px rgba(168,200,120,.4));
+  }
+  .albero-centro .radici {
+    position:absolute; bottom:-4px; left:50%; transform:translateX(-50%);
+    width:40px; height:8px;
+    background:
+      radial-gradient(ellipse at 30% 100%, #2a1a10 0%, transparent 40%),
+      radial-gradient(ellipse at 50% 100%, #2a1a10 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 100%, #2a1a10 0%, transparent 40%);
+  }
+  .centro-label {
+    position:absolute; bottom:-26px; left:50%; transform:translateX(-50%);
+    font-family:'Cinzel Decorative', serif; font-size:10px; color:#a8c878;
+    letter-spacing:2px;
+  }
+
+  .membro {
+    position:absolute; width:44px; height:44px;
+    background:radial-gradient(circle at 50% 80%, #152a0c 0%, #0a1408 100%);
+    border:1px solid #2a3a20;
+    border-radius:50% 50% 40% 40% / 60% 60% 40% 40%;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:0.3s;
+    box-shadow:0 3px 8px rgba(0,0,0,.4), inset 0 -4px 8px rgba(0,0,0,.4);
+  }
+  .membro::after {
+    content:''; position:absolute; bottom:-6px; left:50%; transform:translateX(-50%);
+    width:1px; height:8px; background:#2a3a20;
+  }
+  .membro:hover {
+    border-color:#a8c878; transform:scale(1.1);
+    box-shadow:0 0 12px rgba(168,200,120,.3), 0 3px 8px rgba(0,0,0,.4);
+  }
+  .membro svg { width:22px; height:22px; }
+  .membro .tag {
+    position:absolute; bottom:-18px; left:50%; transform:translateX(-50%);
+    font-size:9px; color:#5a7a40; font-style:italic; white-space:nowrap;
+    letter-spacing:1px;
+  }
+  .m1 { top:10%; left:50%; transform:translateX(-50%); }
+  .m2 { bottom:16%; left:10%; }
+  .m3 { bottom:16%; right:10%; }
+
+  /* Sentieri (linee organiche) */
+  .sentieri { position:absolute; inset:0; pointer-events:none; }
+
+  /* Segnali come pietre-muschio con luci (lucciole) */
+  .segnali {
+    display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
+    margin-bottom:20px;
+  }
+  .segnale { text-align:center; cursor:pointer; transition:0.3s; }
+  .muschio-pietra {
+    width:40px; height:40px; margin:0 auto 4px;
+    background:radial-gradient(circle at 40% 30%, #2a4a1a 0%, #152a0c 70%);
+    border:1px solid #2a3a20;
+    border-radius:40% 60% 50% 50% / 50% 50% 60% 40%;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    box-shadow:inset 0 -4px 8px rgba(0,0,0,.4), 0 3px 6px rgba(0,0,0,.3);
+  }
+  .muschio-pietra::after {
+    content:''; position:absolute; inset:3px;
+    border-radius:40% 60% 50% 50% / 50% 50% 60% 40%;
+    background:radial-gradient(circle at 60% 70%, rgba(100,150,60,.15) 0%, transparent 50%);
+  }
+  .lucciola {
+    width:8px; height:8px; border-radius:50%;
+    background:radial-gradient(circle, #e8ffb0 0%, #a8d060 50%, transparent 80%);
+    box-shadow:0 0 10px rgba(200,240,140,.8), 0 0 20px rgba(168,200,120,.4);
+    animation:glow 2s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100% { opacity:.5; transform:scale(.8); }
+    50% { opacity:1; transform:scale(1.2); }
+  }
+  .segnale.inattivo .lucciola {
+    background:radial-gradient(circle, #4a5a3a 0%, #2a3a20 50%, transparent 80%);
+    box-shadow:none; animation:none;
+  }
+  .segnale .slabel {
+    font-size:9px; color:#5a7a40; font-style:italic; letter-spacing:1px;
+  }
+  .segnale:hover .muschio-pietra {
+    border-color:#a8c878;
+    box-shadow:0 0 10px rgba(168,200,120,.3), inset 0 -4px 8px rgba(0,0,0,.4);
+  }
+
+  .info {
+    border-top:1px solid #1a2a15; padding-top:16px;
+    font-size:14px; color:#6a8a50; line-height:1.7; font-style:italic;
+    text-align:center;
+  }
+  .info b {
+    color:#c8e098; font-weight:600; font-style:normal;
+    font-family:'Cinzel Decorative', serif; letter-spacing:1px;
+  }
+
+  .back { margin-top:20px; text-align:center; }
+  .back a {
+    font-family:'Cinzel Decorative', serif; font-size:10px; letter-spacing:2px;
+    color:#5a7a40; text-decoration:none;
+  }
+  .back a:hover { color:#a8c878; }
+
+  .sigillo-fondo {
+    width:28px; height:28px; margin:16px auto 0;
+    background:radial-gradient(circle at 50% 80%, #1a2a12 0%, #0a1408 100%);
+    border:1px solid #2a3a20;
+    border-radius:50% 50% 40% 40% / 60% 60% 40% 40%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; color:#a8c878;
+    box-shadow:0 2px 6px rgba(0,0,0,.4);
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="leaf-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d4e8a0"/>
+      <stop offset="100%" stop-color="#a8c878"/>
+    </linearGradient>
+    <linearGradient id="leaf-silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c8d4b0"/>
+      <stop offset="100%" stop-color="#88a868"/>
+    </linearGradient>
+
+    <!-- Vite/rampicante decorativo -->
+    <symbol id="vite" viewBox="0 0 40 40">
+      <path d="M4 36 Q10 28 8 20 Q6 12 14 10 Q20 8 22 14 Q24 20 18 22 Q12 24 14 30"
+        fill="none" stroke="#3a4a28" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M14 10 Q18 6 24 8 Q20 12 14 10" fill="#2a4a1a"/>
+      <circle cx="18" cy="22" r="2" fill="#4a6a2a"/>
+    </symbol>
+
+    <!-- Strega: cappello di corteccia + foglia -->
+    <symbol id="i-strega" viewBox="0 0 24 24">
+      <path d="M12 2 L17 13 L7 13 Z" fill="none" stroke="url(#leaf-gold)" stroke-width="1.2"/>
+      <ellipse cx="12" cy="13" rx="9" ry="2.5" fill="none" stroke="url(#leaf-gold)" stroke-width="1.2"/>
+      <path d="M12 6 Q15 8 14 12 M12 6 Q9 8 10 12" fill="none" stroke="#4a6a2a" stroke-width="0.8"/>
+      <path d="M18 4 Q20 6 19 9 Q17 7 18 4" fill="url(#leaf-silver)"/>
+    </symbol>
+    <!-- Stregone: cappuccio di corteccia + pigna -->
+    <symbol id="i-stregone" viewBox="0 0 24 24">
+      <path d="M12 2.5 C6.5 2.5 4.5 8 4.5 14 L4.5 21.5 L19.5 21.5 L19.5 14 C19.5 8 17.5 2.5 12 2.5 Z"
+        fill="none" stroke="url(#leaf-silver)" stroke-width="1.2"/>
+      <path d="M12 8 L14 12 L12 16 L10 12 Z" fill="url(#leaf-gold)" opacity="0.8"/>
+      <line x1="10" y1="12" x2="14" y2="12" stroke="#4a6a2a" stroke-width="0.6"/>
+    </symbol>
+    <!-- Sciamano: tamburo di legno + piume -->
+    <symbol id="i-sciamano" viewBox="0 0 24 24">
+      <circle cx="12" cy="14.5" r="6" fill="none" stroke="url(#leaf-silver)" stroke-width="1.2"/>
+      <circle cx="12" cy="14.5" r="3.5" fill="none" stroke="url(#leaf-gold)" stroke-width="0.6"/>
+      <path d="M8.5 9.5 C6.5 7 5.5 5 5.5 2.5 M8.5 9.5 C7.5 8 7 6.5 7 5"
+        fill="none" stroke="url(#leaf-gold)" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M15.5 9.5 C17.5 7 18.5 5 18.5 2.5 M15.5 9.5 C16.5 8 17 6.5 17 5"
+        fill="none" stroke="url(#leaf-gold)" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M5.5 2.5 Q4 1 3 2 Q4.5 3 5.5 2.5 M18.5 2.5 Q20 1 21 2 Q19.5 3 18.5 2.5" fill="url(#leaf-silver)"/>
+    </symbol>
+    <!-- Guaritore: mano che regge un germoglio -->
+    <symbol id="i-guaritore" viewBox="0 0 24 24">
+      <path d="M4 19 Q8 15 12 17 Q16 19 20 15" fill="none" stroke="url(#leaf-silver)" stroke-width="1"/>
+      <path d="M12 16 L12 10" stroke="url(#leaf-gold)" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M12 12 Q8 10 7 6 Q11 7 12 12 Q13 7 17 6 Q16 10 12 12"
+        fill="url(#leaf-gold)" opacity="0.8"/>
+      <circle cx="12" cy="9" r="1.5" fill="none" stroke="url(#leaf-gold)" stroke-width="0.8"/>
+    </symbol>
+    <!-- Veggente: occhio nel cerchio di luce boschiva -->
+    <symbol id="i-veggente" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" fill="none" stroke="url(#leaf-gold)" stroke-width="0.8"/>
+      <path d="M4 12 Q12 7 20 12 Q12 17 4 12 Z" fill="none" stroke="url(#leaf-silver)" stroke-width="1"/>
+      <circle cx="12" cy="12" r="2.5" fill="url(#leaf-gold)"/>
+      <circle cx="12" cy="12" r="0.8" fill="#0a120c"/>
+      <circle cx="12" cy="12" r="5.5" fill="none" stroke="#4a6a2a" stroke-width="0.4" stroke-dasharray="1 2"/>
+    </symbol>
+    <!-- Viandante: impronta di animale nel muschio -->
+    <symbol id="i-viandante" viewBox="0 0 24 24">
+      <ellipse cx="12" cy="14" rx="4" ry="5" fill="none" stroke="url(#leaf-silver)" stroke-width="1"/>
+      <circle cx="9.5" cy="8" r="1.2" fill="url(#leaf-gold)"/>
+      <circle cx="12" cy="6.5" r="1.2" fill="url(#leaf-gold)"/>
+      <circle cx="14.5" cy="8" r="1.2" fill="url(#leaf-gold)"/>
+      <path d="M4 21 Q8 19 12 20 Q16 21 20 19" fill="none" stroke="#3a4a28" stroke-width="0.8"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="frame">
+  <!-- Viti decorative agli angoli -->
+  <svg class="vite vite-tl"><use href="#vite"/></svg>
+  <svg class="vite vite-tr"><use href="#vite"/></svg>
+  <svg class="vite vite-bl"><use href="#vite"/></svg>
+  <svg class="vite vite-br"><use href="#vite"/></svg>
+
+  <div class="header">
+    <div class="title">Il Crocevia</div>
+    <div class="subtitle">— radura sacra nel bosco antico —</div>
+    <div class="natura-row">
+      <svg width="16" height="16" viewBox="0 0 24 24">
+        <path d="M12 22 L12 8 M12 12 L7 7 M12 12 L17 7 M12 16 L8 12 M12 16 L16 12"
+          fill="none" stroke="#6a8a50" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <span>Autunno · Samhain tra quattro giorni</span>
+    </div>
+  </div>
+
+  <div class="section-title">Scegli la tua radice</div>
+  <div class="archetipi">
+    <div class="archetipo sel" onclick="sel(this)">
+      <div class="radice"><svg><use href="#i-strega"/></svg></div>
+      <div class="nome">Strega</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="radice"><svg><use href="#i-stregone"/></svg></div>
+      <div class="nome">Stregone</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="radice"><svg><use href="#i-sciamano"/></svg></div>
+      <div class="nome">Sciamano</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="radice"><svg><use href="#i-guaritore"/></svg></div>
+      <div class="nome">Guaritore</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="radice"><svg><use href="#i-veggente"/></svg></div>
+      <div class="nome">Veggente</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="radice"><svg><use href="#i-viandante"/></svg></div>
+      <div class="nome">Viandante</div>
+    </div>
+  </div>
+
+  <div class="section-title">La tua radura · Milano</div>
+  <div class="cerchio-wrap">
+    <div class="cerchio">
+      <!-- Alberi sul bordo -->
+      <div class="albero-bordo ab1"></div>
+      <div class="albero-bordo ab2"></div>
+      <div class="albero-bordo ab3"></div>
+      <div class="albero-bordo ab4"></div>
+      <div class="albero-bordo ab5"></div>
+      <div class="albero-bordo ab6"></div>
+
+      <!-- Sentieri organici verso il centro -->
+      <svg class="sentieri" viewBox="0 0 260 260">
+        <path d="M130 30 Q120 80 130 130" fill="none" stroke="#2a3a20" stroke-width="1" stroke-dasharray="1 4"/>
+        <path d="M40 200 Q80 170 130 130" fill="none" stroke="#2a3a20" stroke-width="1" stroke-dasharray="1 4"/>
+        <path d="M220 200 Q180 170 130 130" fill="none" stroke="#2a3a20" stroke-width="1" stroke-dasharray="1 4"/>
+      </svg>
+
+      <!-- Albero centrale (tu) -->
+      <div class="centro">
+        <div class="albero-centro">
+          <div class="radici"></div>
+          <div class="tronco"></div>
+          <div class="chioma"></div>
+          <svg><use href="#i-strega"/></svg>
+          <span class="centro-label">Tu</span>
+        </div>
+      </div>
+
+      <div class="membro m1">
+        <svg><use href="#i-veggente"/></svg>
+        <span class="tag">Luna Rossa</span>
+      </div>
+      <div class="membro m2">
+        <svg><use href="#i-sciamano"/></svg>
+        <span class="tag">Corvo Nero</span>
+      </div>
+      <div class="membro m3">
+        <svg><use href="#i-guaritore"/></svg>
+        <span class="tag">Salice</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Lascia una traccia</div>
+  <div class="segnali">
+    <div class="segnale" title="Rituale in corso">
+      <div class="muschio-pietra"><div class="lucciola"></div></div>
+      <div class="slabel">rituale</div>
+    </div>
+    <div class="segnale inattivo" title="Pericolo">
+      <div class="muschio-pietra"><div class="lucciola"></div></div>
+      <div class="slabel">pericolo</div>
+    </div>
+    <div class="segnale inattivo" title="Tutto bene">
+      <div class="muschio-pietra"><div class="lucciola"></div></div>
+      <div class="slabel">tutto bene</div>
+    </div>
+    <div class="segnale inattivo" title="Cerco aiuto">
+      <div class="muschio-pietra"><div class="lucciola"></div></div>
+      <div class="slabel">cerco aiuto</div>
+    </div>
+  </div>
+
+  <div class="info">
+    Sei una <b>Strega</b> della radura di Milano.<br/>
+    <b>Tre</b> anime nel tuo bosco. <b>Luna Rossa</b> ha acceso una lucciola.
+  </div>
+
+  <div class="sigillo-fondo">❧</div>
+</div>
+
+<div class="back">
+  <a href="index.html">← Torna agli esempi</a> · V2-C: Bosco Sacro
+</div>
+
+<script>
+  function sel(el) {
+    document.querySelectorAll('.archetipo').forEach(a => a.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+  document.querySelectorAll('.segnale').forEach(s => {
+    s.addEventListener('click', () => s.classList.toggle('inattivo'));
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Il Crocevia — V8: Bussola delle Anime</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh; background:#0d0b08;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(60,45,25,.2), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    color:#c8b898; font-family:'Cormorant Garamond', Georgia, serif;
+    display:flex; flex-direction:column; align-items:center; padding:36px 16px;
+  }
+  h1 { font-family:'Cinzel',serif; font-size:22px; letter-spacing:4px; color:#c9a84c; margin-bottom:6px; font-weight:400; }
+  .sub { font-size:14px; color:#8a7050; font-style:italic; margin-bottom:32px; text-align:center; max-width:420px; }
+  .card {
+    display:block; width:min(430px,100%); padding:24px; text-decoration:none; color:inherit;
+    border:1px solid #4a3060; border-radius:4px; text-align:center;
+    background:linear-gradient(180deg,#2a1a35,#1a1020);
+    transition:.3s;
+  }
+  .card:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(138,90,168,.2); border-color:#8a6aa0; }
+  .card .icona { font-size:40px; margin-bottom:12px; }
+  .card h3 { font-family:'Cinzel',serif; font-size:16px; color:#d4b8f0; margin-bottom:8px; font-weight:400; }
+  .card p { font-size:13px; color:#8a6aa0; font-style:italic; line-height:1.5; }
+  .card .funzioni { margin-top:12px; font-size:11px; color:#6a4a80; letter-spacing:1px; text-transform:uppercase; }
+</style>
+</head>
+<body>
+  <h1>✦ Il Crocevia ✦</h1>
+  <p class="sub">V8 — La bussola delle anime. Tre lancette, tre röle: chi è più vicino, chi è dopo, e il sacro.</p>
+  <a class="card" href="skin-strega-bussola.html">
+    <div class="icona">🧭</div>
+    <h3>Skin Strega — Bussola delle Anime</h3>
+    <p>Pergamena viola con bussola antigua. Lancetta grande = utente più vicino. Lancetta media = secondo utente. Lancetta piccola dorata = POI sacro più vicino. Clicca la legenda per evidenziare.</p>
+    <div class="funzioni">✦ 3 lancette · ✦ 2 anime · ✦ 1 luogo sacro</div>
+  </a>
+  <p style="margin-top:24px;font-size:11px;color:#5a4a30;font-style:italic;">Un solo file, nessun server. Apri e clicca sulla legenda.</p>
+</body>
+</html>

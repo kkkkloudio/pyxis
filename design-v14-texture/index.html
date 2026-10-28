@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bussola delle Anime — Pergamena Texture Reale</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    background:#2a1a0e;
+    display:flex; justify-content:center; align-items:center;
+    padding:20px;
+    font-family:'Cormorant Garamond', Georgia, serif;
+  }
+
+  /* ===== TELEFONO ===== */
+  .phone {
+    position:relative;
+    width:390px; height:844px;
+    border-radius:44px;
+    background:#0a0a0a;
+    box-shadow:
+      0 0 0 4px #1a1a1a,
+      0 0 0 8px #000,
+      0 40px 100px rgba(0,0,0,.8),
+      inset 0 0 80px rgba(0,0,0,.5);
+    overflow:hidden;
+  }
+  .phone::before {
+    content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:150px; height:28px; background:#000; border-radius:0 0 18px 18px; z-index:200;
+  }
+
+  /* ===== SCHERMO: PERGAMENA TEXTURE REALE ===== */
+  .screen {
+    position:absolute; inset:10px;
+    border-radius:36px; overflow:hidden;
+  }
+  /* Texture pergamena reale (la tua foto, schiarita) */
+  .parchment {
+    position:absolute; inset:0;
+    background:url('assets/parchment-mobile.jpg') center/cover;
+  }
+  /* Strato bianco semi-trasparente per leggibilità testo */
+  .parchment::after {
+    content:''; position:absolute; inset:0;
+    background:rgba(252, 248, 238, 0.55);
+  }
+  /* Ombra bordo (profondità) */
+  .vignette {
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at center, transparent 50%, rgba(60,40,20,.25) 100%);
+  }
+  /* Cera rossa in alto */
+  .wax {
+    position:absolute; top:-2px; left:-10px; right:-10px; height:70px;
+    background:url('assets/wax.png') top/100% auto no-repeat;
+    z-index:20;
+    filter:drop-shadow(0 3px 5px rgba(0,0,0,.3));
+  }
+
+  /* ===== CONTENUTO ===== */
+  .content {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center;
+    padding:60px 20px 20px;
+    z-index:10;
+  }
+
+  /* Testo leggibile su texture: ombra chiara sotto */
+  .readable {
+    text-shadow:0 1px 2px rgba(255,255,255,.8), 0 0 4px rgba(255,255,255,.4);
+  }
+
+  /* HEADER */
+  .header {
+    display:flex; align-items:center; justify-content:space-between;
+    width:100%; margin-bottom:8px;
+  }
+  .icona {
+    width:56px; height:56px;
+    background:rgba(255,252,245,.85);
+    border:3px solid #2a1a0a;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 6px rgba(0,0,0,.2);
+  }
+  .icona img { width:38px; height:38px; }
+
+  .titolo-wrap { text-align:center; flex:1; }
+  .titolo {
+    font-family:'Cinzel', serif;
+    font-size:19px; font-weight:700; color:#1a0f08; letter-spacing:.5px;
+    text-shadow:0 1px 3px rgba(255,255,255,.9);
+  }
+  .sottotitolo {
+    font-family:'IM Fell English', serif;
+    font-size:13px; color:#3a2a18; font-style:italic; margin-top:1px;
+    text-shadow:0 1px 2px rgba(255,255,255,.8);
+  }
+
+  /* ===== BUSSOLA (sulla texture) ===== */
+  .compass-wrap {
+    position:relative;
+    width:280px; height:280px;
+    margin:6px 0;
+    filter:drop-shadow(2px 4px 6px rgba(40,25,10,.3));
+  }
+  .compass-shadow {
+    position:absolute; inset:-10px;
+    background:url('assets/shadow.png') center/contain no-repeat;
+    opacity:.4;
+  }
+  .compass-bg {
+    position:absolute; inset:0;
+    background:url('assets/compass.png') center/contain no-repeat;
+  }
+  .hand {
+    position:absolute; bottom:50%; left:50%;
+    transform-origin:bottom center;
+    transition:transform 1s ease, opacity .3s;
+  }
+  .hand img { display:block; filter:drop-shadow(1px 2px 2px rgba(0,0,0,.3)); }
+  .hand.large { width:40px; margin-left:-20px; transform:rotate(-50deg); z-index:3; }
+  .hand.large img { width:40px; }
+  .hand.medium { width:32px; margin-left:-16px; transform:rotate(35deg); z-index:2; }
+  .hand.medium img { width:32px; }
+  .hand.small { width:24px; margin-left:-12px; transform:rotate(155deg); z-index:4; }
+  .hand.small img { width:24px; }
+
+  .center-dot {
+    position:absolute; top:50%; left:50%;
+    width:22px; height:22px; margin:-11px 0 0 -11px;
+    background:#1a0f08; border-radius:50%;
+    border:3px solid #b8963e;
+    box-shadow:0 2px 4px rgba(0,0,0,.4);
+    z-index:10;
+  }
+
+  /* ===== LEGENDA (su card bianca semi-trasparente, sopra texture) ===== */
+  .legend {
+    width:100%;
+    background:rgba(255,252,245,.92);
+    border:2px solid #2a1a0a;
+    border-radius:10px;
+    padding:12px 16px;
+    margin-bottom:12px;
+    box-shadow:0 4px 12px rgba(40,25,10,.2);
+  }
+  .legend-title {
+    font-family:'Cinzel', serif;
+    font-size:11px; font-weight:700; letter-spacing:2px;
+    color:#1a0f08; text-align:center; margin-bottom:8px;
+    text-transform:uppercase;
+  }
+  .legend-item {
+    display:flex; align-items:center; gap:12px;
+    padding:8px 6px;
+    border-bottom:1px solid #c4b088;
+    cursor:pointer; transition:.15s;
+    border-radius:4px;
+  }
+  .legend-item:last-child { border-bottom:none; }
+  .legend-item:hover, .legend-item.sel {
+    background:#f0e6cc;
+  }
+  .legend-item .bar {
+    width:32px; flex-shrink:0; border-radius:3px;
+    border:2px solid #1a0f08;
+  }
+  .bar.large { height:10px; background:#8270b4; }
+  .bar.medium { height:8px; background:#5a4189; }
+  .bar.small { height:6px; background:#b8963e; }
+
+  .legend-item .text { flex:1; }
+  .legend-item .name {
+    font-family:'Cormorant Garamond', serif;
+    font-size:17px; font-weight:700; color:#1a0f08;
+  }
+  .legend-item .desc {
+    font-family:'IM Fell English', serif;
+    font-size:12px; color:#4a3520; font-style:italic;
+  }
+  .legend-item .tag {
+    font-family:'Cinzel', serif;
+    font-size:10px; font-weight:600; letter-spacing:.5px;
+    color:#5a4530; text-transform:uppercase;
+    background:#e8dcc0; padding:2px 8px; border-radius:10px;
+    border:1px solid #c4b088;
+  }
+
+  /* ===== AZIONI ===== */
+  .actions {
+    display:flex; justify-content:center; gap:24px;
+    margin-top:auto; padding-top:12px;
+  }
+  .action {
+    width:60px; height:60px; border-radius:50%;
+    background:rgba(255,252,245,.95);
+    border:4px solid #2a1a0a;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:.15s;
+    box-shadow:0 3px 8px rgba(40,25,10,.3);
+    position:relative;
+  }
+  .action:hover { transform:translateY(-3px); }
+  .action:active { transform:scale(.92); }
+  .action img { width:38px; height:38px; }
+  .action .badge {
+    position:absolute; top:-6px; right:-6px;
+    width:22px; height:22px; border-radius:50%;
+    background:#c43; border:3px solid #fff;
+    font-size:12px; color:#fff; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cinzel', serif;
+  }
+
+  /* ===== SEGNALIBRO ===== */
+  .bookmark {
+    position:absolute; right:-8px; top:140px;
+    width:32px; height:100px;
+    background:url('assets/bookmark.png') center/contain no-repeat;
+    cursor:pointer; z-index:30;
+    filter:drop-shadow(-2px 2px 4px rgba(0,0,0,.4));
+    transition:right .2s;
+  }
+  .bookmark:hover { right:-4px; }
+
+  /* ===== MENU ===== */
+  .menu {
+    position:absolute; top:0; right:-240px; bottom:0;
+    width:240px;
+    background:rgba(253,250,243,.98);
+    background-image:url('assets/parchment-texture.jpg');
+    background-size:cover;
+    border-left:4px solid #2a1a0a;
+    transition:right .3s; z-index:100;
+    padding:70px 24px 24px;
+    box-shadow:-8px 0 24px rgba(0,0,0,.3);
+  }
+  .menu::before {
+    content:''; position:absolute; inset:0;
+    background:rgba(252, 248, 238, 0.7);
+  }
+  .menu > * { position:relative; z-index:1; }
+  .menu.open { right:0; }
+  .menu h4 {
+    font-family:'Cinzel', serif; font-size:17px; font-weight:700;
+    color:#1a0f08; margin-bottom:18px; text-align:center;
+    text-shadow:0 1px 2px rgba(255,255,255,.8);
+  }
+  .menu a {
+    display:block; padding:12px 8px;
+    color:#1a0f08; text-decoration:none;
+    font-family:'Cormorant Garamond', serif;
+    font-size:16px; font-weight:600;
+    border-bottom:1px solid #c4b088;
+    text-shadow:0 1px 1px rgba(255,255,255,.6);
+  }
+  .menu a:hover { background:rgba(240,230,204,.6); }
+
+  /* ===== NOTA ===== */
+  .note {
+    margin-top:10px;
+    font-family:'IM Fell English', serif;
+    font-size:11px; color:#3a2a18;
+    font-style:italic; text-align:center;
+    text-shadow:0 1px 2px rgba(255,255,255,.8);
+  }
+
+  .v14-label {
+    position:absolute; bottom:12px; left:20px;
+    font-family:'IM Fell English', serif;
+    font-size:10px; color:#4a3520; z-index:10;
+    text-shadow:0 1px 1px rgba(255,255,255,.6);
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen">
+    <!-- TEXTURE PERGAMENA REALE -->
+    <div class="parchment"></div>
+    <div class="vignette"></div>
+    <div class="wax"></div>
+
+    <div class="content">
+      <!-- HEADER -->
+      <div class="header">
+        <div class="icona"><img src="assets/icon-moon.png" alt="Luna"></div>
+        <div class="titolo-wrap">
+          <div class="titolo">Bussola delle Anime</div>
+          <div class="sottotitolo">Milano · tema Strega</div>
+        </div>
+        <div class="icona"><img src="assets/icon-candle.png" alt="Candela"></div>
+      </div>
+
+      <!-- BUSSOLA su texture -->
+      <div class="compass-wrap">
+        <div class="compass-shadow"></div>
+        <div class="compass-bg"></div>
+        <div class="hand small" data-type="small"><img src="assets/hand-small.png" alt=""></div>
+        <div class="hand medium" data-type="medium"><img src="assets/hand-medium.png" alt=""></div>
+        <div class="hand large" data-type="large"><img src="assets/hand-large.png" alt=""></div>
+        <div class="center-dot"></div>
+      </div>
+
+      <!-- LEGENDA (su card bianca sopra texture) -->
+      <div class="legend">
+        <div class="legend-title">Le tre lancette</div>
+        <div class="legend-item sel" data-type="large">
+          <div class="bar large"></div>
+          <div class="text">
+            <div class="name">Luna Rossa</div>
+            <div class="desc">Veggente · candela accesa</div>
+          </div>
+          <div class="tag">più vicina</div>
+        </div>
+        <div class="legend-item" data-type="medium">
+          <div class="bar medium"></div>
+          <div class="text">
+            <div class="name">Corvo Nero</div>
+            <div class="desc">Sciamano · silenzioso</div>
+          </div>
+          <div class="tag">seconda</div>
+        </div>
+        <div class="legend-item" data-type="small">
+          <div class="bar small"></div>
+          <div class="text">
+            <div class="name">Quercia dei Sussurri</div>
+            <div class="desc">Luogo sacro · congrega</div>
+          </div>
+          <div class="tag">il sacro</div>
+        </div>
+      </div>
+
+      <!-- AZIONI -->
+      <div class="actions">
+        <div class="action" title="Accendi candela"><img src="assets/icon-candle.png" alt=""></div>
+        <div class="action" title="Scrivi lettera"><img src="assets/icon-letter.png" alt=""><span class="badge">1</span></div>
+        <div class="action" title="Suona campana"><img src="assets/icon-bell.png" alt=""></div>
+      </div>
+
+      <div class="note">niente GPS · niente distanze · solo la bussola sa</div>
+    </div>
+
+    <!-- SEGNALIBRO -->
+    <div class="bookmark" id="bookmark"></div>
+
+    <!-- MENU (con texture pergamena) -->
+    <div class="menu" id="menu">
+      <h4>✦ Indice ✦</h4>
+      <a href="#">☾ La mia via</a>
+      <a href="#">◉ Il cerchio</a>
+      <a href="#">❦ Le congreghe</a>
+      <a href="#">☀ Calendario sacro</a>
+      <a href="#">⚙ Impostazioni</a>
+    </div>
+
+    <div class="v14-label">V14 · texture pergamena reale</div>
+  </div>
+</div>
+
+<script>
+  // Legenda cliccabile
+  document.querySelectorAll('.legend-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.legend-item').forEach(function(i) { i.classList.remove('sel'); });
+      this.classList.add('sel');
+      var type = this.dataset.type;
+      document.querySelectorAll('.hand').forEach(function(h) { h.style.opacity = '0.15'; });
+      var sel = document.querySelector('.hand.' + type);
+      if (sel) sel.style.opacity = '1';
+    });
+  });
+
+  // Segnalibro: menu
+  var menuOpen = false;
+  document.getElementById('bookmark').addEventListener('click', function() {
+    menuOpen = !menuOpen;
+    document.getElementById('menu').classList.toggle('open', menuOpen);
+  });
+
+  // Azioni: feedback
+  document.querySelectorAll('.action').forEach(function(a) {
+    a.addEventListener('click', function() {
+      this.style.transform = 'scale(0.9)';
+      var el = this;
+      setTimeout(function() { el.style.transform = ''; }, 150);
+    });
+  });
+</script>
+</body>
+</html>

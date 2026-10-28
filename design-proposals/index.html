@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Il Crocevia — 3 Esempi Grafici</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    background:#0a0a12;
+    color:#c8c4d8;
+    font-family:Georgia, serif;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:40px 20px;
+  }
+  h1 {
+    font-size:22px; letter-spacing:4px; text-transform:uppercase;
+    color:#a89ad4; margin-bottom:8px; font-weight:normal;
+  }
+  .sub { font-size:13px; color:#6a6688; font-style:italic; margin-bottom:40px; text-align:center; max-width:400px; }
+  .cards { display:flex; flex-direction:column; gap:16px; width:min(430px,100%); }
+  .card {
+    display:flex; align-items:center; gap:16px; padding:20px;
+    border:1px solid #2a2a40; border-radius:16px; text-decoration:none;
+    color:inherit; transition:0.3s; background:#12121e;
+  }
+  .card:hover { border-color:#a89ad4; transform:translateY(-2px); box-shadow:0 8px 30px rgba(110,80,190,.15); }
+  .card .swatch { width:48px; height:48px; border-radius:12px; flex-shrink:0; }
+  .card .info h3 { font-size:15px; font-weight:normal; margin-bottom:4px; }
+  .card .info p { font-size:12px; color:#6a6688; line-height:1.4; }
+  .card .arrow { margin-left:auto; color:#4a4a68; font-size:20px; }
+
+  .swatch-a { background:linear-gradient(135deg, #0a0a0c, #1a1410); border:1px solid #c86a2e; }
+  .swatch-b { background:linear-gradient(135deg, #241c14, #3a2e20); border:1px solid #8a6a3a; }
+  .swatch-c { background:linear-gradient(135deg, #1a1440, #3a2a6a); border:1px solid #a89ad4; box-shadow:0 0 20px rgba(168,154,212,.2); }
+</style>
+</head>
+<body>
+  <h1>✦ Il Crocevia</h1>
+  <p class="sub">Scegli uno stile grafico. Clicca per vedere l'esempio completo.</p>
+
+  <div class="cards">
+    <a class="card" href="esempio-a-luna-nera.html">
+      <div class="swatch swatch-a"></div>
+      <div class="info">
+        <h3>Esempio A — Luna Nera</h3>
+        <p>Dark, minimal, elegante. Monocromatico + arancio bruciato. Seria, misteriosa, adulta.</p>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+
+    <a class="card" href="esempio-b-bosco-antico.html">
+      <div class="swatch swatch-b"></div>
+      <div class="info">
+        <h3>Esempio B — Bosco Antico</h3>
+        <p>Naturale, caldo, radicato nella terra. Verdi scuri, marroni, ancestrale, accogliente.</p>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+
+    <a class="card" href="esempio-c-cielo-stellato.html">
+      <div class="swatch swatch-c"></div>
+      <div class="info">
+        <h3>Esempio C — Cielo Stellato</h3>
+        <p>Etereo, luminoso, magico. Blu notte, stelle, aloni viola/argento. Celestiale.</p>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+
+  <p style="margin-top:32px; font-size:11px; color:#4a4a68; font-style:italic;">
+    Ogni esempio mostra: archetipi · cerchio (tu + 3) · segnali rapidi
+  </p>
+</body>
+</html>

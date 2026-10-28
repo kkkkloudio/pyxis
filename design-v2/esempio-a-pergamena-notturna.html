@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Il Crocevia — V2-A: Pergamena Notturna</title>
+<style>
+  /* ============================================
+     V2-A — "PERGAMENA NOTTURNA"
+     Carta antica, inchiostro, cera, sigilli. Pagine di grimorio.
+     ============================================ */
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    background:#1c1610;
+    background-image:
+      /* macchie di carta vecchia */
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(90,70,40,.15), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 90%, rgba(70,55,35,.12), transparent),
+      radial-gradient(ellipse 50% 30% at 50% 50%, rgba(100,80,50,.08), transparent),
+      /* grana carta */
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    color:#d4c4a0;
+    font-family:'Cormorant Garamond', Georgia, serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:16px 10px;
+  }
+  .frame {
+    width:min(430px, 100%);
+    border:3px double #6b5230;
+    border-radius:2px;
+    background:linear-gradient(180deg, #2a2015 0%, #1c1610 100%);
+    background-image:
+      radial-gradient(ellipse 100% 60% at 50% 0%, rgba(107,82,48,.15), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    box-shadow:
+      inset 0 0 80px rgba(0,0,0,.6),
+      0 10px 40px rgba(0,0,0,.5),
+      0 0 0 1px #3a2c18,
+      0 0 0 8px #1c1610,
+      0 0 0 9px #4a3a20;
+    padding:24px 18px;
+    position:relative;
+  }
+  /* Angoli ornamentali */
+  .frame::before, .frame::after {
+    content:'❦'; position:absolute; font-size:20px; color:#6b5230;
+  }
+  .frame::before { top:6px; left:10px; }
+  .frame::after { top:6px; right:10px; transform:scaleX(-1); }
+
+  .header {
+    text-align:center; margin-bottom:20px;
+    border-bottom:1px solid #4a3a20; padding-bottom:16px;
+  }
+  .title {
+    font-family:'Cinzel', serif;
+    font-size:22px; letter-spacing:6px; color:#c9a84c;
+    text-shadow:1px 1px 2px rgba(0,0,0,.8);
+  }
+  .subtitle {
+    font-size:12px; color:#8a7050; font-style:italic;
+    letter-spacing:2px; margin-top:4px;
+  }
+  .luna-row {
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin-top:10px; font-size:13px; color:#a08850; font-style:italic;
+  }
+  .luna { width:18px; height:18px; }
+
+  /* Archetipi come sigilli di cera */
+  .section-title {
+    font-family:'Cinzel', serif; font-size:12px; letter-spacing:3px;
+    color:#8a7050; text-align:center; margin-bottom:12px;
+    text-transform:uppercase;
+  }
+  .archetipi {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+    margin-bottom:24px;
+  }
+  .archetipo {
+    text-align:center; cursor:pointer; transition:0.3s;
+    padding:10px 4px;
+  }
+  .sigillo {
+    width:56px; height:56px; margin:0 auto 6px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #4a2018, #2a0f08);
+    border:2px solid #6b5230;
+    box-shadow:
+      inset 0 2px 8px rgba(0,0,0,.6),
+      inset 0 -2px 4px rgba(201,168,76,.1),
+      0 3px 8px rgba(0,0,0,.4);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .sigillo::after {
+    content:''; position:absolute; inset:4px; border-radius:50%;
+    border:1px dashed rgba(201,168,76,.3);
+  }
+  .sigillo svg { width:28px; height:28px; }
+  .archetipo .nome {
+    font-family:'Cinzel', serif; font-size:10px; letter-spacing:1px;
+    color:#8a7050; text-transform:uppercase;
+  }
+  .archetipo:hover .sigillo, .archetipo.sel .sigillo {
+    background:radial-gradient(circle at 35% 30%, #6b2a1a, #3a1508);
+    border-color:#c9a84c;
+    box-shadow:
+      inset 0 2px 8px rgba(0,0,0,.6),
+      0 0 15px rgba(201,168,76,.3),
+      0 3px 8px rgba(0,0,0,.4);
+  }
+  .archetipo.sel .nome { color:#c9a84c; }
+
+  /* Cerchio come mandala antico */
+  .cerchio-wrap {
+    text-align:center; margin-bottom:20px;
+  }
+  .cerchio {
+    position:relative; width:260px; height:260px; margin:0 auto;
+    border-radius:50%;
+    border:1px solid #4a3a20;
+    background:radial-gradient(circle, rgba(74,58,32,.2) 0%, transparent 70%);
+  }
+  .cerchio::before {
+    content:''; position:absolute; inset:12px; border-radius:50%;
+    border:1px dashed #3a2c18;
+  }
+  .cerchio::after {
+    content:''; position:absolute; inset:30px; border-radius:50%;
+    border:1px solid #2a2015;
+  }
+  /* Rune/cerchio decorativo esterno */
+  .mandala-ring {
+    position:absolute; inset:-10px; border-radius:50%;
+    border:2px dotted #3a2c18;
+  }
+
+  .centro {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:64px; height:64px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #3a2c18, #1c1610);
+    border:2px solid #c9a84c;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 20px rgba(201,168,76,.2), inset 0 2px 8px rgba(0,0,0,.5);
+  }
+  .centro svg { width:32px; height:32px; }
+  .centro-label {
+    position:absolute; bottom:-22px; left:50%; transform:translateX(-50%);
+    font-family:'Cinzel', serif; font-size:10px; color:#c9a84c;
+    letter-spacing:2px; text-transform:uppercase;
+  }
+
+  .membro {
+    position:absolute; width:44px; height:44px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #2a1f12, #1a130c);
+    border:1px solid #4a3a20;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:0.3s;
+  }
+  .membro:hover {
+    border-color:#c9a84c; transform:scale(1.15);
+    box-shadow:0 0 12px rgba(201,168,76,.3);
+  }
+  .membro svg { width:22px; height:22px; }
+  .membro .tag {
+    position:absolute; bottom:-16px; left:50%; transform:translateX(-50%);
+    font-size:9px; color:#6b5230; font-style:italic; white-space:nowrap;
+    letter-spacing:1px;
+  }
+  .m1 { top:6%; left:50%; transform:translateX(-50%); }
+  .m2 { bottom:14%; left:8%; }
+  .m3 { bottom:14%; right:8%; }
+
+  /* Linee di connessione stile pergamena */
+  .linee { position:absolute; inset:0; pointer-events:none; }
+
+  /* Segnali come candele di cera */
+  .segnali {
+    display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+    margin-bottom:20px;
+  }
+  .segnale {
+    text-align:center; cursor:pointer; transition:0.3s;
+  }
+  .candela {
+    width:36px; height:48px; margin:0 auto 4px; position:relative;
+    background:linear-gradient(180deg, #e8dcc0 0%, #c9b88a 100%);
+    border-radius:3px 3px 2px 2px;
+    box-shadow:inset -3px 0 6px rgba(0,0,0,.2), 0 2px 4px rgba(0,0,0,.3);
+  }
+  .candela::before {
+    content:''; position:absolute; top:-2px; left:50%; transform:translateX(-50%);
+    width:2px; height:6px; background:#3a2c18;
+  }
+  .fiamma {
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:12px; height:16px;
+    background:radial-gradient(ellipse at 50% 80%, #ffd060 0%, #e8963c 40%, #c85a1e 80%, transparent 100%);
+    border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow:0 0 12px rgba(255,180,60,.5), 0 0 24px rgba(255,150,60,.2);
+    animation:flicker 1.5s ease-in-out infinite;
+  }
+  @keyframes flicker {
+    0%, 100% { transform:translateX(-50%) scale(1) rotate(-2deg); opacity:.9; }
+    25% { transform:translateX(-50%) scale(1.05) rotate(2deg); opacity:1; }
+    50% { transform:translateX(-50%) scale(.95) rotate(-1deg); opacity:.85; }
+    75% { transform:translateX(-50%) scale(1.02) rotate(1deg); opacity:.95; }
+  }
+  .segnale .slabel {
+    font-size:9px; color:#6b5230; font-style:italic; letter-spacing:1px;
+  }
+  .segnale.inattivo .fiamma { display:none; }
+  .segnale.inattivo .candela { background:linear-gradient(180deg, #8a7a5a 0%, #5a4a35 100%); }
+  .segnale:hover .candela { box-shadow:0 0 10px rgba(201,168,76,.3), inset -3px 0 6px rgba(0,0,0,.2); }
+
+  /* Info stile passo di grimorio */
+  .info {
+    border-top:1px solid #4a3a20; padding-top:16px;
+    font-size:14px; color:#8a7050; line-height:1.7; font-style:italic;
+    text-align:center;
+  }
+  .info b {
+    color:#c9a84c; font-weight:600; font-style:normal;
+    font-family:'Cinzel', serif; letter-spacing:1px;
+  }
+
+  .back {
+    margin-top:20px; text-align:center;
+  }
+  .back a {
+    font-family:'Cinzel', serif; font-size:10px; letter-spacing:2px;
+    color:#6b5230; text-decoration:none; text-transform:uppercase;
+  }
+  .back a:hover { color:#c9a84c; }
+
+  /* Sigillo decorativo in fondo */
+  .sigillo-fondo {
+    width:32px; height:32px; margin:16px auto 0; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #4a2018, #2a0f08);
+    border:1px solid #6b5230;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; color:#c9a84c;
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- Colori inchiostro antico -->
+    <linearGradient id="ink-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8d060"/>
+      <stop offset="100%" stop-color="#c9a84c"/>
+    </linearGradient>
+    <linearGradient id="ink-silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d4c4a0"/>
+      <stop offset="100%" stop-color="#a08850"/>
+    </linearGradient>
+
+    <!-- Strega: cappello + luna crescente + stella -->
+    <symbol id="i-strega" viewBox="0 0 24 24">
+      <path d="M12 2 L17 13 L7 13 Z" fill="none" stroke="url(#ink-gold)" stroke-width="1.2"/>
+      <ellipse cx="12" cy="13" rx="9" ry="2.5" fill="none" stroke="url(#ink-gold)" stroke-width="1.2"/>
+      <path d="M18 4 a3 3 0 1 0 3 4 a2.5 2.5 0 1 1 -3 -4" fill="url(#ink-silver)"/>
+      <circle cx="5" cy="5" r="0.6" fill="url(#ink-silver)"/>
+    </symbol>
+    <!-- Stregone: cappuccio + falce di luna interna -->
+    <symbol id="i-stregone" viewBox="0 0 24 24">
+      <path d="M12 2.5 C6.5 2.5 4.5 8 4.5 14 L4.5 21.5 L19.5 21.5 L19.5 14 C19.5 8 17.5 2.5 12 2.5 Z"
+        fill="none" stroke="url(#ink-silver)" stroke-width="1.2"/>
+      <path d="M15.5 8 a3.5 3.5 0 1 0 3.5 4.5 a3 3 0 1 1 -3.5 -4.5" fill="#1c1610" stroke="url(#ink-gold)" stroke-width="0.8"/>
+      <circle cx="12" cy="14" r="1.2" fill="url(#ink-gold)"/>
+    </symbol>
+    <!-- Sciamano: tamburo + corna di cervo -->
+    <symbol id="i-sciamano" viewBox="0 0 24 24">
+      <circle cx="12" cy="14.5" r="6" fill="none" stroke="url(#ink-silver)" stroke-width="1.2"/>
+      <circle cx="12" cy="14.5" r="3.5" fill="none" stroke="url(#ink-gold)" stroke-width="0.6"/>
+      <path d="M8.5 9.5 C6.5 7 5.5 5 5.5 2.5 M8.5 9.5 C7.5 8 7 6.5 7 5"
+        fill="none" stroke="url(#ink-gold)" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M15.5 9.5 C17.5 7 18.5 5 18.5 2.5 M15.5 9.5 C16.5 8 17 6.5 17 5"
+        fill="none" stroke="url(#ink-gold)" stroke-width="1.2" stroke-linecap="round"/>
+    </symbol>
+    <!-- Guaritore: mano che offre + erba -->
+    <symbol id="i-guaritore" viewBox="0 0 24 24">
+      <path d="M4 18 Q8 14 12 16 Q16 18 20 14" fill="none" stroke="url(#ink-silver)" stroke-width="1"/>
+      <path d="M12 15 C12 10 14 6 18 3 C18 9 16 13 12 15 Z" fill="url(#ink-gold)" opacity="0.8"/>
+      <path d="M12 15 C12 11 10.5 8 7 6" fill="none" stroke="url(#ink-gold)" stroke-width="0.8"/>
+      <circle cx="12" cy="15" r="1.5" fill="none" stroke="url(#ink-gold)" stroke-width="0.8"/>
+    </symbol>
+    <!-- Veggente: occhio nel triangolo (occhio di zahara) -->
+    <symbol id="i-veggente" viewBox="0 0 24 24">
+      <path d="M12 2 L22 20 L2 20 Z" fill="none" stroke="url(#ink-gold)" stroke-width="1"/>
+      <path d="M6 16 Q12 11 18 16 Q12 21 6 16 Z" fill="none" stroke="url(#ink-silver)" stroke-width="1"/>
+      <circle cx="12" cy="16" r="2" fill="url(#ink-gold)"/>
+      <circle cx="12" cy="16" r="0.7" fill="#1c1610"/>
+    </symbol>
+    <!-- Viandante: orma + bussola antigua -->
+    <symbol id="i-viandante" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" fill="none" stroke="url(#ink-silver)" stroke-width="0.8"/>
+      <circle cx="12" cy="12" r="7" fill="none" stroke="url(#ink-gold)" stroke-width="0.4" stroke-dasharray="1 2"/>
+      <path d="M12 5 L13.5 10.5 L19 12 L13.5 13.5 L12 19 L10.5 13.5 L5 12 L10.5 10.5 Z"
+        fill="url(#ink-gold)" opacity="0.9"/>
+      <circle cx="12" cy="12" r="1" fill="#1c1610"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="frame">
+  <div class="header">
+    <div class="title">Il Crocevia</div>
+    <div class="subtitle">— libro delle ombre e delle luci —</div>
+    <div class="luna-row">
+      <svg class="luna" viewBox="0 0 24 24">
+        <path d="M18 14 a8 8 0 1 1 -9 -11 a7 7 0 1 0 9 11" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      </svg>
+      <span>Luna calante · Samhain tra quattro giorni</span>
+    </div>
+  </div>
+
+  <div class="section-title">Scegli il tuo sigillo</div>
+  <div class="archetipi">
+    <div class="archetipo sel" onclick="sel(this)">
+      <div class="sigillo"><svg><use href="#i-strega"/></svg></div>
+      <div class="nome">Strega</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="sigillo"><svg><use href="#i-stregone"/></svg></div>
+      <div class="nome">Stregone</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="sigillo"><svg><use href="#i-sciamano"/></svg></div>
+      <div class="nome">Sciamano</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="sigillo"><svg><use href="#i-guaritore"/></svg></div>
+      <div class="nome">Guaritore</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="sigillo"><svg><use href="#i-veggente"/></svg></div>
+      <div class="nome">Veggente</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="sigillo"><svg><use href="#i-viandante"/></svg></div>
+      <div class="nome">Viandante</div>
+    </div>
+  </div>
+
+  <div class="section-title">Il tuo cerchio · Milano</div>
+  <div class="cerchio-wrap">
+    <div class="cerchio">
+      <div class="mandala-ring"></div>
+      <svg class="linee" viewBox="0 0 260 260">
+        <line x1="130" y1="130" x2="130" y2="24" stroke="#3a2c18" stroke-width="0.8" stroke-dasharray="3 5"/>
+        <line x1="130" y1="130" x2="32" y2="200" stroke="#3a2c18" stroke-width="0.8" stroke-dasharray="3 5"/>
+        <line x1="130" y1="130" x2="228" y2="200" stroke="#3a2c18" stroke-width="0.8" stroke-dasharray="3 5"/>
+        <!-- Piccole rune lungo le linee -->
+        <circle cx="130" cy="77" r="1.5" fill="#6b5230"/>
+        <circle cx="81" cy="165" r="1.5" fill="#6b5230"/>
+        <circle cx="179" cy="165" r="1.5" fill="#6b5230"/>
+      </svg>
+      <div class="centro">
+        <svg><use href="#i-strega"/></svg>
+        <span class="centro-label">Tu</span>
+      </div>
+      <div class="membro m1">
+        <svg><use href="#i-veggente"/></svg>
+        <span class="tag">Luna Rossa</span>
+      </div>
+      <div class="membro m2">
+        <svg><use href="#i-sciamano"/></svg>
+        <span class="tag">Corvo Nero</span>
+      </div>
+      <div class="membro m3">
+        <svg><use href="#i-guaritore"/></svg>
+        <span class="tag">Salice</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Accendi una luce</div>
+  <div class="segnali">
+    <div class="segnale" title="Rituale in corso">
+      <div class="candela"><div class="fiamma"></div></div>
+      <div class="slabel">rituale</div>
+    </div>
+    <div class="segnale inattivo" title="Pericolo">
+      <div class="candela"><div class="fiamma"></div></div>
+      <div class="slabel">pericolo</div>
+    </div>
+    <div class="segnale inattivo" title="Tutto bene">
+      <div class="candela"><div class="fiamma"></div></div>
+      <div class="slabel">tutto bene</div>
+    </div>
+    <div class="segnale inattivo" title="Cerco aiuto">
+      <div class="candela"><div class="fiamma"></div></div>
+      <div class="slabel">cerco aiuto</div>
+    </div>
+  </div>
+
+  <div class="info">
+    Sei una <b>Strega</b> a Milano.<br/>
+    Nel tuo cerchio: <b>tre</b> anime. <b>Luna Rossa</b> ha acceso una candela.
+  </div>
+
+  <div class="sigillo-fondo">✦</div>
+</div>
+
+<div class="back">
+  <a href="index.html">← Torna agli esempi</a> · V2-A: Pergamena Notturna
+</div>
+
+<script>
+  function sel(el) {
+    document.querySelectorAll('.archetipo').forEach(a => a.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+  // Toggle segnali
+  document.querySelectorAll('.segnale').forEach(s => {
+    s.addEventListener('click', () => s.classList.toggle('inattivo'));
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tema GUARITORE — Erbario Antico</title>
+<style>
+  /* ═══════════════════════════════════════════
+     TEMA GUARITORE — "Erbario Antico"
+     Carta crema, verde salvia, marrone, oro
+     spento. Erbe, mortai, ampolle, schede
+     botaniche. Layout: erbario, illustrazioni,
+     molto leggibile, pulito.
+     ═══════════════════════════════════════════ */
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=IM+Fell+English:ital@0;1&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --crema:#f0ead8; --verde:#6b8e5a; --verde-scuro:#3a5a30;
+    --marrone:#6b4a2a; --oro:#b8963e; --inchiostro:#2a2015;
+    --rosa:#c48a8a; --pagina:#f8f4e8;
+  }
+  body {
+    min-height:100vh; background:#d4c8a8;
+    background-image:
+      radial-gradient(ellipse 50% 30% at 20% 10%, rgba(180,160,120,.2), transparent),
+      radial-gradient(ellipse 40% 30% at 80% 90%, rgba(160,140,100,.18), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    color:var(--inchiostro);
+    font-family:'IM Fell English', 'Cormorant Garamond', Georgia, serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:16px 10px;
+  }
+  .erbario {
+    width:min(430px, 100%);
+    background:var(--pagina);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(255,252,240,.6), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    border:1px solid #c4b088;
+    box-shadow:0 8px 30px rgba(80,60,30,.25), inset 0 0 40px rgba(180,160,120,.15);
+    padding:24px 20px;
+    position:relative;
+  }
+  /* Bordo erbario */
+  .erbario::before {
+    content:''; position:absolute; inset:8px; pointer-events:none;
+    border:2px solid var(--verde); opacity:.4;
+  }
+  .erbario::after {
+    content:''; position:absolute; inset:12px; pointer-events:none;
+    border:1px solid var(--verde-scuro); opacity:.3;
+  }
+
+  /* Intestazione botanica */
+  .intestazione { text-align:center; margin-bottom:14px; border-bottom:2px solid var(--verde); padding-bottom:12px; }
+  .intestazione .pianta {
+    width:48px; height:48px; margin:0 auto 8px;
+    background:radial-gradient(circle at 50% 80%, var(--verde-scuro), var(--verde));
+    border-radius:50% 50% 40% 40% / 60% 60% 40% 40%;
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+    box-shadow:0 3px 8px rgba(58,90,48,.3);
+  }
+  .titolo {
+    font-family:'Cinzel', serif; font-size:20px; letter-spacing:2px;
+    color:var(--verde-scuro); font-weight:600;
+  }
+  .sottotitolo {
+    font-style:italic; font-size:13px; color:var(--marrone);
+    margin-top:2px;
+  }
+
+  /* Testo leggibile */
+  .testo {
+    font-size:16px; line-height:1.7; color:var(--inchiostro);
+    text-align:justify; margin-top:12px;
+  }
+  .testo::first-letter {
+    font-family:'Cinzel', serif; font-size:34px; color:var(--verde-scuro);
+    float:left; line-height:.8; margin-right:6px; margin-top:2px;
+  }
+  .testo b { color:var(--verde-scuro); font-weight:600; }
+
+  /* Schede botaniche (archetipi/colture) */
+  .schede {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0;
+  }
+  .scheda {
+    border:1px solid #c4b088; border-radius:4px; padding:10px 6px;
+    text-align:center; cursor:pointer; transition:.2s; background:rgba(255,252,240,.5);
+  }
+  .scheda .illustrazione {
+    width:40px; height:40px; margin:0 auto 4px; border-radius:50%;
+    background:radial-gradient(circle at 40% 35%, #d4e0c0, var(--verde));
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+    border:2px solid var(--verde);
+  }
+  .scheda .nome { font-family:'Cinzel',serif; font-size:10px; color:var(--verde-scuro); letter-spacing:1px; }
+  .scheda .latino { font-size:9px; color:var(--marrone); font-style:italic; }
+  .scheda:hover, .scheda.sel {
+    border-color:var(--verde); background:rgba(107,142,90,.1);
+    box-shadow:0 0 8px rgba(107,142,90,.3); transform:translateY(-2px);
+  }
+
+  /* Rubrica verde */
+  .rubrica {
+    font-family:'Cinzel', serif; font-size:13px; letter-spacing:2px;
+    color:var(--verde-scuro); text-align:center; margin:14px 0 8px;
+    text-transform:uppercase; font-weight:600;
+  }
+  .rubrica::before, .rubrica::after { content:' ❀ '; color:var(--verde); font-size:11px; }
+
+  /* Cerchio delle erbe (circular garden) */
+  .giardino {
+    position:relative; width:220px; height:220px; margin:12px auto;
+    border:2px solid var(--verde); border-radius:50%;
+    background:radial-gradient(circle, rgba(107,142,90,.1) 0%, transparent 70%);
+  }
+  .giardino::before {
+    content:''; position:absolute; inset:12px; border-radius:50%;
+    border:1px dashed var(--verde-scuro); opacity:.5;
+  }
+  /* Solchi (righe del giardino) */
+  .solchi { position:absolute; inset:0; }
+  .solchi line { stroke:var(--verde); stroke-width:.5; opacity:.2; }
+
+  .pianta-centro {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:52px; height:52px; border-radius:50%;
+    background:radial-gradient(circle at 40% 35%, #8aa870, var(--verde-scuro));
+    border:2px solid var(--verde-scuro);
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+    box-shadow:0 0 15px rgba(107,142,90,.4), inset 0 2px 6px rgba(0,0,0,.2);
+  }
+  .erba {
+    position:absolute; width:36px; height:36px; border-radius:50%;
+    background:radial-gradient(circle at 40% 35%, #a8c890, var(--verde));
+    border:1px solid var(--verde-scuro);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:.2s; font-size:16px;
+  }
+  .erba:hover { transform:scale(1.15); box-shadow:0 0 10px rgba(107,142,90,.5); }
+  .erba .nome { position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); font-size:9px; color:var(--marrone); font-style:italic; white-space:nowrap; }
+  .er1{top:8%;left:50%;transform:translateX(-50%)}.er2{bottom:16%;left:8%}.er3{bottom:16%;right:8%}
+
+  /* Erbe medicinali come segnali */
+  .erbe-segnale {
+    display:flex; justify-content:center; gap:14px; margin:12px 0;
+    padding:12px 0; border-top:1px solid #c4b088; border-bottom:1px solid #c4b088;
+  }
+  .erba-seg {
+    text-align:center; cursor:pointer; transition:.2s; padding:6px;
+  }
+  .erba-seg .ampolla {
+    width:32px; height:44px; margin:0 auto 4px; position:relative;
+    border:2px solid var(--marrone); border-radius:4px 4px 8px 8px;
+    background:linear-gradient(180deg, transparent 30%, rgba(107,142,90,.3) 30%);
+    display:flex; align-items:flex-end; justify-content:center; padding-bottom:4px;
+    font-size:14px;
+  }
+  .erba-seg .ampolla::before {
+    content:''; position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+    width:12px; height:6px; background:var(--marrone); border-radius:2px 2px 0 0;
+  }
+  .erba-seg.acceso .ampolla {
+    border-color:var(--verde-scuro);
+    background:linear-gradient(180deg, transparent 20%, rgba(107,142,90,.5) 20%);
+    box-shadow:0 0 10px rgba(107,142,90,.4);
+  }
+  .erba-seg span { font-size:10px; color:var(--marrone); font-family:'Cinzel',serif; letter-spacing:.5px; font-weight:600; }
+  .erba-seg.acceso span { color:var(--verde-scuro); }
+
+  /* Tavola delle erbe (congrega) */
+  .tavola-erbe {
+    margin-top:12px; padding:12px; border:1px solid #c4b088; border-radius:4px;
+    background:rgba(255,252,240,.6);
+  }
+  .tavola-erbe .nome { font-family:'Cinzel',serif; font-size:13px; color:var(--verde-scuro); text-align:center; margin-bottom:8px; letter-spacing:1px; }
+  .fiori { display:flex; justify-content:center; gap:6px; flex-wrap:wrap; }
+  .fiore {
+    width:28px; height:28px; border-radius:50%;
+    background:radial-gradient(circle at 40% 35%, #d4e0c0, var(--verde));
+    border:1px solid var(--verde-scuro);
+    display:flex; align-items:center; justify-content:center; font-size:12px;
+    cursor:pointer; transition:.2s;
+  }
+  .fiore:hover { transform:scale(1.2); box-shadow:0 0 8px rgba(107,142,90,.5); }
+
+  .piè {
+    text-align:center; margin-top:16px; font-size:11px; color:var(--marrone);
+    font-style:italic;
+  }
+  .piè::before { content:'🌿 '; }
+
+  .back { margin-top:14px; text-align:center; }
+  .back a {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px;
+    color:var(--marrone); text-decoration:none; text-transform:uppercase;
+  }
+  .back a:hover { color:var(--verde-scuro); }
+</style>
+</head>
+<body>
+
+<div class="erbario">
+  <div class="intestazione">
+    <div class="pianta">🌿</div>
+    <div class="titolo">Erbario Antico</div>
+    <div class="sottotitolo">— tema del Guaritore —</div>
+  </div>
+
+  <div class="testo">
+    Tu sei <b>Herbarius</b>, custode delle piante. A Milano, tre anime
+    condividono il tuo giardino. <b>Salice</b> ha annaffiato le erbe
+    questa notte. La raccolta di Samhain è vicina.
+  </div>
+
+  <div class="rubrica">Le tue Erbe</div>
+  <div class="schede">
+    <div class="scheda sel" onclick="selScheda(this)"><div class="illustrazione">🌿</div><div class="nome">Salvia</div><div class="latino">Salvia officinalis</div></div>
+    <div class="scheda" onclick="selScheda(this)"><div class="illustrazione">🍄</div><div class="nome">Reishi</div><div class="latino">Ganoderma</div></div>
+    <div class="scheda" onclick="selScheda(this)"><div class="illustrazione">🌸</div><div class="nome">Lavanda</div><div class="latino">Lavandula</div></div>
+    <div class="scheda" onclick="selScheda(this)"><div class="illustrazione">🌲</div><div class="nome">Tasso</div><div class="latino">Taxus</div></div>
+    <div class="scheda" onclick="selScheda(this)"><div class="illustrazione">🐝</div><div class="nome">Miele</div><div class="latino">Mel</div></div>
+    <div class="scheda" onclick="selScheda(this)"><div class="illustrazione">🪨</div><div class="nome">Pietre</div><div class="latino">Lithos</div></div>
+  </div>
+
+  <div class="rubrica">Il tuo Giardino · Milano</div>
+  <div class="giardino">
+    <svg class="solchi" viewBox="0 0 220 220">
+      <line x1="110" y1="20" x2="110" y2="200"/><line x1="20" y1="110" x2="200" y2="110"/>
+      <line x1="45" y1="45" x2="175" y2="175"/><line x1="175" y1="45" x2="45" y2="175"/>
+    </svg>
+    <div class="pianta-centro">🌳</div>
+    <div class="erba er1" title="Veggente">👁<span class="nome">Luna Rossa</span></div>
+    <div class="erba er2" title="Strega">🌙<span class="nome">Corvo Nero</span></div>
+    <div class="erba er3" title="Sciamano">🪶<span class="nome">Salice</span></div>
+  </div>
+
+  <div class="rubrica">Prepara una Pozione</div>
+  <div class="erbe-segnale">
+    <div class="erba-seg acceso" onclick="toggleErba(this)"><div class="ampolla">🌿</div><span>Curativa</span></div>
+    <div class="erba-seg" onclick="toggleErba(this)"><div class="ampolla">⚠️</div><span>Allerga</span></div>
+    <div class="erba-seg" onclick="toggleErba(this)"><div class="ampolla">💚</div><span>Salute</span></div>
+    <div class="erba-seg" onclick="toggleErba(this)"><div class="ampolla">🤲</div><span>Aiuto</span></div>
+  </div>
+
+  <div class="tavola-erbe">
+    <div class="nome">❀ Conventus Herbarum ❀</div>
+    <div class="fiori">
+      <div class="fiore" title="Tu">🌿</div>
+      <div class="fiore" title="Luna Rossa">👁</div>
+      <div class="fiore" title="Corvo Nero">🌙</div>
+      <div class="fiore" title="Salice">🪶</div>
+      <div class="fiore" title="...">❀</div>
+      <div class="fiore" title="...">❀</div>
+      <div class="fiore" title="...">❀</div>
+      <div class="fiore" title="...">❀</div>
+    </div>
+  </div>
+
+  <div class="piè">niente GPS · niente nomi veri · la natura non ha indirizzo</div>
+</div>
+
+<div class="back">
+  <a href="index.html">← Torna ai temi</a> · Tema 4/6: GUARITORE
+</div>
+
+<script>
+  function selScheda(el){document.querySelectorAll('.scheda').forEach(s=>s.classList.remove('sel'));el.classList.add('sel');}
+  function toggleErba(el){el.classList.toggle('acceso');}
+</script>
+</body>
+</html>

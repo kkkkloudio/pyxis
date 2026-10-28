@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Il Crocevia — 3 Esempi Grafici V3 (Manoscritti Medievali)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Uncial+Antiqua&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    background:#0d0b08;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(60,45,25,.2), transparent),
+      radial-gradient(ellipse 60% 40% at 50% 100%, rgba(40,30,15,.2), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    color:#c8b898;
+    font-family:'Cormorant Garamond', Georgia, serif;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:40px 20px;
+  }
+  h1 {
+    font-family:'Uncial Antiqua', 'Cinzel', serif;
+    font-size:24px; letter-spacing:4px; color:#c9a84c;
+    margin-bottom:6px; font-weight:400; text-align:center;
+  }
+  .version { font-family:'Cinzel', serif; font-size:11px; letter-spacing:4px; color:#8a6a3a; text-transform:uppercase; margin-bottom:8px; }
+  .sub { font-size:14px; color:#8a7050; font-style:italic; margin-bottom:40px; text-align:center; max-width:420px; }
+  .cards { display:flex; flex-direction:column; gap:16px; width:min(440px,100%); }
+  .card {
+    display:flex; align-items:center; gap:16px; padding:20px;
+    border:1px solid #2a2018; border-radius:4px; text-decoration:none;
+    color:inherit; transition:0.3s;
+    background:linear-gradient(180deg, #1a1410 0%, #12100c 100%);
+    box-shadow:0 4px 16px rgba(0,0,0,.3);
+  }
+  .card:hover {
+    border-color:#c9a84c; transform:translateY(-2px);
+    box-shadow:0 8px 30px rgba(201,168,76,.1), 0 4px 16px rgba(0,0,0,.3);
+  }
+  .card .swatch {
+    width:56px; height:56px; border-radius:4px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+  }
+  .card .info h3 {
+    font-family:'Cinzel', serif; font-size:14px; font-weight:400;
+    margin-bottom:4px; letter-spacing:1px; color:#d4c4a0;
+  }
+  .card .info .tag { font-size:10px; color:#8a6a3a; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+  .card .info p { font-size:12px; color:#8a7050; line-height:1.5; font-style:italic; }
+  .card .arrow { margin-left:auto; color:#4a3a20; font-size:20px; }
+
+  /* Swatch A: pergamena + oro + rosso rubriche */
+  .swatch-a {
+    background:linear-gradient(135deg, #f0e6cc 0%, #d4c49a 100%);
+    border:2px solid #b8963e; color:#8a1a1a;
+    box-shadow:inset 0 0 8px rgba(180,150,100,.3), 0 0 10px rgba(185,150,62,.2);
+  }
+  /* Swatch B: legno + pergamena + animali */
+  .swatch-b {
+    background:linear-gradient(135deg, #2a1a0e 0%, #1a0f08 100%);
+    border:2px solid #8a6a3a; color:#d4a020;
+    box-shadow:inset 0 0 8px rgba(0,0,0,.5), 0 0 10px rgba(212,160,32,.15);
+  }
+  /* Swatch C: pelle nera + rame */
+  .swatch-c {
+    background:radial-gradient(circle at 35% 30%, #2a1a10, #0a0806);
+    border:2px solid #8a6a3a; color:#c8b898;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,.6), 0 0 12px rgba(138,106,58,.25);
+    border-radius:50%;
+  }
+</style>
+</head>
+<body>
+  <div class="version">Terza serie · V3 · Ispirata ai manoscritti medievali</div>
+  <h1>Il Crocevia</h1>
+  <p class="sub">Tre stili completamente diversi, tutti antiche. Scegli il tuo.</p>
+
+  <div class="cards">
+    <a class="card" href="esempio-a-codex-aureus.html">
+      <div class="swatch swatch-a">✦</div>
+      <div class="info">
+        <div class="tag">Manoscritto Illuminato</div>
+        <h3>V3-A — Codex Aureus</h3>
+        <p>Pergamena, inchiostro nero, bordi dorati, iniziali miniate, rubriche rosse, capilettera, marginalia. Come i codici miniati del XIII secolo.</p>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+
+    <a class="card" href="esempio-b-bestiarium-notturnum.html">
+      <div class="swatch swatch-b">🜏</div>
+      <div class="info">
+        <div class="tag">Bestiario Medievale</div>
+        <h3>V3-B — Bestiarium Notturnum</h3>
+        <p>Leggio di legno, pergamena, bordi di fogliame, animali simbolici (gufo, corvo, cervo, serpente, falco, lupo) in riquadri araldici. Nomi in latino.</p>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+
+    <a class="card" href="esempio-c-grimorium-nigrum.html">
+      <div class="swatch swatch-c">☿</div>
+      <div class="info">
+        <div class="tag">Grimorio Occulto</div>
+        <h3>V3-C — Grimorium Nigrum</h3>
+        <p>Pelle nera, rame/ottone, rilegatura con cerniere, sigilli di ceralacca, simboli esoterici, pentagramma, rune. Magia rinascimentale, libro proibito.</p>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+
+  <p style="margin-top:32px; font-size:11px; color:#5a4a30; font-style:italic; text-align:center; max-width:420px;">
+    Ogni esempio ha: font antichi (Uncial Antiqua, Cinzel, IM Fell English) · archetipi come iniziali/animali/sigilli ·
+    cerchio come rosone/radura/pentacolo · segnali come candele miniate/sigilli araldici/sigilli di cera
+  </p>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Il Crocevia — Esempio C: Cielo Stellato</title>
+<style>
+  /* ============================================
+     ESEMPIO C — "CIELO STELLATO"
+     Etereo, luminoso, magico. Blu notte, stelle, aloni viola/argento
+     ============================================ */
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    background:#070912;
+    background-image:
+      radial-gradient(2px 2px at 15% 20%, rgba(200,200,230,.6) 50%, transparent 51%),
+      radial-gradient(1px 1px at 80% 10%, rgba(200,200,230,.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 55% 35%, rgba(200,200,230,.4) 50%, transparent 51%),
+      radial-gradient(2px 2px at 90% 50%, rgba(200,200,230,.55) 50%, transparent 51%),
+      radial-gradient(1px 1px at 30% 65%, rgba(200,200,230,.35) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 65% 80%, rgba(200,200,230,.45) 50%, transparent 51%),
+      radial-gradient(2px 2px at 10% 90%, rgba(200,200,230,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 45% 8%, rgba(200,200,230,.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 70% 55%, rgba(180,160,230,.35) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 25% 45%, rgba(180,160,230,.4) 50%, transparent 51%);
+    color:#d8d2e8;
+    font-family:'Georgia', serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:20px 12px;
+  }
+  .frame {
+    width:min(430px, 100%);
+    border:1px solid rgba(140,120,200,.3);
+    border-radius:24px;
+    background:linear-gradient(180deg, rgba(20,15,40,.8) 0%, rgba(10,10,25,.9) 100%);
+    box-shadow:0 0 60px rgba(110,80,190,.15), inset 0 0 40px rgba(0,0,0,.3);
+    backdrop-filter:blur(10px);
+    padding:20px 16px;
+  }
+  .header {
+    display:flex; justify-content:space-between; align-items:center;
+    border-bottom:1px solid rgba(140,120,200,.2); padding-bottom:12px; margin-bottom:16px;
+  }
+  .title {
+    font-size:15px; letter-spacing:3px; color:#a89ad4;
+    text-shadow:0 0 10px rgba(168,154,212,.3);
+  }
+  .luna {
+    width:22px; height:22px; border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #e8e4f8, #a89ad4);
+    box-shadow:0 0 15px rgba(168,154,212,.4);
+    position:relative;
+  }
+  .luna::after {
+    content:''; position:absolute; top:2px; left:6px;
+    width:18px; height:18px; border-radius:50%;
+    background:#070912;
+  }
+
+  .archetipi { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
+  .archetipo {
+    border:1px solid rgba(140,120,200,.2); border-radius:16px; padding:12px 6px;
+    text-align:center; cursor:pointer; transition:0.3s;
+    background:rgba(20,15,40,.5);
+  }
+  .archetipo:hover, .archetipo.sel {
+    border-color:#a89ad4;
+    background:rgba(60,45,110,.3);
+    box-shadow:0 0 15px rgba(168,154,212,.2);
+  }
+  .archetipo svg { width:32px; height:32px; margin-bottom:6px; filter:drop-shadow(0 0 4px rgba(168,154,212,.3)); }
+  .archetipo .nome {
+    font-size:10px; letter-spacing:1px; color:#8a80b4;
+    font-style:italic;
+  }
+  .archetipo.sel .nome { color:#e8a54b; text-shadow:0 0 8px rgba(232,165,75,.4); }
+
+  .cerchio {
+    position:relative; width:280px; height:280px; margin:0 auto 16px;
+    border:1px solid rgba(140,120,200,.25); border-radius:50%;
+    background:radial-gradient(circle, rgba(80,60,150,.1) 0%, transparent 70%);
+  }
+  .cerchio::before {
+    content:''; position:absolute; inset:-8px; border-radius:50%;
+    border:1px dashed rgba(140,120,200,.15);
+  }
+  .cerchio .centro {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:64px; height:64px; border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #3a2a6a, #1a1440);
+    border:1px solid #e8a54b;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 30px rgba(232,165,75,.25), inset 0 0 15px rgba(0,0,0,.3);
+  }
+  .cerchio .centro svg { width:32px; height:32px; filter:drop-shadow(0 0 6px rgba(232,165,75,.5)); }
+  .cerchio .membro {
+    position:absolute; width:48px; height:48px; border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #2a2050, #151030);
+    border:1px solid rgba(168,154,212,.4);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:0.3s;
+  }
+  .cerchio .membro:hover {
+    border-color:#a89ad4; transform:scale(1.1);
+    box-shadow:0 0 20px rgba(168,154,212,.3);
+  }
+  .cerchio .membro svg { width:24px; height:24px; filter:drop-shadow(0 0 4px rgba(168,154,212,.3)); }
+  .cerchio .membro .tag {
+    position:absolute; bottom:-18px; font-size:8px; color:#6a6090;
+    font-style:italic; white-space:nowrap; letter-spacing:1px;
+  }
+  .m1 { top:8%; left:50%; transform:translateX(-50%); }
+  .m2 { bottom:18%; left:10%; }
+  .m3 { bottom:18%; right:10%; }
+
+  /* Linee di connessione (costellazione) */
+  .costellazione {
+    position:absolute; inset:0; pointer-events:none;
+  }
+
+  .segnali { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+  .segnale {
+    width:44px; height:44px; border:1px solid rgba(140,120,200,.25); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    background:rgba(20,15,40,.6); transition:0.3s;
+  }
+  .segnale:hover, .segnale.attivo {
+    border-color:#e8a54b;
+    background:rgba(60,45,30,.4);
+    box-shadow:0 0 15px rgba(232,165,75,.3);
+  }
+  .segnale svg { width:20px; height:20px; }
+
+  .info {
+    border-top:1px solid rgba(140,120,200,.2); padding-top:12px; font-size:12px;
+    color:#8a80b4; line-height:1.6; font-style:italic;
+  }
+  .info b { color:#e8a54b; font-weight:normal; text-shadow:0 0 6px rgba(232,165,75,.3); }
+
+  .back {
+    margin-top:16px; font-size:10px; color:#5a5080;
+    font-style:italic; text-align:center; letter-spacing:1px;
+  }
+  .back a { color:#8a80b4; text-decoration:none; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="glow-strega" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c8b8f0"/>
+      <stop offset="100%" stop-color="#8a6ad4"/>
+    </linearGradient>
+    <linearGradient id="glow-stregone" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a8a0d0"/>
+      <stop offset="100%" stop-color="#6a5a9a"/>
+    </linearGradient>
+    <linearGradient id="glow-sciamano" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d4c8a8"/>
+      <stop offset="100%" stop-color="#a8906a"/>
+    </linearGradient>
+    <linearGradient id="glow-guaritore" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a8d4a0"/>
+      <stop offset="100%" stop-color="#6a9a70"/>
+    </linearGradient>
+    <linearGradient id="glow-veggente" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8d4f0"/>
+      <stop offset="100%" stop-color="#b48ad4"/>
+    </linearGradient>
+
+    <!-- Strega: cappello + luna + stelle -->
+    <symbol id="i-strega" viewBox="0 0 24 24">
+      <path d="M12 2 L16.5 13 L7.5 13 Z" fill="url(#glow-strega)" opacity="0.9"/>
+      <ellipse cx="12" cy="13" rx="8.5" ry="2" fill="#4a3a7a"/>
+      <path d="M18 5 a3 3 0 1 0 3 4 a2.5 2.5 0 1 1 -3 -4" fill="#e8e4f8"/>
+      <circle cx="6" cy="6" r="0.6" fill="#e8e4f8"/>
+      <circle cx="20" cy="16" r="0.5" fill="#e8e4f8"/>
+    </symbol>
+    <!-- Stregone: cappuccio + luna interna -->
+    <symbol id="i-stregone" viewBox="0 0 24 24">
+      <path d="M12 2.5 C7 2.5 4.5 8 4.5 14 L4.5 21 L19.5 21 L19.5 14 C19.5 8 17 2.5 12 2.5 Z"
+        fill="url(#glow-stregone)" opacity="0.85"/>
+      <path d="M15 8 a3 3 0 1 0 3 4 a2.5 2.5 0 1 1 -3 -4" fill="#1a1440" opacity="0.8"/>
+      <circle cx="12" cy="12" r="1.5" fill="#e8e4f8"/>
+    </symbol>
+    <!-- Sciamano: tamburo + stelle-corna -->
+    <symbol id="i-sciamano" viewBox="0 0 24 24">
+      <circle cx="12" cy="14" r="6.5" fill="#3a2e20" stroke="url(#glow-sciamano)" stroke-width="1.2"/>
+      <path d="M7.5 9.5 C5.5 7 4.5 5 4.5 2.5 M16.5 9.5 C18.5 7 19.5 5 19.5 2.5"
+        fill="none" stroke="url(#glow-sciamano)" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M4.5 2.5 L6.5 2.5 L5.5 4.5 Z M19.5 2.5 L17.5 2.5 L18.5 4.5 Z" fill="#e8d4a8"/>
+      <circle cx="12" cy="14" r="2" fill="none" stroke="#e8d4a8" stroke-width="0.8"/>
+    </symbol>
+    <!-- Guaritore: foglia kristallina + alone -->
+    <symbol id="i-guaritore" viewBox="0 0 24 24">
+      <path d="M12 22 C12 14 15 7 21 3 C21 12 17 19 12 22 Z"
+        fill="url(#glow-guaritore)" opacity="0.85"/>
+      <path d="M12 22 C12 17 10 12 5 9" fill="none" stroke="#a8d4a0" stroke-width="0.8"/>
+      <circle cx="12" cy="12" r="8" fill="url(#glow-guaritore)" opacity="0.1"/>
+    </symbol>
+    <!-- Veggente: occhio cosmico + alone viola -->
+    <symbol id="i-veggente" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" fill="none" stroke="url(#glow-veggente)" stroke-width="0.8" opacity="0.5"/>
+      <path d="M3.5 12 Q12 5.5 20.5 12 Q12 18.5 3.5 12 Z" fill="url(#glow-veggente)" opacity="0.7"/>
+      <circle cx="12" cy="12" r="3" fill="#1a1440" stroke="#e8d4f0" stroke-width="1"/>
+      <circle cx="12" cy="12" r="1.2" fill="#e8d4f0"/>
+      <circle cx="12" cy="12" r="5" fill="none" stroke="#b48ad4" stroke-width="0.4" opacity="0.5"/>
+    </symbol>
+    <!-- Viandante: stella a 4 punte + scia -->
+    <symbol id="i-viandante" viewBox="0 0 24 24">
+      <path d="M12 3 L13.5 10.5 L21 12 L13.5 13.5 L12 21 L10.5 13.5 L3 12 L10.5 10.5 Z"
+        fill="url(#glow-veggente)" opacity="0.7"/>
+      <path d="M4 20 Q8 18 12 19 Q16 20 20 18" fill="none" stroke="#6a5a9a" stroke-width="0.8" opacity="0.5"/>
+    </symbol>
+    <!-- Segnali -->
+    <symbol id="s-candela" viewBox="0 0 24 24">
+      <rect x="10" y="11" width="4" height="9" rx="1" fill="#2a2050" stroke="#a89ad4" stroke-width="1"/>
+      <path d="M12 3 C13.5 5.5 14.5 7 14.5 9 a2.5 2.5 0 0 1 -5 0 C9.5 7 10.5 5.5 12 3 Z" fill="#e8a54b"/>
+      <circle cx="12" cy="8.5" r="4.5" fill="#e8a54b" opacity="0.15"/>
+      <circle cx="12" cy="8.5" r="7" fill="#e8a54b" opacity="0.06"/>
+    </symbol>
+    <symbol id="s-pericolo" viewBox="0 0 24 24">
+      <path d="M12 3 C14.5 8 19.5 10.5 19.5 15.5 a7.5 7.5 0 0 1 -15 0 C4.5 10.5 9.5 8 12 3 Z"
+        fill="#4a1a1a" stroke="#e86a5a" stroke-width="1.2"/>
+      <path d="M12 10 C13 12 14 13 14 15 a2 2 0 0 1 -4 0 C10 13 11 12 12 10 Z" fill="#e86a5a"/>
+      <circle cx="12" cy="14" r="5" fill="#e86a5a" opacity="0.1"/>
+    </symbol>
+    <symbol id="s-ok" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" fill="#1a3a2a" stroke="#7ad4a0" stroke-width="1" opacity="0.9"/>
+      <path d="M8 12 L11 15 L16 9" fill="none" stroke="#7ad4a0" stroke-width="1.5"/>
+      <circle cx="12" cy="12" r="9.5" fill="#7ad4a0" opacity="0.08"/>
+    </symbol>
+    <symbol id="s-aiuto" viewBox="0 0 24 24">
+      <path d="M6 12 C6 7 8.5 4 12 4 C15.5 4 18 7 18 12 L18 21 L6 21 Z"
+        fill="none" stroke="#a89ad4" stroke-width="1.2"/>
+      <path d="M12 8 L12 15 M8.5 11.5 L15.5 11.5" stroke="#e8a54b" stroke-width="1.5"/>
+      <circle cx="12" cy="11.5" r="6" fill="#e8a54b" opacity="0.08"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="frame">
+  <div class="header">
+    <span class="title">✦ Il Crocevia</span>
+    <div class="luna"></div>
+  </div>
+
+  <div style="font-size:11px; letter-spacing:2px; color:#8a80b4; margin-bottom:10px; text-align:center; font-style:italic;">
+    Scegli la tua via, viandante delle stelle
+  </div>
+
+  <div class="archetipi">
+    <div class="archetipo sel" onclick="sel(this)">
+      <svg><use href="#i-strega"/></svg>
+      <div class="nome">Strega</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <svg><use href="#i-stregone"/></svg>
+      <div class="nome">Stregone</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <svg><use href="#i-sciamano"/></svg>
+      <div class="nome">Sciamano</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <svg><use href="#i-guaritore"/></svg>
+      <div class="nome">Guaritore</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <svg><use href="#i-veggente"/></svg>
+      <div class="nome">Veggente</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <svg><use href="#i-viandante"/></svg>
+      <div class="nome">Viandante</div>
+    </div>
+  </div>
+
+  <div style="font-size:11px; letter-spacing:2px; color:#8a80b4; margin-bottom:10px; text-align:center; font-style:italic;">
+    Il tuo cerchio · cielo di Milano
+  </div>
+
+  <div class="cerchio">
+    <!-- Costellazione: linee che collegano centro ai membri -->
+    <svg class="costellazione" viewBox="0 0 280 280">
+      <line x1="140" y1="140" x2="140" y2="30" stroke="rgba(168,154,212,.2)" stroke-width="0.5" stroke-dasharray="2 4"/>
+      <line x1="140" y1="140" x2="42" y2="212" stroke="rgba(168,154,212,.2)" stroke-width="0.5" stroke-dasharray="2 4"/>
+      <line x1="140" y1="140" x2="238" y2="212" stroke="rgba(168,154,212,.2)" stroke-width="0.5" stroke-dasharray="2 4"/>
+    </svg>
+    <div class="centro">
+      <svg><use href="#i-strega"/></svg>
+    </div>
+    <div class="membro m1">
+      <svg><use href="#i-veggente"/></svg>
+      <span class="tag">✦ LunaRossa</span>
+    </div>
+    <div class="membro m2">
+      <svg><use href="#i-sciamano"/></svg>
+      <span class="tag">✦ CorvoNero</span>
+    </div>
+    <div class="membro m3">
+      <svg><use href="#i-guaritore"/></svg>
+      <span class="tag">✦ Salice</span>
+    </div>
+  </div>
+
+  <div class="segnali">
+    <div class="segnale attivo" title="Rituale in corso">
+      <svg><use href="#s-candela"/></svg>
+    </div>
+    <div class="segnale" title="Pericolo">
+      <svg><use href="#s-pericolo"/></svg>
+    </div>
+    <div class="segnale" title="Tutto bene">
+      <svg><use href="#s-ok"/></svg>
+    </div>
+    <div class="segnale" title="Cerco aiuto">
+      <svg><use href="#s-aiuto"/></svg>
+    </div>
+  </div>
+
+  <div class="info">
+    <b>Tu</b> — Strega delle Stelle · Milano<br/>
+    Nel tuo cerchio: <b>3</b> anime. LunaRossa ha acceso una <b>candela</b> sotto la luna.
+  </div>
+</div>
+
+<div class="back">
+  <a href="index.html">← Torna agli esempi</a> · Esempio C: Cielo Stellato
+</div>
+
+<script>
+  function sel(el) {
+    document.querySelectorAll('.archetipo').forEach(a => a.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+</script>
+</body>
+</html>

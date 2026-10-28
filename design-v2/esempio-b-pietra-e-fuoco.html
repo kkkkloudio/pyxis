@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Il Crocevia — V2-B: Pietra e Fuoco</title>
+<style>
+  /* ============================================
+     V2-B — "PIETRA E FUOCO"
+     Pietra, muschio, brace, ceneri. Fuoco vivo al centro.
+     ============================================ */
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    background:#0d0b09;
+    background-image:
+      /* braci sparse */
+      radial-gradient(2px 2px at 15% 85%, rgba(255,120,40,.15) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 85% 15%, rgba(255,140,60,.12) 50%, transparent 51%),
+      radial-gradient(1px 1px at 60% 90%, rgba(255,100,30,.1) 50%, transparent 51%),
+      radial-gradient(2px 2px at 30% 10%, rgba(255,130,50,.08) 50%, transparent 51%),
+      radial-gradient(ellipse 100% 60% at 50% 100%, rgba(80,30,10,.2), transparent),
+      /* grana pietra */
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    color:#c8b898;
+    font-family:'Cormorant Garamond', Georgia, serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:16px 10px;
+  }
+  .frame {
+    width:min(430px, 100%);
+    border:1px solid #3a3228;
+    border-radius:8px;
+    background:linear-gradient(180deg, #1a1612 0%, #0d0b09 100%);
+    box-shadow:
+      inset 0 0 60px rgba(0,0,0,.7),
+      0 12px 40px rgba(0,0,0,.6),
+      0 0 0 4px #0a0806,
+      0 0 0 5px #2a2420;
+    padding:24px 18px;
+    position:relative;
+  }
+  /* Bordi pietra irregolari (simulati con ombre) */
+  .frame::before {
+    content:''; position:absolute; inset:0; border-radius:8px; pointer-events:none;
+    box-shadow:inset 0 0 0 1px rgba(120,100,70,.1);
+  }
+
+  .header {
+    text-align:center; margin-bottom:20px;
+    border-bottom:1px solid #2a2420; padding-bottom:16px;
+  }
+  .title {
+    font-family:'Cinzel', serif;
+    font-size:20px; letter-spacing:5px; color:#d4a060;
+    text-shadow:0 0 10px rgba(212,160,96,.2), 1px 1px 3px rgba(0,0,0,.9);
+  }
+  .subtitle {
+    font-size:12px; color:#7a6a50; font-style:italic;
+    letter-spacing:2px; margin-top:4px;
+  }
+  .fuoco-row {
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    margin-top:12px;
+  }
+  .braci-small {
+    width:8px; height:8px; border-radius:50%;
+    background:radial-gradient(circle, #ff8830, #c84a10);
+    box-shadow:0 0 8px rgba(255,130,40,.5);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  .braci-small:nth-child(2) { animation-delay:.5s; width:6px; height:6px; }
+  .braci-small:nth-child(3) { animation-delay:1s; width:7px; height:7px; }
+  @keyframes pulse {
+    0%,100% { opacity:.6; transform:scale(1); }
+    50% { opacity:1; transform:scale(1.3); }
+  }
+  .fuoco-text { font-size:13px; color:#a08050; font-style:italic; }
+
+  .section-title {
+    font-family:'Cinzel', serif; font-size:11px; letter-spacing:4px;
+    color:#7a6a50; text-align:center; margin-bottom:14px;
+    text-transform:uppercase;
+  }
+
+  /* Archetipi come pietre incise */
+  .archetipi {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:14px;
+    margin-bottom:24px;
+  }
+  .archetipo { text-align:center; cursor:pointer; transition:0.3s; }
+  .pietra {
+    width:56px; height:56px; margin:0 auto 6px;
+    background:linear-gradient(145deg, #2a2420, #1a1612);
+    border-radius:12px 8px 14px 6px; /* irregolare */
+    border:1px solid #3a3228;
+    box-shadow:
+      inset 2px 2px 4px rgba(120,100,70,.1),
+      inset -2px -2px 4px rgba(0,0,0,.5),
+      0 4px 8px rgba(0,0,0,.4);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .pietra::before {
+    content:''; position:absolute; inset:3px;
+    border-radius:10px 6px 12px 4px;
+    border:1px solid rgba(120,100,70,.15);
+  }
+  .pietra svg { width:28px; height:28px; }
+  .archetipo .nome {
+    font-family:'Cinzel', serif; font-size:9px; letter-spacing:2px;
+    color:#7a6a50; text-transform:uppercase;
+  }
+  .archetipo:hover .pietra, .archetipo.sel .pietra {
+    background:linear-gradient(145deg, #3a2a1a, #241a10);
+    border-color:#d4a060;
+    box-shadow:
+      inset 2px 2px 4px rgba(212,160,96,.15),
+      inset -2px -2px 4px rgba(0,0,0,.5),
+      0 0 15px rgba(212,160,96,.2),
+      0 4px 8px rgba(0,0,0,.4);
+  }
+  .archetipo.sel .nome { color:#d4a060; }
+
+  /* Cerchio come cerchio di pietre (stone circle) */
+  .cerchio-wrap { text-align:center; margin-bottom:20px; }
+  .cerchio {
+    position:relative; width:260px; height:260px; margin:0 auto;
+  }
+  /* Pietre sul bordo del cerchio */
+  .cerchio .standing-stone {
+    position:absolute; width:20px; height:32px;
+    background:linear-gradient(145deg, #2a2420, #1a1612);
+    border:1px solid #3a3228;
+    border-radius:10px 10px 4px 4px;
+    box-shadow:inset 1px 1px 2px rgba(120,100,70,.1), 0 2px 4px rgba(0,0,0,.5);
+  }
+  .ss1 { top:-8px; left:50%; transform:translateX(-50%) rotate(-3deg); }
+  .ss2 { top:30%; right:-6px; transform:rotate(5deg); width:16px; height:26px; }
+  .ss3 { bottom:20%; right:8%; transform:rotate(-4deg); width:18px; height:28px; }
+  .ss4 { bottom:-6px; left:50%; transform:translateX(-50%) rotate(2deg); }
+  .ss5 { bottom:20%; left:8%; transform:rotate(3deg); width:18px; height:28px; }
+  .ss6 { top:30%; left:-6px; transform:rotate(-5deg); width:16px; height:26px; }
+
+  /* Brace centrale */
+  .brazier {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:80px; height:80px;
+  }
+  .brazier .pietra-base {
+    position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+    width:70px; height:20px;
+    background:linear-gradient(180deg, #2a2420, #1a1612);
+    border-radius:50% / 100% 100% 0 0;
+    border:1px solid #3a3228;
+    box-shadow:0 4px 8px rgba(0,0,0,.5);
+  }
+  .brazier .fuoco {
+    position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+    width:40px; height:50px;
+    background:
+      radial-gradient(ellipse at 50% 90%, #ffd060 0%, #ff8830 30%, #c84a10 60%, transparent 80%);
+    border-radius:50% 50% 30% 30% / 70% 70% 30% 30%;
+    filter:blur(1px);
+    animation:flickerBig 1.2s ease-in-out infinite;
+  }
+  .brazier .fuoco-inner {
+    position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+    width:20px; height:30px;
+    background:radial-gradient(ellipse at 50% 90%, #fff0c0 0%, #ffd060 50%, transparent 80%);
+    border-radius:50% 50% 30% 30% / 70% 70% 30% 30%;
+    filter:blur(2px);
+    animation:flickerBig 0.8s ease-in-out infinite reverse;
+  }
+  @keyframes flickerBig {
+    0%,100% { transform:translateX(-50%) scale(1) skewX(0deg); opacity:.9; }
+    25% { transform:translateX(-50%) scale(1.05, .95) skewX(3deg); opacity:1; }
+    50% { transform:translateX(-50%) scale(.95, 1.05) skewX(-2deg); opacity:.85; }
+    75% { transform:translateX(-50%) scale(1.02, .98) skewX(2deg); opacity:.95; }
+  }
+  .brazier .glow {
+    position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+    width:100px; height:100px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,150,50,.15) 0%, transparent 70%);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  .brazier svg {
+    position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
+    width:32px; height:32px; z-index:2;
+    filter:drop-shadow(0 0 6px rgba(255,200,100,.5));
+  }
+  .brazier-label {
+    position:absolute; bottom:-24px; left:50%; transform:translateX(-50%);
+    font-family:'Cinzel', serif; font-size:9px; color:#d4a060;
+    letter-spacing:3px; text-transform:uppercase;
+  }
+
+  .membro {
+    position:absolute; width:44px; height:44px;
+    background:linear-gradient(145deg, #241c16, #14100c);
+    border:1px solid #3a3228;
+    border-radius:8px 6px 10px 4px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:0.3s;
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+  .membro:hover {
+    border-color:#d4a060; transform:scale(1.1) rotate(2deg);
+    box-shadow:0 0 12px rgba(212,160,96,.3), 0 3px 6px rgba(0,0,0,.4);
+  }
+  .membro svg { width:22px; height:22px; }
+  .membro .tag {
+    position:absolute; bottom:-16px; left:50%; transform:translateX(-50%);
+    font-size:9px; color:#6a5a40; font-style:italic; white-space:nowrap;
+    letter-spacing:1px;
+  }
+  .m1 { top:12%; left:50%; transform:translateX(-50%) rotate(-2deg); }
+  .m2 { bottom:18%; left:10%; transform:rotate(3deg); }
+  .m3 { bottom:18%; right:10%; transform:rotate(-3deg); }
+
+  /* Ceneri/sfarfallio */
+  .embers { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .ember {
+    position:absolute; width:3px; height:3px; border-radius:50%;
+    background:#ff8830; opacity:0;
+    animation:rise 4s ease-in infinite;
+  }
+  @keyframes rise {
+    0% { bottom:30%; left:50%; opacity:0; transform:translateX(0) scale(1); }
+    20% { opacity:.8; }
+    100% { bottom:90%; left:calc(50% + 30px); opacity:0; transform:translateX(20px) scale(.3); }
+  }
+
+  /* Segnali come pietre con brace */
+  .segnali {
+    display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
+    margin-bottom:20px;
+  }
+  .segnale { text-align:center; cursor:pointer; transition:0.3s; }
+  .segnale .pietra-piccola {
+    width:40px; height:40px; margin:0 auto 4px;
+    background:linear-gradient(145deg, #241c16, #14100c);
+    border:1px solid #3a3228;
+    border-radius:8px 6px 10px 4px;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+  .segnale .brace {
+    width:12px; height:12px; border-radius:50%;
+    background:radial-gradient(circle, #ff8830, #c84a10);
+    box-shadow:0 0 10px rgba(255,130,40,.6);
+    animation:pulse 1.5s ease-in-out infinite;
+  }
+  .segnale.inattivo .brace {
+    background:radial-gradient(circle, #4a4038, #2a2420);
+    box-shadow:none; animation:none;
+  }
+  .segnale .slabel {
+    font-size:9px; color:#6a5a40; font-style:italic; letter-spacing:1px;
+  }
+  .segnale:hover .pietra-piccola {
+    border-color:#d4a060;
+    box-shadow:0 0 10px rgba(212,160,96,.3), 0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .info {
+    border-top:1px solid #2a2420; padding-top:16px;
+    font-size:14px; color:#7a6a50; line-height:1.7; font-style:italic;
+    text-align:center;
+  }
+  .info b {
+    color:#d4a060; font-weight:600; font-style:normal;
+    font-family:'Cinzel', serif; letter-spacing:1px;
+  }
+
+  .back { margin-top:20px; text-align:center; }
+  .back a {
+    font-family:'Cinzel', serif; font-size:10px; letter-spacing:2px;
+    color:#6a5a40; text-decoration:none; text-transform:uppercase;
+  }
+  .back a:hover { color:#d4a060; }
+
+  .sigillo-fondo {
+    width:28px; height:28px; margin:16px auto 0;
+    background:linear-gradient(145deg, #2a2420, #1a1612);
+    border:1px solid #3a3228;
+    border-radius:6px 4px 8px 4px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; color:#d4a060;
+    box-shadow:0 2px 4px rgba(0,0,0,.4);
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="stone-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8c080"/>
+      <stop offset="100%" stop-color="#d4a060"/>
+    </linearGradient>
+    <linearGradient id="stone-silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c8b898"/>
+      <stop offset="100%" stop-color="#a08050"/>
+    </linearGradient>
+
+    <symbol id="i-strega" viewBox="0 0 24 24">
+      <path d="M12 2 L17 13 L7 13 Z" fill="none" stroke="url(#stone-gold)" stroke-width="1.2"/>
+      <ellipse cx="12" cy="13" rx="9" ry="2.5" fill="none" stroke="url(#stone-gold)" stroke-width="1.2"/>
+      <path d="M18 4 a3 3 0 1 0 3 4 a2.5 2.5 0 1 1 -3 -4" fill="url(#stone-silver)"/>
+    </symbol>
+    <symbol id="i-stregone" viewBox="0 0 24 24">
+      <path d="M12 2.5 C6.5 2.5 4.5 8 4.5 14 L4.5 21.5 L19.5 21.5 L19.5 14 C19.5 8 17.5 2.5 12 2.5 Z"
+        fill="none" stroke="url(#stone-silver)" stroke-width="1.2"/>
+      <path d="M15.5 8 a3.5 3.5 0 1 0 3.5 4.5 a3 3 0 1 1 -3.5 -4.5" fill="#0d0b09" stroke="url(#stone-gold)" stroke-width="0.8"/>
+    </symbol>
+    <symbol id="i-sciamano" viewBox="0 0 24 24">
+      <circle cx="12" cy="14.5" r="6" fill="none" stroke="url(#stone-silver)" stroke-width="1.2"/>
+      <circle cx="12" cy="14.5" r="3.5" fill="none" stroke="url(#stone-gold)" stroke-width="0.6"/>
+      <path d="M8.5 9.5 C6.5 7 5.5 5 5.5 2.5 M8.5 9.5 C7.5 8 7 6.5 7 5"
+        fill="none" stroke="url(#stone-gold)" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M15.5 9.5 C17.5 7 18.5 5 18.5 2.5 M15.5 9.5 C16.5 8 17 6.5 17 5"
+        fill="none" stroke="url(#stone-gold)" stroke-width="1.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-guaritore" viewBox="0 0 24 24">
+      <path d="M4 18 Q8 14 12 16 Q16 18 20 14" fill="none" stroke="url(#stone-silver)" stroke-width="1"/>
+      <path d="M12 15 C12 10 14 6 18 3 C18 9 16 13 12 15 Z" fill="url(#stone-gold)" opacity="0.8"/>
+      <path d="M12 15 C12 11 10.5 8 7 6" fill="none" stroke="url(#stone-gold)" stroke-width="0.8"/>
+    </symbol>
+    <symbol id="i-veggente" viewBox="0 0 24 24">
+      <path d="M12 2 L22 20 L2 20 Z" fill="none" stroke="url(#stone-gold)" stroke-width="1"/>
+      <path d="M6 16 Q12 11 18 16 Q12 21 6 16 Z" fill="none" stroke="url(#stone-silver)" stroke-width="1"/>
+      <circle cx="12" cy="16" r="2" fill="url(#stone-gold)"/>
+    </symbol>
+    <symbol id="i-viandante" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9.5" fill="none" stroke="url(#stone-silver)" stroke-width="0.8"/>
+      <path d="M12 5 L13.5 10.5 L19 12 L13.5 13.5 L12 19 L10.5 13.5 L5 12 L10.5 10.5 Z"
+        fill="url(#stone-gold)" opacity="0.9"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="frame">
+  <div class="header">
+    <div class="title">Il Crocevia</div>
+    <div class="subtitle">— cerchio di pietra e fuoco —</div>
+    <div class="fuoco-row">
+      <div class="braci-small"></div>
+      <span class="fuoco-text">Fuoco acceso · Samhain tra quattro giorni</span>
+      <div class="braci-small"></div>
+    </div>
+  </div>
+
+  <div class="section-title">Scegli la tua pietra</div>
+  <div class="archetipi">
+    <div class="archetipo sel" onclick="sel(this)">
+      <div class="pietra"><svg><use href="#i-strega"/></svg></div>
+      <div class="nome">Strega</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="pietra"><svg><use href="#i-stregone"/></svg></div>
+      <div class="nome">Stregone</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="pietra"><svg><use href="#i-sciamano"/></svg></div>
+      <div class="nome">Sciamano</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="pietra"><svg><use href="#i-guaritore"/></svg></div>
+      <div class="nome">Guaritore</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="pietra"><svg><use href="#i-veggente"/></svg></div>
+      <div class="nome">Veggente</div>
+    </div>
+    <div class="archetipo" onclick="sel(this)">
+      <div class="pietra"><svg><use href="#i-viandante"/></svg></div>
+      <div class="nome">Viandante</div>
+    </div>
+  </div>
+
+  <div class="section-title">Il tuo cerchio · Milano</div>
+  <div class="cerchio-wrap">
+    <div class="cerchio">
+      <!-- Pietre erette (stone circle) -->
+      <div class="standing-stone ss1"></div>
+      <div class="standing-stone ss2"></div>
+      <div class="standing-stone ss3"></div>
+      <div class="standing-stone ss4"></div>
+      <div class="standing-stone ss5"></div>
+      <div class="standing-stone ss6"></div>
+
+      <!-- Brace centrale -->
+      <div class="brazier">
+        <div class="glow"></div>
+        <div class="pietra-base"></div>
+        <div class="fuoco"></div>
+        <div class="fuoco-inner"></div>
+        <svg><use href="#i-strega"/></svg>
+        <span class="brazier-label">Tu</span>
+      </div>
+
+      <!-- Ceneri che salgono -->
+      <div class="embers">
+        <div class="ember" style="animation-delay:0s"></div>
+        <div class="ember" style="animation-delay:1s"></div>
+        <div class="ember" style="animation-delay:2s"></div>
+        <div class="ember" style="animation-delay:3s"></div>
+      </div>
+
+      <div class="membro m1">
+        <svg><use href="#i-veggente"/></svg>
+        <span class="tag">Luna Rossa</span>
+      </div>
+      <div class="membro m2">
+        <svg><use href="#i-sciamano"/></svg>
+        <span class="tag">Corvo Nero</span>
+      </div>
+      <div class="membro m3">
+        <svg><use href="#i-guaritore"/></svg>
+        <span class="tag">Salice</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Getta nel fuoco</div>
+  <div class="segnali">
+    <div class="segnale" title="Rituale in corso">
+      <div class="pietra-piccola"><div class="brace"></div></div>
+      <div class="slabel">rituale</div>
+    </div>
+    <div class="segnale inattivo" title="Pericolo">
+      <div class="pietra-piccola"><div class="brace"></div></div>
+      <div class="slabel">pericolo</div>
+    </div>
+    <div class="segnale inattivo" title="Tutto bene">
+      <div class="pietra-piccola"><div class="brace"></div></div>
+      <div class="slabel">tutto bene</div>
+    </div>
+    <div class="segnale inattivo" title="Cerco aiuto">
+      <div class="pietra-piccola"><div class="brace"></div></div>
+      <div class="slabel">cerco aiuto</div>
+    </div>
+  </div>
+
+  <div class="info">
+    Sei una <b>Strega</b> del cerchio di Milano.<br/>
+    <b>Tre</b> anime intorno al tuo fuoco. <b>Luna Rossa</b> ha acceso una brace.
+  </div>
+
+  <div class="sigillo-fondo">◆</div>
+</div>
+
+<div class="back">
+  <a href="index.html">← Torna agli esempi</a> · V2-B: Pietra e Fuoco
+</div>
+
+<script>
+  function sel(el) {
+    document.querySelectorAll('.archetipo').forEach(a => a.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+  document.querySelectorAll('.segnale').forEach(s => {
+    s.addEventListener('click', () => s.classList.toggle('inattivo'));
+  });
+</script>
+</body>
+</html>

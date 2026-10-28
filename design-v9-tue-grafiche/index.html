@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bussola delle Anime — Le tue grafiche</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Uncial+Antiqua&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    background:#0d0a07;
+    display:flex; justify-content:center; align-items:center;
+    font-family:'IM Fell English', 'Cormorant Garamond', Georgia, serif;
+    overflow:hidden;
+  }
+
+  /* ===== TELEFONO (frame fisico) ===== */
+  .phone {
+    position:relative;
+    width:390px; height:844px;
+    border-radius:40px;
+    background:#1a1a1a;
+    box-shadow:
+      0 0 0 3px #2a2a2a,
+      0 0 0 6px #0a0a0a,
+      0 30px 80px rgba(0,0,0,.8),
+      inset 0 0 60px rgba(0,0,0,.5);
+    overflow:hidden;
+  }
+  /* Notch */
+  .phone::before {
+    content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:140px; height:24px; background:#0a0a0a; border-radius:0 0 16px 16px; z-index:100;
+  }
+
+  /* ===== SCHERMO: Pergamena reale ===== */
+  .screen {
+    position:absolute; inset:8px;
+    border-radius:32px; overflow:hidden;
+    background:#1a1410;
+  }
+  .pergamena-bg {
+    position:absolute; inset:0;
+    background:url('assets/pergamena.png') center/cover;
+    filter:sepia(.3) brightness(.95);
+  }
+  /* Ombra candela (luce laterale calda) */
+  .ombra {
+    position:absolute; top:-50px; left:-50px; width:400px; height:400px;
+    background:url('assets/ombra-candela.png') center/contain no-repeat;
+    mix-blend-mode:screen; opacity:.6;
+  }
+  /* Cera colata in alto */
+  .cera {
+    position:absolute; top:0; left:0; right:0; height:80px;
+    background:url('assets/cera-colata.png') top/100% auto no-repeat;
+    z-index:10;
+  }
+
+  /* ===== CONTENUTO ===== */
+  .content {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center;
+    padding:50px 20px 20px;
+    z-index:5;
+  }
+
+  /* Header: luna + titolo + candela */
+  .header {
+    display:flex; align-items:center; justify-content:space-between;
+    width:100%; margin-bottom:8px;
+  }
+  .icona-header {
+    width:44px; height:44px;
+    background:rgba(255,250,235,.15);
+    border:2px solid #6b5230; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.3), inset 0 0 10px rgba(0,0,0,.2);
+  }
+  .icona-header img { width:28px; height:28px; }
+
+  .titolo-wrap { text-align:center; flex:1; }
+  .titolo {
+    font-family:'Uncial Antiqua', serif;
+    font-size:22px; color:#3a2a1a; letter-spacing:1px;
+    text-shadow:1px 1px 0 rgba(255,250,235,.5);
+  }
+  .sottotitolo {
+    font-size:12px; color:#6b5230; font-style:italic; margin-top:2px;
+  }
+
+  /* ===== BUSSOLA CENTRALE ===== */
+  .bussola-wrap {
+    position:relative;
+    width:300px; height:300px;
+    margin:12px 0;
+    filter:drop-shadow(4px 6px 12px rgba(0,0,0,.4));
+  }
+  .bussola-base {
+    position:absolute; inset:0;
+    background:url('assets/bussola-base.png') center/contain no-repeat;
+  }
+  /* Lancette (ruotano dal centro) */
+  .lancette { position:absolute; inset:0; }
+  .lancetta {
+    position:absolute; bottom:50%; left:50%;
+    transform-origin:bottom center;
+    transition:transform 1.5s cubic-bezier(.4,0,.2,1);
+  }
+  .lancetta img { display:block; }
+  
+  /* 3 lancette con angoli diversi */
+  .lancetta.grande {
+    width:32px; margin-left:-16px;
+    transform:rotate(-45deg); /* nord-ovest: utente più vicino */
+    z-index:3;
+  }
+  .lancetta.grande img { width:32px; }
+  
+  .lancetta.media {
+    width:24px; margin-left:-12px;
+    transform:rotate(35deg); /* nord-est: secondo utente */
+    z-index:2;
+  }
+  .lancetta.media img { width:24px; }
+  
+  .lancetta.piccola {
+    width:16px; margin-left:-8px;
+    transform:rotate(155deg); /* sud-est: POI sacro */
+    z-index:4;
+  }
+  .lancetta.piccola img { width:16px; }
+
+  /* Centro bussola (punto fisso) */
+  .centro {
+    position:absolute; top:50%; left:50%;
+    width:28px; height:28px; margin:-14px 0 0 -14px;
+    background:radial-gradient(circle at 35% 30%, #4a3a28, #1a120a);
+    border:3px solid #3a2a1a; border-radius:50%;
+    box-shadow:0 2px 6px rgba(0,0,0,.5), inset 0 1px 3px rgba(255,250,235,.2);
+    z-index:10;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .centro::after {
+    content:'✦'; font-size:12px; color:#b8963e;
+    text-shadow:0 0 6px rgba(184,150,62,.6);
+  }
+
+  /* ===== LEGENDA (sotto bussola, stile pergamena) ===== */
+  .legenda {
+    width:100%; margin-top:8px;
+    background:rgba(255,250,235,.25);
+    border:1px solid #8a6a3a; border-radius:4px;
+    padding:10px 12px;
+    box-shadow:inset 0 0 20px rgba(0,0,0,.1);
+  }
+  .legenda-titolo {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px;
+    color:#4a3a20; text-align:center; margin-bottom:8px;
+    text-transform:uppercase;
+  }
+  .legenda-item {
+    display:flex; align-items:center; gap:10px;
+    padding:6px 8px; margin-bottom:4px;
+    border-bottom:1px dotted #a08a5a;
+    cursor:pointer; transition:.2s;
+    border-radius:2px;
+  }
+  .legenda-item:last-child { border-bottom:none; margin-bottom:0; }
+  .legenda-item:hover, .legenda-item.sel {
+    background:rgba(184,150,62,.15);
+  }
+  .legenda-item .dot {
+    width:12px; height:12px; border-radius:50%; flex-shrink:0;
+    border:2px solid #3a2a1a;
+  }
+  .dot.grande { background:#6b5a8a; box-shadow:0 0 4px #6b5a8a; }
+  .dot.media { background:#4a3a6a; }
+  .dot.piccola { background:#b8963e; box-shadow:0 0 4px #b8963e; }
+  
+  .legenda-item .info { flex:1; }
+  .legenda-item .nome {
+    font-size:14px; color:#2a1a0a; font-weight:600;
+  }
+  .legenda-item .dettaglio {
+    font-size:11px; color:#6b5230; font-style:italic;
+  }
+  .legenda-item .etichetta {
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:1px;
+    color:#8a6a3a; text-transform:uppercase;
+  }
+
+  /* ===== AZIONI IN BASSO (3 icone) ===== */
+  .azioni {
+    display:flex; justify-content:center; gap:24px;
+    margin-top:auto; padding-top:12px;
+  }
+  .azione {
+    width:56px; height:56px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #f0e6cc, #d4c49a);
+    border:3px solid #6b5230;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:.2s;
+    box-shadow:0 4px 10px rgba(0,0,0,.4), inset 0 2px 4px rgba(255,255,255,.3);
+    position:relative;
+  }
+  .azione:hover { transform:translateY(-3px); box-shadow:0 8px 16px rgba(0,0,0,.5); }
+  .azione:active { transform:translateY(0); }
+  .azione img { width:32px; height:32px; }
+  .azione .badge {
+    position:absolute; top:-4px; right:-4px;
+    width:18px; height:18px; border-radius:50%;
+    background:#b8321e; border:2px solid #f0e6cc;
+    font-size:10px; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cinzel',serif; font-weight:600;
+  }
+
+  /* ===== SEGNALIBRO (spunta a destra) ===== */
+  .segnalibro {
+    position:absolute; right:-8px; top:120px;
+    width:40px; height:120px;
+    background:url('assets/segnalibro.png') center/contain no-repeat;
+    cursor:pointer; z-index:20;
+    filter:drop-shadow(-3px 3px 6px rgba(0,0,0,.4));
+    transition:right .2s;
+  }
+  .segnalibro:hover { right:-4px; }
+
+  /* ===== MENU SEGNALIBRO (nascosto, esce al click) ===== */
+  .menu-laterale {
+    position:absolute; top:0; right:-200px; bottom:0;
+    width:200px; background:rgba(42,26,16,.95);
+    border-left:3px solid #6b5230;
+    transition:right .3s; z-index:50;
+    padding:60px 20px 20px;
+    backdrop-filter:blur(4px);
+  }
+  .menu-laterale.aperto { right:0; }
+  .menu-laterale h4 {
+    font-family:'Uncial Antiqua',serif; color:#d4b860;
+    font-size:16px; margin-bottom:16px; text-align:center;
+  }
+  .menu-laterale a {
+    display:block; padding:10px; color:#c4a860;
+    text-decoration:none; font-size:14px; border-bottom:1px dotted #6b5230;
+  }
+  .menu-laterale a:hover { color:#f0d878; background:rgba(184,150,62,.1); }
+
+  /* ===== NOTA IN FONDO ===== */
+  .nota {
+    margin-top:10px; font-size:10px; color:#6b5230;
+    font-style:italic; text-align:center;
+  }
+
+  /* ===== V8 label ===== */
+  .v8-label {
+    position:absolute; bottom:12px; left:20px;
+    font-size:10px; color:#4a3a20; font-style:italic;
+    z-index:5;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen">
+    <!-- Sfondo pergamena reale -->
+    <div class="pergamena-bg"></div>
+    <div class="ombra"></div>
+    <div class="cera"></div>
+
+    <div class="content">
+      <!-- Header: luna | titolo | candela -->
+      <div class="header">
+        <div class="icona-header"><img src="assets/icona-luna.png" alt="Luna"></div>
+        <div class="titolo-wrap">
+          <div class="titolo">Bussola delle Anime</div>
+          <div class="sottotitolo">tema della Strega · Milano</div>
+        </div>
+        <div class="icona-header"><img src="assets/icona-candela.png" alt="Candela"></div>
+      </div>
+
+      <!-- Bussola centrale -->
+      <div class="bussola-wrap">
+        <div class="bussola-base"></div>
+        <div class="lancette">
+          <div class="lancetta piccola" data-tipo="piccola"><img src="assets/lancetta-piccola.png" alt="POI"></div>
+          <div class="lancetta media" data-tipo="media"><img src="assets/lancetta-media.png" alt="Secondo utente"></div>
+          <div class="lancetta grande" data-tipo="grande"><img src="assets/lancetta-grande.png" alt="Utente più vicino"></div>
+        </div>
+        <div class="centro"></div>
+      </div>
+
+      <!-- Legenda -->
+      <div class="legenda">
+        <div class="legenda-titolo">Le tre lancette</div>
+        <div class="legenda-item sel" data-tipo="grande">
+          <div class="dot grande"></div>
+          <div class="info">
+            <div class="nome">Luna Rossa</div>
+            <div class="dettaglio">Veggente · candela accesa</div>
+          </div>
+          <div class="etichetta">più vicina</div>
+        </div>
+        <div class="legenda-item" data-tipo="media">
+          <div class="dot media"></div>
+          <div class="info">
+            <div class="nome">Corvo Nero</div>
+            <div class="dettaglio">Sciamano · silenzioso</div>
+          </div>
+          <div class="etichetta">seconda</div>
+        </div>
+        <div class="legenda-item" data-tipo="piccola">
+          <div class="dot piccola"></div>
+          <div class="info">
+            <div class="nome">Quercia dei Sussurri</div>
+            <div class="dettaglio">Luogo sacro · congrega</div>
+          </div>
+          <div class="etichetta">il sacro</div>
+        </div>
+      </div>
+
+      <!-- Azioni in basso -->
+      <div class="azioni">
+        <div class="azione" title="Accendi una candela"><img src="assets/icona-candela.png" alt="Candela"></div>
+        <div class="azione" title="Scrivi una lettera"><img src="assets/icona-lettera.png" alt="Lettera"><span class="badge">1</span></div>
+        <div class="azione" title="Suona la campana"><img src="assets/icona-campana.png" alt="Campana"></div>
+      </div>
+
+      <div class="nota">niente GPS · niente distanze · solo la bussola sa</div>
+    </div>
+
+    <!-- Segnalibro laterale -->
+    <div class="segnalibro" id="segnalibro" title="Menu"></div>
+
+    <!-- Menu laterale (nascosto) -->
+    <div class="menu-laterale" id="menu">
+      <h4>✦ Indice ✦</h4>
+      <a href="#">La mia via</a>
+      <a href="#">Il cerchio</a>
+      <a href="#">Le congreghe</a>
+      <a href="#">Calendario sacro</a>
+      <a href="#">Impostazioni</a>
+    </div>
+
+    <div class="v8-label">V8 · le tue grafiche</div>
+  </div>
+</div>
+
+<script>
+  // Legenda cliccabile: seleziona e anima lancetta
+  document.querySelectorAll('.legenda-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.legenda-item').forEach(function(i) { i.classList.remove('sel'); });
+      this.classList.add('sel');
+      var tipo = this.dataset.tipo;
+      
+      // Tutte le lancette si affievoliscono
+      document.querySelectorAll('.lancetta').forEach(function(l) {
+        l.style.opacity = '0.25';
+      });
+      // Quella selezionata si illumina
+      var sel = document.querySelector('.lancetta.' + tipo);
+      if (sel) {
+        sel.style.opacity = '1';
+        sel.style.filter = 'drop-shadow(0 0 6px rgba(184,150,62,.8))';
+      }
+    });
+  });
+
+  // Segnalibro: apre/chiude menu
+  var menuOpen = false;
+  document.getElementById('segnalibro').addEventListener('click', function() {
+    menuOpen = !menuOpen;
+    document.getElementById('menu').classList.toggle('aperto', menuOpen);
+  });
+
+  // Azioni (feedback visivo)
+  document.querySelectorAll('.azione').forEach(function(a) {
+    a.addEventListener('click', function() {
+      this.style.transform = 'scale(0.9)';
+      setTimeout(() => { this.style.transform = ''; }, 150);
+    });
+  });
+</script>
+</body>
+</html>

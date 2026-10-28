@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Il Crocevia — 6 Temi per Archetipo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh; background:#0d0b08;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(60,45,25,.2), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    color:#c8b898; font-family:'Cormorant Garamond', Georgia, serif;
+    display:flex; flex-direction:column; align-items:center; padding:30px 16px;
+  }
+  h1 { font-family:'Cinzel',serif; font-size:22px; letter-spacing:4px; color:#c9a84c; margin-bottom:6px; font-weight:400; }
+  .sub { font-size:14px; color:#8a7050; font-style:italic; margin-bottom:28px; text-align:center; max-width:400px; }
+  .griglia { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; width:min(440px,100%); }
+  @media(max-width:400px){ .griglia{grid-template-columns:1fr;} }
+  .tema {
+    display:block; text-decoration:none; color:inherit; padding:16px 12px;
+    border:1px solid #2a2018; border-radius:8px; text-align:center;
+    transition:.3s; background:linear-gradient(180deg,#1a1410,#12100c);
+  }
+  .tema:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.4); }
+  .tema .icona { font-size:32px; margin-bottom:8px; display:block; }
+  .tema .nome { font-family:'Cinzel',serif; font-size:13px; letter-spacing:1px; color:#d4c4a0; margin-bottom:4px; }
+  .tema .desc { font-size:11px; color:#8a7050; font-style:italic; line-height:1.4; }
+  /* Colori bordo per tema */
+  .t1:hover{border-color:#8a5aa8;box-shadow:0 8px 24px rgba(138,90,168,.2)}
+  .t2:hover{border-color:#b87333;box-shadow:0 8px 24px rgba(184,115,51,.2)}
+  .t3:hover{border-color:#8a6a3a;box-shadow:0 8px 24px rgba(138,106,58,.2)}
+  .t4:hover{border-color:#6b8e5a;box-shadow:0 8px 24px rgba(107,142,90,.2)}
+  .t5:hover{border-color:#6a7090;box-shadow:0 8px 24px rgba(106,112,144,.2)}
+  .t6:hover{border-color:#c4956a;box-shadow:0 8px 24px rgba(196,149,106,.2)}
+</style>
+</head>
+<body>
+  <h1>✦ Il Crocevia ✦</h1>
+  <p class="sub">Ogni archetipo ha il suo tema. Scegli il tuo, viandante.</p>
+  <div class="griglia">
+    <a class="tema t1" href="tema-1-strega.html"><span class="icona">☾</span><div class="nome">STREGA</div><div class="desc">Pergamena delle Ombre<br/>candele · luna · sigilli</div></a>
+    <a class="tema t2" href="tema-2-stregone.html"><span class="icona">🜂</span><div class="nome">STREGONE</div><div class="desc">Libro del Fuoco<br/>athanor · elementi · alchimia</div></a>
+    <a class="tema t3" href="tema-3-sciamano.html"><span class="icona">🪶</span><div class="nome">SCIAMANO</div><div class="desc">Pelle del Tamburo<br/>totem · spiriti · tribù</div></a>
+    <a class="tema t4" href="tema-4-guaritore.html"><span class="icona">🌿</span><div class="nome">GUARITORE</div><div class="desc">Erbario Antico<br/>erbe · ampolle · giardino</div></a>
+    <a class="tema t5" href="tema-5-veggente.html"><span class="icona">👁</span><div class="nome">VEGGENTE</div><div class="desc">Atlante Stellato<br/>costellazioni · stelle · cielo</div></a>
+    <a class="tema t6" href="tema-6-viandante.html"><span class="icona">🧭</span><div class="nome">VIANDANTE</div><div class="desc">Diario di Strada<br/>orme · mappe · sentieri</div></a>
+  </div>
+  <p style="margin-top:24px;font-size:11px;color:#5a4a30;font-style:italic;">La grafica cambia in base all'archetipo scelto dall'utente.</p>
+</body>
+</html>

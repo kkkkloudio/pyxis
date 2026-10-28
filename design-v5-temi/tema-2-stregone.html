@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tema STREGONE — Libro del Fuoco</title>
+<style>
+  /* ═══════════════════════════════════════════
+     TEMA STREGONE — "Libro del Fuoco"
+     Pelle nera, rame, athanor, fiamme, simboli
+     alchemici. Colori: nero, rosso, oro, rame.
+     Layout: tavole alchemiche, diagrammi,
+     simboli sparsi. MOLTO LEGGIBILE.
+     ═══════════════════════════════════════════ */
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Uncial+Antiqua&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --nero:#0a0806; --rame:#b87333; --oro:#d4a020; --rosso:#c41e1e;
+    --pergamena:#e8dcc0; --inchiostro:#2a1a0a; --grigio:#8a7a6a;
+  }
+  body {
+    min-height:100vh; background:var(--nero);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 30% 20%, rgba(80,30,10,.15), transparent),
+      radial-gradient(ellipse 50% 40% at 70% 80%, rgba(60,20,8,.12), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.1'/%3E%3C/svg%3E");
+    color:var(--pergamena);
+    font-family:'Cormorant Garamond', Georgia, serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:16px 10px;
+  }
+  .tomo {
+    width:min(430px, 100%);
+    background:linear-gradient(145deg, #1a1410 0%, #0a0806 100%);
+    border:2px solid #3a2418;
+    border-radius:8px;
+    box-shadow:
+      inset 0 0 40px rgba(0,0,0,.8),
+      0 12px 40px rgba(0,0,0,.7),
+      0 0 0 3px var(--nero),
+      0 0 0 4px #2a1a10;
+    padding:24px 20px;
+    position:relative;
+  }
+  /* Rilegatura rame laterale */
+  .tomo::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:10px;
+    background:repeating-linear-gradient(0deg, #4a2a18 0 6px, var(--nero) 6px 12px);
+    border-right:2px solid var(--rame);
+    border-radius:8px 0 0 8px;
+  }
+  /* Cerniere rame */
+  .cerniera { position:absolute; width:6px; height:24px; background:linear-gradient(90deg,#6a3a1a,var(--rame),#6a3a1a); border-radius:2px; right:-3px; }
+  .ce1{top:20%}.ce2{top:50%;transform:translateY(-50%)}.ce3{bottom:20%}
+
+  /* Athanor (forno alchemico) come header */
+  .athanor {
+    width:80px; height:80px; margin:0 auto 14px; position:relative;
+  }
+  .athanor .corpo {
+    position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+    width:60px; height:40px;
+    background:linear-gradient(180deg, #2a1a10, #0a0806);
+    border:3px solid var(--rame); border-radius:30px 30px 4px 4px;
+    box-shadow:inset 0 -10px 20px rgba(0,0,0,.6), 0 4px 12px rgba(0,0,0,.5);
+  }
+  .athanor .fuoco {
+    position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+    width:32px; height:36px;
+    background:radial-gradient(ellipse at 50% 90%, #ffd060 0%, #ff8830 35%, var(--rosso) 70%, transparent 95%);
+    border-radius:50% 50% 40% 40% / 70% 70% 30% 30%;
+    filter:blur(1px); animation:flickerFire 1.2s ease-in-out infinite;
+  }
+  .athanor .fuoco-interno {
+    position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+    width:16px; height:20px;
+    background:radial-gradient(ellipse at 50% 90%, #fff0c0, #ffd060 60%, transparent);
+    border-radius:50% 50% 40% 40% / 70% 70% 30% 30%;
+    filter:blur(2px); animation:flickerFire 0.8s ease-in-out infinite reverse;
+  }
+  @keyframes flickerFire {
+    0%,100% { transform:translateX(-50%) scale(1) skewX(0); opacity:.9; }
+    25% { transform:translateX(-50%) scale(1.05,.95) skewX(4deg); opacity:1; }
+    50% { transform:translateX(-50%) scale(.95,1.05) skewX(-3deg); opacity:.85; }
+    75% { transform:translateX(-50%) scale(1.02,.98) skewX(2deg); opacity:.95; }
+  }
+  .athanor .ciminiera {
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:16px; height:20px; background:linear-gradient(180deg, #3a2418, #1a0f08);
+    border:2px solid var(--rame); border-bottom:none; border-radius:4px 4px 0 0;
+  }
+  .athanor .fumo {
+    position:absolute; top:-12px; left:50%; transform:translateX(-50%);
+    width:8px; height:16px; background:rgba(150,140,130,.3); border-radius:50%;
+    filter:blur(3px); animation:smoke 3s ease-in-out infinite;
+  }
+  @keyframes smoke { 0%{opacity:0;transform:translateX(-50%) translateY(0) scale(.5)} 50%{opacity:.4;transform:translateX(-50%) translateY(-8px) scale(1)} 100%{opacity:0;transform:translateX(-50%) translateY(-16px) scale(1.5)} }
+
+  .titolo {
+    font-family:'Uncial Antiqua', 'Cinzel', serif;
+    font-size:22px; letter-spacing:2px; color:var(--oro);
+    text-align:center; text-shadow:0 0 12px rgba(212,160,32,.4), 1px 1px 2px rgba(0,0,0,.9);
+  }
+  .sottotitolo {
+    text-align:center; font-style:italic; font-size:14px;
+    color:var(--rame); margin-top:4px; letter-spacing:2px;
+  }
+
+  /* Testo leggibile */
+  .testo {
+    margin-top:16px; font-size:16px; line-height:1.7;
+    color:var(--pergamena); text-align:justify;
+  }
+  .testo b { color:var(--oro); font-weight:600; }
+
+  /* Simboli alchemici grandi e chiari */
+  .simboli {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:16px 0;
+  }
+  .simbolo {
+    aspect-ratio:1; border:2px solid var(--rame); border-radius:8px;
+    background:radial-gradient(circle at 35% 30%, #1a1410, #0a0806);
+    display:flex; align-items:center; justify-content:center;
+    font-size:28px; color:var(--oro); cursor:pointer; transition:.3s;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,.6), 0 3px 6px rgba(0,0,0,.4);
+  }
+  .simbolo:hover, .simbolo.sel {
+    border-color:var(--oro); transform:scale(1.08);
+    box-shadow:0 0 15px rgba(212,160,32,.4), inset 0 2px 6px rgba(0,0,0,.6);
+    text-shadow:0 0 10px rgba(212,160,32,.6);
+  }
+  .simbolo .nome { font-size:9px; font-family:'Cinzel',serif; color:var(--grigio); margin-top:2px; letter-spacing:1px; }
+
+  /* Diagramma alchemico (cerchio) */
+  .diagramma {
+    position:relative; width:220px; height:220px; margin:16px auto;
+  }
+  .diagramma .anello { position:absolute; border-radius:50%; border:2px solid var(--rame); }
+  .diagramma .a1 { inset:0; }
+  .diagramma .a2 { inset:16px; border-style:dashed; border-color:#6a3a1a; }
+  .diagramma .a3 { inset:40px; border-color:var(--oro); background:radial-gradient(circle, rgba(80,40,10,.2), transparent); }
+  /* Triangoli alchemici */
+  .diagramma .triangolo {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:0; height:0;
+    border-left:35px solid transparent; border-right:35px solid transparent;
+    border-bottom:60px solid rgba(184,115,51,.15);
+  }
+  .diagramma .triangolo2 {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(180deg);
+    width:0; height:0;
+    border-left:35px solid transparent; border-right:35px solid transparent;
+    border-bottom:60px solid rgba(212,160,32,.1);
+  }
+  .nucleo {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:48px; height:48px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #2a1a10, #0a0806);
+    border:2px solid var(--oro);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 15px rgba(212,160,32,.3), inset 0 2px 6px rgba(0,0,0,.6);
+  }
+  .nucleo::after { content:'🜂'; font-size:20px; color:var(--oro); }
+  .nodo-alch {
+    position:absolute; width:32px; height:32px; border-radius:50%;
+    background:var(--nero); border:2px solid var(--rame);
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; color:var(--oro); cursor:pointer; transition:.2s;
+  }
+  .nodo-alch:hover { border-color:var(--oro); transform:scale(1.2); box-shadow:0 0 10px rgba(212,160,32,.4); }
+  .nodo-alch .nome { position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); font-size:8px; color:var(--grigio); font-family:'Cinzel',serif; white-space:nowrap; }
+  .na1{top:4%;left:50%;transform:translateX(-50%)}.na2{bottom:16%;left:8%}.na3{bottom:16%;right:8%}
+
+  /* Rubrica */
+  .rubrica {
+    font-family:'Cinzel', serif; font-size:13px; letter-spacing:3px;
+    color:var(--oro); text-align:center; margin:16px 0 8px;
+    text-transform:uppercase;
+  }
+  .rubrica::before, .rubrica::after { content:' ☿ '; color:var(--rame); font-size:11px; }
+
+  /* Fuochi come segnali (grandi e chiari) */
+  .fuochi {
+    display:flex; justify-content:center; gap:16px; margin:12px 0;
+    padding:14px 0; border-top:1px solid #3a2418; border-bottom:1px solid #3a2418;
+  }
+  .fuoco-segnale {
+    text-align:center; cursor:pointer; transition:.3s; padding:6px;
+  }
+  .fuoco-segnale .brace {
+    width:44px; height:44px; margin:0 auto 6px; border-radius:50%;
+    background:radial-gradient(circle at 50% 70%, #3a1a10, #0a0806);
+    border:3px solid #3a2418;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; transition:.3s;
+  }
+  .fuoco-segnale.acceso .brace {
+    border-color:var(--rosso);
+    background:radial-gradient(circle at 50% 70%, #5a1a1a, #1a0808);
+    box-shadow:0 0 20px rgba(196,30,30,.5), inset 0 0 10px rgba(196,30,30,.3);
+    animation:pulseFire 1.5s ease-in-out infinite;
+  }
+  @keyframes pulseFire { 0%,100%{box-shadow:0 0 20px rgba(196,30,30,.5), inset 0 0 10px rgba(196,30,30,.3)} 50%{box-shadow:0 0 30px rgba(196,30,30,.7), inset 0 0 15px rgba(196,30,30,.4)} }
+  .fuoco-segnale span {
+    font-size:11px; color:var(--grigio); font-family:'Cinzel',serif;
+    letter-spacing:1px; text-transform:uppercase; font-weight:600;
+  }
+  .fuoco-segnale.acceso span { color:var(--oro); }
+
+  /* Tavola (congrega) */
+  .tavola-congrega {
+    margin-top:14px; padding:14px;
+    border:2px solid var(--rame); border-radius:6px;
+    background:rgba(26,20,16,.6);
+  }
+  .tavola-congrega .nome-tavola {
+    font-family:'Cinzel', serif; font-size:14px; color:var(--oro);
+    text-align:center; letter-spacing:2px; margin-bottom:10px;
+  }
+  .membri-tavola {
+    display:flex; justify-content:center; gap:8px; flex-wrap:wrap;
+  }
+  .membro-tavola {
+    width:36px; height:36px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #2a1a10, #0a0806);
+    border:2px solid #4a2a18;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; color:var(--rame); cursor:pointer; transition:.2s;
+  }
+  .membro-tavola:hover { border-color:var(--oro); transform:scale(1.15); color:var(--oro); }
+
+  .piè {
+    text-align:center; margin-top:18px; font-size:11px; color:#5a4a3a;
+    font-style:italic; letter-spacing:1px;
+  }
+  .piè::before { content:'🜏 '; color:var(--rame); }
+
+  .back { margin-top:16px; text-align:center; }
+  .back a {
+    font-family:'Cinzel', serif; font-size:11px; letter-spacing:2px;
+    color:var(--rame); text-decoration:none; text-transform:uppercase;
+  }
+  .back a:hover { color:var(--oro); }
+</style>
+</head>
+<body>
+
+<div class="tomo">
+  <div class="cerniera ce1"></div><div class="cerniera ce2"></div><div class="cerniera ce3"></div>
+
+  <div class="athanor">
+    <div class="ciminiera"></div><div class="fumo"></div>
+    <div class="corpo"></div><div class="fuoco"></div><div class="fuoco-interno"></div>
+  </div>
+  <div class="titolo">Libro del Fuoco</div>
+  <div class="sottotitolo">— tema dello Stregone —</div>
+
+  <div class="testo">
+    Tu sei <b>Ignis</b>, maestro dell'athanor. A Milano, tre anime sono
+    vicine al tuo fuoco. <b>Luna Rossa</b> ha acceso una fiamma questa notte.
+    Il tempo della Grande Opera si avvicina.
+  </div>
+
+  <div class="rubrica">Elementi</div>
+  <div class="simboli">
+    <div class="simbolo sel" title="Fuoco">🜂<div class="nome">Ignis</div></div>
+    <div class="simbolo" title="Aria">🜁<div class="nome">Aer</div></div>
+    <div class="simbolo" title="Terra">🜄<div class="nome">Terra</div></div>
+    <div class="simbolo" title="Acqua">🜃<div class="nome">Aqua</div></div>
+  </div>
+
+  <div class="rubrica">Il tuo Cerchio · Milano</div>
+  <div class="diagramma">
+    <div class="anello a1"></div><div class="anello a2"></div><div class="anello a3"></div>
+    <div class="triangolo"></div><div class="triangolo2"></div>
+    <div class="nucleo"></div>
+    <div class="nodo-alch na1" title="Veggente">☿<span class="nome">Luna Rossa</span></div>
+    <div class="nodo-alch na2" title="Strega">🜍<span class="nome">Corvo Nero</span></div>
+    <div class="nodo-alch na3" title="Guaritore">🜏<span class="nome">Salice</span></div>
+  </div>
+
+  <div class="rubrica">Alza una Fiamma</div>
+  <div class="fuochi">
+    <div class="fuoco-segnale acceso" onclick="toggleFuoco(this)">
+      <div class="brace">🔥</div><span>Opera in corso</span>
+    </div>
+    <div class="fuoco-segnale" onclick="toggleFuoco(this)">
+      <div class="brace">⚡</div><span>Pericolo</span>
+    </div>
+    <div class="fuoco-segnale" onclick="toggleFuoco(this)">
+      <div class="brace">✨</div><span>Perfetto</span>
+    </div>
+    <div class="fuoco-segnale" onclick="toggleFuoco(this)">
+      <div class="brace">🤲</div><span>Cerco aiuto</span>
+    </div>
+  </div>
+
+  <div class="tavola-congrega">
+    <div class="nome-tavola">🜂 Congregatio Ignis 🜂</div>
+    <div class="membri-tavola">
+      <div class="membro-tavola" title="Tu">🜂</div>
+      <div class="membro-tavola" title="Luna Rossa">☿</div>
+      <div class="membro-tavola" title="Corvo Nero">🜍</div>
+      <div class="membro-tavola" title="Salice">🜏</div>
+      <div class="membro-tavola" title="...">·</div>
+      <div class="membro-tavola" title="...">·</div>
+      <div class="membro-tavola" title="...">·</div>
+      <div class="membro-tavola" title="...">·</div>
+    </div>
+  </div>
+
+  <div class="piè">niente GPS · niente nomi veri · il fuoco non ha indirizzo</div>
+</div>
+
+<div class="back">
+  <a href="index.html">← Torna ai temi</a> · Tema 2/6: STREGONE
+</div>
+
+<script>
+  function toggleFuoco(el){el.classList.toggle('acceso');}
+  document.querySelectorAll('.simbolo').forEach(s=>s.addEventListener('click',()=>{
+    document.querySelectorAll('.simbolo').forEach(x=>x.classList.remove('sel'));s.classList.add('sel');
+  }));
+</script>
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Il Crocevia — V3-B: Bestiarium Notturnum</title>
+<style>
+  /* ============================================
+     V3-B — "BESTIARIUM NOTTURNUM" (Bestiario Medievale)
+     Ispirato ai bestiari: animali simbolici, bordi di fogliame,
+     inchiostro nero su pergamena,inschaft, riquadri con scene,
+     animali che rappresentano virtù/archetipi.
+     ============================================ */
+  @import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    /* Tavola di legno scuro (come un leggio da scriptorium) */
+    background:#2a1a0e;
+    background-image:
+      /* venature legno */
+      repeating-linear-gradient(90deg, transparent 0px, transparent 40px, rgba(0,0,0,.15) 40px, rgba(0,0,0,.15) 42px),
+      repeating-linear-gradient(0deg, transparent 0px, transparent 80px, rgba(0,0,0,.08) 80px, rgba(0,0,0,.08) 81px),
+      radial-gradient(ellipse 100% 60% at 50% 0%, rgba(80,50,25,.3), transparent);
+    color:#1a0f08;
+    font-family:'IM Fell English', 'Cormorant Garamond', Georgia, serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:16px 10px;
+  }
+  .tavola {
+    width:min(430px, 100%);
+    /* Pergamena appoggiata sul leggio */
+    background:#e8dcc0;
+    background-image:
+      radial-gradient(ellipse 30% 20% at 20% 15%, rgba(180,150,100,.2), transparent),
+      radial-gradient(ellipse 25% 20% at 80% 80%, rgba(170,140,90,.18), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    box-shadow:
+      0 4px 8px rgba(0,0,0,.4),
+      0 12px 32px rgba(0,0,0,.5),
+      inset 0 0 40px rgba(160,130,80,.2);
+    padding:0;
+    position:relative;
+    /* Bordi irregolari da pergamena tagliata a mano */
+    border-radius:2px 8px 4px 12px;
+  }
+
+  /* Bordo di fogliame (come nei bestiari) */
+  .bordo-fogliame {
+    position:absolute; inset:0; pointer-events:none;
+    background:
+      /* Foglie agli angoli */
+      radial-gradient(ellipse 20px 30px at 0% 0%, #4a6a2a 0 40%, transparent 41%),
+      radial-gradient(ellipse 20px 30px at 100% 0%, #4a6a2a 0 40%, transparent 41%),
+      radial-gradient(ellipse 20px 30px at 0% 100%, #4a6a2a 0 40%, transparent 41%),
+      radial-gradient(ellipse 20px 30px at 100% 100%, #4a6a2a 0 40%, transparent 41%);
+  }
+  /* Vignetta centrale (bordo nero spesso) */
+  .vignetta {
+    margin:16px;
+    border:2px solid #1a0f08;
+    padding:16px;
+    background:#f0e6cc;
+    background-image:
+      radial-gradient(ellipse 50% 30% at 50% 0%, rgba(255,250,235,.4), transparent);
+    position:relative;
+  }
+  /* Doppia bordura interna */
+  .vignetta::before {
+    content:''; position:absolute; inset:4px; pointer-events:none;
+    border:1px solid #8a6a3a;
+  }
+
+  .header {
+    text-align:center; margin-bottom:14px;
+    border-bottom:1px solid #8a6a3a; padding-bottom:10px;
+  }
+  .title {
+    font-family:'Uncial Antiqua', serif;
+    font-size:20px; letter-spacing:1px; color:#1a0f08;
+  }
+  .subtitle {
+    font-style:italic; font-size:12px; color:#6a4a2a;
+    margin-top:2px;
+  }
+  /* Data e scriba in alto */
+  .scriptio {
+    font-size:10px; color:#8a6a3a; font-style:italic;
+    display:flex; justify-content:space-between; margin-bottom:8px;
+  }
+
+  .rubrica {
+    font-family:'Cinzel', serif; font-size:12px; letter-spacing:2px;
+    color:#8a2a1a; text-align:center; margin:12px 0 8px;
+  }
+  .rubrica::before { content:'☙ '; color:#4a6a2a; }
+  .rubrica::after { content:' ⚜'; color:#4a6a2a; }
+
+  /* Archetipi come animali simbolici in riquadri */
+  .archetipi {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+    margin-bottom:6px;
+  }
+  .archetipo { text-align:center; cursor:pointer; transition:0.2s; }
+  .bestia {
+    width:56px; height:56px; margin:0 auto 4px;
+    border:1.5px solid #1a0f08;
+    background:#f8f0d8;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    /* Forma a scudo/araldica */
+    clip-path:polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+  }
+  .bestia::before {
+    content:''; position:absolute; inset:2px;
+    border:1px solid #8a6a3a;
+    clip-path:polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+  }
+  /* Colori diversi per ogni "specie" */
+  .bestia.strega { background:linear-gradient(180deg, #3a1a3a 0%, #1a0a1a 100%); }
+  .bestia.stregone { background:linear-gradient(180deg, #1a2a3a 0%, #0a1520 100%); }
+  .bestia.sciamano { background:linear-gradient(180deg, #3a3a1a 0%, #1a1a0a 100%); }
+  .bestia.guaritore { background:linear-gradient(180deg, #1a3a1a 0%, #0a1a0a 100%); }
+  .bestia.veggente { background:linear-gradient(180deg, #2a1a3a 0%, #150a20 100%); }
+  .bestia.viandante { background:linear-gradient(180deg, #3a2a1a 0%, #1a1508 100%); }
+
+  .bestia svg { width:28px; height:28px; position:relative; z-index:1; }
+  .archetipo .nome {
+    font-family:'Cinzel', serif; font-size:9px; letter-spacing:1px;
+    color:#4a3010; text-transform:uppercase;
+  }
+  .archetipo .latino {
+    font-size:8px; color:#8a6a3a; font-style:italic;
+  }
+  .archetipo:hover .bestia, .archetipo.sel .bestia {
+    box-shadow:0 0 8px rgba(138,42,26,.4);
+    transform:scale(1.05);
+  }
+  .archetipo.sel .nome { color:#8a2a1a; font-weight:600; }
+
+  /* Cerchio come " radura bestiale" con animali intorno */
+  .cerchio-wrap { text-align:center; margin:6px 0; }
+  .radura {
+    position:relative; width:240px; height:240px; margin:0 auto;
+    border:2px solid #1a0f08;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 50% 50%, #d4c49a 0%, #c4b088 60%, #b4a078 100%);
+    box-shadow:inset 0 0 20px rgba(140,110,70,.3);
+  }
+  /* Anello esterno con "fogliame" */
+  .radura::before {
+    content:''; position:absolute; inset:-6px; border-radius:50%;
+    border:3px dotted #4a6a2a;
+    opacity:.6;
+  }
+  /* Impronte di animali (zampate) sul bordo */
+  .zampa {
+    position:absolute; width:12px; height:12px;
+    background:#8a6a3a; border-radius:50% 50% 50% 0;
+    opacity:.4;
+  }
+
+  .centro {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:60px; height:60px;
+    /* Drago/fenice stilizzato al centro */
+    background:radial-gradient(circle at 50% 40%, #f8f0d8, #e0d0a8);
+    border:2px solid #8a2a1a;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 12px rgba(138,42,26,.3), inset 0 0 8px rgba(160,130,80,.3);
+  }
+  .centro svg { width:30px; height:30px; }
+  .centro-label {
+    position:absolute; bottom:-16px; left:50%; transform:translateX(-50%);
+    font-family:'Cinzel', serif; font-size:9px; color:#8a2a1a;
+    letter-spacing:2px; text-transform:uppercase; white-space:nowrap;
+  }
+
+  .membro {
+    position:absolute; width:38px; height:38px;
+    border:1.5px solid #1a0f08;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:0.2s;
+    box-shadow:0 2px 4px rgba(0,0,0,.2);
+  }
+  .membro:hover {
+    transform:scale(1.15);
+    box-shadow:0 0 10px rgba(138,42,26,.4), 0 2px 4px rgba(0,0,0,.2);
+  }
+  .membro svg { width:20px; height:20px; }
+  .membro .tag {
+    position:absolute; bottom:-14px; left:50%; transform:translateX(-50%);
+    font-style:italic; font-size:9px; color:#4a3010; white-space:nowrap;
+  }
+  /* Colori animali diversi */
+  .m1 { top:8%; left:50%; transform:translateX(-50%); background:linear-gradient(180deg, #2a1a3a, #150a20); }
+  .m2 { bottom:18%; left:8%; background:linear-gradient(180deg, #3a3a1a, #1a1a0a); }
+  .m3 { bottom:18%; right:8%; background:linear-gradient(180deg, #1a3a1a, #0a1a0a); }
+
+  /* Segnali come sigilli araldici */
+  .segnali {
+    display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
+    margin:8px 0; padding:10px 0;
+    border-top:1px solid #c4b088; border-bottom:1px solid #c4b088;
+  }
+  .segnale { text-align:center; cursor:pointer; transition:0.2s; }
+  .sigillo-araldico {
+    width:36px; height:40px; margin:0 auto 4px;
+    /* Forma a scudo araldico */
+    clip-path:polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+    background:linear-gradient(180deg, #8a2a1a 0%, #5a1a0a 100%);
+    border:2px solid #d4b860;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    box-shadow:0 2px 4px rgba(0,0,0,.3);
+  }
+  .sigillo-araldico.activo {
+    background:linear-gradient(180deg, #d4a020 0%, #b8860a 100%);
+    box-shadow:0 0 10px rgba(212,160,32,.5), 0 2px 4px rgba(0,0,0,.3);
+  }
+  .sigillo-araldico .simbolo {
+    color:#f8f0d8; font-size:14px;
+  }
+  .segnale.inattivo .sigillo-araldico {
+    background:linear-gradient(180deg, #6a5a4a 0%, #4a3a2a 100%);
+  }
+  .segnale.inattivo .simbolo { color:#a89878; }
+  .segnale .slabel {
+    font-family:'Cinzel', serif; font-size:8px; color:#6a4a2a;
+    letter-spacing:1px; text-transform:uppercase;
+  }
+
+  /* Testo bestiario */
+  .info {
+    font-size:13px; color:#1a0f08; line-height:1.7;
+    text-align:justify; margin-top:6px;
+    font-style:italic;
+  }
+  .info::first-letter {
+    font-family:'Uncial Antiqua', serif;
+    font-size:26px; color:#8a2a1a; float:left;
+    line-height:.8; margin-right:4px; font-style:normal;
+  }
+  .info b {
+    color:#8a2a1a; font-weight:600; font-style:normal;
+    font-family:'Cinzel', serif; font-size:11px; letter-spacing:.5px;
+  }
+
+  .colofone {
+    text-align:center; margin-top:10px; padding-top:8px;
+    border-top:1px solid #c4b088;
+    font-style:italic; font-size:10px; color:#6a4a2a;
+  }
+  .colofone::before { content:'🜏 '; }
+
+  .back { margin-top:14px; text-align:center; }
+  .back a {
+    font-family:'Cinzel', serif; font-size:10px; letter-spacing:2px;
+    color:#8a6a3a; text-decoration:none; text-transform:uppercase;
+  }
+  .back a:hover { color:#8a2a1a; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="oro-araldico" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f0d878"/>
+      <stop offset="50%" stop-color="#d4a020"/>
+      <stop offset="100%" stop-color="#b8860a"/>
+    </linearGradient>
+
+    <!-- Animali stilizzati (bestiario) -->
+    <!-- Strega: gufo (sapienza notturna) -->
+    <symbol id="i-strega" viewBox="0 0 24 24">
+      <path d="M12 4 C7 4 5 8 5 13 C5 18 8 21 12 21 C16 21 19 18 19 13 C19 8 17 4 12 4 Z"
+        fill="none" stroke="url(#oro-araldico)" stroke-width="1.5"/>
+      <circle cx="9" cy="11" r="2.5" fill="none" stroke="url(#oro-araldico)" stroke-width="1.2"/>
+      <circle cx="15" cy="11" r="2.5" fill="none" stroke="url(#oro-araldico)" stroke-width="1.2"/>
+      <circle cx="9" cy="11" r="0.8" fill="url(#oro-araldico)"/>
+      <circle cx="15" cy="11" r="0.8" fill="url(#oro-araldico)"/>
+      <path d="M12 14 L10.5 16 L12 15 L13.5 16 Z" fill="url(#oro-araldico)"/>
+      <path d="M7 5 L5 2 M17 5 L19 2" stroke="url(#oro-araldico)" stroke-width="1.2" stroke-linecap="round"/>
+    </symbol>
+    <!-- Stregone: corvo (messaggero) -->
+    <symbol id="i-stregone" viewBox="0 0 24 24">
+      <path d="M4 18 Q8 14 12 15 Q16 16 20 12 Q18 18 12 19 Q6 20 4 18 Z"
+        fill="none" stroke="url(#oro-araldico)" stroke-width="1.5"/>
+      <circle cx="17" cy="11" r="2.5" fill="none" stroke="url(#oro-araldico)" stroke-width="1.5"/>
+      <path d="M19.5 11 L22 10 L19.5 12.5" fill="url(#oro-araldico)"/>
+      <circle cx="17.5" cy="10.5" r="0.5" fill="#f8f0d8"/>
+      <path d="M8 16 L6 19 M12 17 L11 20" stroke="url(#oro-araldico)" stroke-width="1"/>
+    </symbol>
+    <!-- Sciamano: cervo (connessione natura) -->
+    <symbol id="i-sciamano" viewBox="0 0 24 24">
+      <circle cx="12" cy="13" r="5" fill="none" stroke="url(#oro-araldico)" stroke-width="1.5"/>
+      <path d="M9 9 C7 7 6 5 6 2 M9 9 C8 7.5 7.5 6 7.5 4.5"
+        fill="none" stroke="url(#oro-araldico)" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M15 9 C17 7 18 5 18 2 M15 9 C16 7.5 16.5 6 16.5 4.5"
+        fill="none" stroke="url(#oro-araldico)" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M6 2 L4.5 3.5 M6 2 L7.5 3.5 M18 2 L16.5 3.5 M18 2 L19.5 3.5"
+        stroke="url(#oro-araldico)" stroke-width="1"/>
+      <circle cx="10.5" cy="12" r="0.7" fill="url(#oro-araldico)"/>
+      <circle cx="13.5" cy="12" r="0.7" fill="url(#oro-araldico)"/>
+      <path d="M11 15.5 Q12 16.5 13 15.5" fill="none" stroke="url(#oro-araldico)" stroke-width="0.8"/>
+    </symbol>
+    <!-- Guaritore: caduceo/serpente (guarigione) -->
+    <symbol id="i-guaritore" viewBox="0 0 24 24">
+      <line x1="12" y1="3" x2="12" y2="21" stroke="url(#oro-araldico)" stroke-width="1.5"/>
+      <path d="M12 6 C8 8 8 11 12 12 C16 13 16 16 12 18"
+        fill="none" stroke="url(#oro-araldico)" stroke-width="1.5"/>
+      <circle cx="12" cy="3" r="1.5" fill="url(#oro-araldico)"/>
+      <path d="M8 5 L12 3 L16 5" fill="none" stroke="url(#oro-araldico)" stroke-width="1.2"/>
+    </symbol>
+    <!-- Veggente: falco (visione) -->
+    <symbol id="i-veggente" viewBox="0 0 24 24">
+      <path d="M12 3 C8 6 6 10 6 14 C6 18 9 21 12 21 C15 21 18 18 18 14 C18 10 16 6 12 3 Z"
+        fill="none" stroke="url(#oro-araldico)" stroke-width="1.5"/>
+      <path d="M6 12 Q2 10 2 6 Q6 8 6 12 M18 12 Q22 10 22 6 Q18 8 18 12"
+        fill="none" stroke="url(#oro-araldico)" stroke-width="1.2"/>
+      <circle cx="12" cy="10" r="2" fill="none" stroke="url(#oro-araldico)" stroke-width="1.2"/>
+      <circle cx="12" cy="10" r="0.6" fill="url(#oro-araldico)"/>
+    </symbol>
+    <!-- Viandante: lupo (viaggio solitario) -->
+    <symbol id="i-viandante" viewBox="0 0 24 24">
+      <path d="M5 20 L7 12 L5 8 L9 10 L12 6 L15 10 L19 8 L17 12 L19 20"
+        fill="none" stroke="url(#oro-araldico)" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle cx="10" cy="13" r="0.7" fill="url(#oro-araldico)"/>
+      <circle cx="14" cy="13" r="0.7" fill="url(#oro-araldico)"/>
+      <path d="M11 16 L12 17 L13 16" fill="none" stroke="url(#oro-araldico)" stroke-width="1"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="tavola">
+  <div class="bordo-fogliame"></div>
+  <div class="vignetta">
+    <div class="scriptio">
+      <span>Anno Domini MMXXVI</span>
+      <span>Liber Bestiarum</span>
+    </div>
+
+    <div class="header">
+      <div class="title">Il Crocevia</div>
+      <div class="subtitle">bestiarium viatorum et praestigiatorum</div>
+    </div>
+
+    <div class="rubrica">De Sex Bestiis</div>
+    <div class="archetipi">
+      <div class="archetipo sel" onclick="sel(this)">
+        <div class="bestia strega"><svg><use href="#i-strega"/></svg></div>
+        <div class="nome">Strega</div>
+        <div class="latino">Strix</div>
+      </div>
+      <div class="archetipo" onclick="sel(this)">
+        <div class="bestia stregone"><svg><use href="#i-stregone"/></svg></div>
+        <div class="nome">Stregone</div>
+        <div class="latino">Corvus</div>
+      </div>
+      <div class="archetipo" onclick="sel(this)">
+        <div class="bestia sciamano"><svg><use href="#i-sciamano"/></svg></div>
+        <div class="nome">Sciamano</div>
+        <div class="latino">Cervus</div>
+      </div>
+      <div class="archetipo" onclick="sel(this)">
+        <div class="bestia guaritore"><svg><use href="#i-guaritore"/></svg></div>
+        <div class="nome">Guaritore</div>
+        <div class="latino">Serpens</div>
+      </div>
+      <div class="archetipo" onclick="sel(this)">
+        <div class="bestia veggente"><svg><use href="#i-veggente"/></svg></div>
+        <div class="nome">Veggente</div>
+        <div class="latino">Falco</div>
+      </div>
+      <div class="archetipo" onclick="sel(this)">
+        <div class="bestia viandante"><svg><use href="#i-viandante"/></svg></div>
+        <div class="nome">Viandante</div>
+        <div class="latino">Lupus</div>
+      </div>
+    </div>
+
+    <div class="rubrica">Tuus Circulus · Mediolanum</div>
+    <div class="cerchio-wrap">
+      <div class="radura">
+        <!-- Zampate decorativi sul bordo -->
+        <div class="zampa" style="top:4%; left:50%; transform:translateX(-50%) rotate(180deg)"></div>
+        <div class="zampa" style="top:25%; right:4%; transform:rotate(-90deg)"></div>
+        <div class="zampa" style="bottom:15%; right:15%; transform:rotate(-45deg)"></div>
+        <div class="zampa" style="bottom:4%; left:50%; transform:translateX(-50%)"></div>
+        <div class="zampa" style="bottom:15%; left:15%; transform:rotate(45deg)"></div>
+        <div class="zampa" style="top:25%; left:4%; transform:rotate(90deg)"></div>
+
+        <div class="centro">
+          <svg><use href="#i-strega"/></svg>
+          <span class="centro-label">Tu</span>
+        </div>
+
+        <div class="membro m1">
+          <svg><use href="#i-veggente"/></svg>
+          <span class="tag">Luna Rubea</span>
+        </div>
+        <div class="membro m2">
+          <svg><use href="#i-sciamano"/></svg>
+          <span class="tag">Corvus Albus</span>
+        </div>
+        <div class="membro m3">
+          <svg><use href="#i-guaritore"/></svg>
+          <span class="tag">Salix</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rubrica">Signa Bestialia</div>
+    <div class="segnali">
+      <div class="segnale" title="Rituale in corso">
+        <div class="sigillo-araldico activo"><span class="simbolo">🜂</span></div>
+        <div class="slabel">ritus</div>
+      </div>
+      <div class="segnale inattivo" title="Pericolo">
+        <div class="sigillo-araldico"><span class="simbolo">🜏</span></div>
+        <div class="slabel">periculum</div>
+      </div>
+      <div class="segnale inattivo" title="Tutto bene">
+        <div class="sigillo-araldico"><span class="simbolo">☙</span></div>
+        <div class="slabel">salus</div>
+      </div>
+      <div class="segnale inattivo" title="Cerco aiuto">
+        <div class="sigillo-araldico"><span class="simbolo">⚔</span></div>
+        <div class="slabel">auxilium</div>
+      </div>
+    </div>
+
+    <div class="info">
+      Es <b>Strix</b>, avis nocturna, in agro Mediolanensi. In tuo circulo sunt
+      <b>tres</b> bestiae. <b>Luna Rubea</b>, vulpes astuta, signum 🜂 dedit.
+      Samhain in quattuor dies appropinquat, tempus memoriae et purificationis.
+    </div>
+
+    <div class="colofone">Explicit bestiarium · pictum manu fratris Benedicti</div>
+  </div>
+</div>
+
+<div class="back">
+  <a href="index.html">← Torna agli esempi</a> · V3-B: Bestiarium Notturnum (Bestiario)
+</div>
+
+<script>
+  function sel(el) {
+    document.querySelectorAll('.archetipo').forEach(a => a.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+  document.querySelectorAll('.segnale').forEach(s => {
+    s.addEventListener('click', () => {
+      s.classList.toggle('inattivo');
+      s.querySelector('.sigillo-araldico').classList.toggle('activo');
+    });
+  });
+</script>
+</body>
+</html>

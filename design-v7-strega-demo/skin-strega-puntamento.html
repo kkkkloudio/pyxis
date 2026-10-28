@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tema STREGA — Mappa del Puntamento</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Uncial+Antiqua&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    background:#1a1020;
+    background-image:
+      radial-gradient(ellipse 50% 40% at 30% 20%, rgba(80,50,100,.12), transparent),
+      radial-gradient(ellipse 40% 30% at 70% 80%, rgba(60,35,80,.1), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    color:#d4c8e0;
+    font-family:'Cormorant Garamond', Georgia, serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:12px 8px;
+  }
+  .pergamena {
+    width:min(420px, 100%);
+    background:#2a1a35;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(100,70,130,.12), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23p)' opacity='0.08'/%3E%3C/svg%3E");
+    border:1px solid #4a3060;
+    box-shadow:
+      inset 0 0 50px rgba(0,0,0,.5),
+      0 10px 30px rgba(0,0,0,.6),
+      0 0 0 3px #1a1020,
+      0 0 0 4px #3a2450;
+    padding:20px 16px;
+    position:relative;
+    border-radius:2px 6px 3px 10px;
+  }
+  .pergamena::before {
+    content:''; position:absolute; inset:6px; pointer-events:none;
+    border:1px solid #5a3a70; border-radius:2px 4px 3px 6px;
+  }
+  .pergamena::after {
+    content:''; position:absolute; inset:10px; pointer-events:none;
+    border:1px dashed #4a2a60; border-radius:2px 3px 3px 4px;
+  }
+
+  /* Sigillo di cera */
+  .sigillo {
+    width:40px; height:40px; margin:0 auto 10px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #4a2a5a, #1a0a25);
+    border:2px solid #6a4a80;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,.6), 0 2px 6px rgba(0,0,0,.4);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .sigillo::before { content:'☾'; font-size:18px; color:#b8a0d0; text-shadow:0 0 6px rgba(184,160,208,.4); }
+
+  .titolo {
+    font-family:'Uncial Antiqua', serif;
+    font-size:18px; letter-spacing:1px; color:#c8a8e0;
+    text-align:center; text-shadow:0 0 10px rgba(200,168,224,.3);
+  }
+  .sottotitolo {
+    text-align:center; font-style:italic; font-size:12px;
+    color:#8a6aa0; margin:2px 0 12px;
+  }
+
+  /* Testo */
+  .testo {
+    font-size:14px; line-height:1.6; color:#c4b4d4;
+    text-align:justify; margin-bottom:8px;
+  }
+  .testo::first-letter {
+    font-family:'Uncial Antiqua', serif;
+    font-size:28px; color:#d4b8f0; float:left;
+    line-height:.8; margin-right:5px; margin-top:2px;
+  }
+  .testo b { color:#e0c8f8; font-weight:600; }
+
+  .rubrica {
+    font-family:'Cinzel', serif; font-size:11px; letter-spacing:2px;
+    color:#a080c0; margin:12px 0 6px; text-transform:uppercase;
+    display:flex; align-items:center; gap:8px;
+  }
+  .rubrica::before, .rubrica::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg, transparent, #5a3a70, transparent);
+  }
+
+  /* MAPPA — pergamena con inchiostro */
+  .mappa-wrap {
+    position:relative; margin:8px 0;
+    border:2px solid #5a3a70; border-radius:4px;
+    background:#241630;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(60,40,90,.2), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    box-shadow:inset 0 0 30px rgba(0,0,0,.5);
+    overflow:hidden;
+  }
+  .mappa-wrap::before {
+    content:''; position:absolute; inset:4px; pointer-events:none;
+    border:1px dashed #4a2a60;
+  }
+  .mappa { display:block; width:100%; height:auto; cursor:crosshair; }
+
+  /* Bussola decorativa */
+  .bussola {
+    position:absolute; top:8px; right:8px; width:36px; height:36px;
+    border:1px solid #5a3a70; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cinzel',serif; font-size:10px; color:#8a6aa0;
+    background:rgba(26,16,32,.7);
+  }
+
+  /* Info POI */
+  .poi-info {
+    margin-top:8px; padding:10px 12px;
+    border-left:3px solid #b8a0d0;
+    background:rgba(90,58,112,.12);
+    font-size:13px; font-style:italic; color:#b8a8d0;
+    display:none;
+  }
+  .poi-info.visibile { display:block; }
+  .poi-info b { color:#e0c8f8; font-style:normal; font-family:'Cinzel',serif; font-size:12px; letter-spacing:1px; }
+  .poi-info .distanza { color:#8a6aa0; font-size:11px; }
+
+  /* Legenda */
+  .legenda {
+    display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
+    margin:10px 0; font-size:11px; color:#8a6aa0;
+  }
+  .legenda span { display:flex; align-items:center; gap:4px; }
+  .legenda .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .dot.tu { background:#e0c8f8; box-shadow:0 0 6px #e0c8f8; }
+  .dot.altro { background:#8a6aa0; }
+  .dot.poi { background:#d4a020; box-shadow:0 0 6px #d4a020; }
+  .dot.puntato { background:#c86a4a; box-shadow:0 0 8px #c86a4a; }
+
+  /* Bottone punta */
+  .btn-punta {
+    display:block; width:100%; padding:10px; margin-top:6px;
+    font-family:'Cinzel',serif; font-size:12px; letter-spacing:2px;
+    color:#1a0a25; background:linear-gradient(180deg,#d4b8f0,#b898e0);
+    border:1px solid #e0c8f8; border-radius:3px; cursor:pointer;
+    text-transform:uppercase; transition:.2s;
+    box-shadow:0 2px 6px rgba(0,0,0,.4), inset 0 1px 2px rgba(255,255,255,.2);
+  }
+  .btn-punta:hover { background:linear-gradient(180deg,#e0c8f8,#c8a8f0); }
+  .btn-punta:disabled { opacity:.4; cursor:not-allowed; }
+
+  .marginalia {
+    margin-top:12px; font-size:11px; font-style:italic; color:#7a5a90;
+    padding-left:10px; border-left:2px solid #5a3a70;
+  }
+  .marginalia::before { content:'☞ '; color:#8a6aa0; }
+
+  .piè {
+    text-align:center; margin-top:12px; font-size:10px; color:#5a3a70;
+    font-style:italic; letter-spacing:1px;
+  }
+
+  .back { text-align:center; margin-top:10px; }
+  .back a { font-size:11px; color:#7a5a90; text-decoration:none; font-style:italic; }
+</style>
+</head>
+<body>
+
+<div class="pergamena">
+  <div class="sigillo"></div>
+  <div class="titolo">Carta del Puntamento</div>
+  <div class="sottotitolo">— tema della Strega · Milano —</div>
+
+  <div class="testo">
+    Qui si marca il <b>luogo sacro</b> che le anime vicine devono trovare.
+    Tocca la pergamena là dove il tuo dito sa che è giusto.
+  </div>
+
+  <div class="rubrica">Mappa del Territorio</div>
+
+  <div class="mappa-wrap">
+    <div class="bussola">N</div>
+    <svg class="mappa" id="mappa" viewBox="0 0 360 280" xmlns="http://www.w3.org/2000/svg">
+      <!-- Pergamena di fondo -->
+      <rect width="360" height="280" fill="#241630"/>
+
+      <!-- Righe di testo sottili (stile manoscritto) -->
+      <g stroke="#3a2450" stroke-width="0.5" opacity="0.3">
+        <line x1="20" y1="40" x2="340" y2="40"/><line x1="20" y1="80" x2="340" y2="80"/>
+        <line x1="20" y1="120" x2="340" y2="120"/><line x1="20" y1="160" x2="340" y2="160"/>
+        <line x1="20" y1="200" x2="340" y2="200"/><line x1="20" y1="240" x2="340" y2="240"/>
+      </g>
+
+      <!-- Sentieri (linee tratteggiate a inchiostro) -->
+      <g stroke="#4a2a60" stroke-width="1.5" fill="none" stroke-dasharray="4 3" opacity="0.7">
+        <path d="M180 140 Q140 100 100 80 Q140 120 180 140"/>
+        <path d="M180 140 Q220 180 260 200 Q220 160 180 140"/>
+        <path d="M180 140 Q160 200 140 240"/>
+      </g>
+
+      <!-- Fiumi/linee d'acqua -->
+      <path d="M40 200 Q100 180 140 200 Q180 220 220 200" stroke="#3a5a70" stroke-width="2" fill="none" opacity="0.4"/>
+
+      <!-- Alberi/vegetazione (piccoli segni) -->
+      <g stroke="#4a6a4a" stroke-width="1" opacity="0.5">
+        <path d="M60 60 l0 -8 M56 56 l4 -4 M64 56 l-4 -4"/>
+        <path d="M300 80 l0 -8 M296 76 l4 -4 M304 76 l-4 -4"/>
+        <path d="M80 240 l0 -8 M76 236 l4 -4 M84 236 l-4 -4"/>
+        <path d="M280 220 l0 -8 M276 216 l4 -4 M284 216 l-4 -4"/>
+      </g>
+
+      <!-- Confine zona (cerchio tratteggiato grande) -->
+      <circle cx="180" cy="140" r="120" fill="none" stroke="#5a3a70" stroke-width="1" stroke-dasharray="6 4" opacity="0.5"/>
+
+      <!-- POI ESOTERICO: Quercia dei Sussurri -->
+      <g id="poi" class="poi-click" data-info="Quercia dei Sussurri|Antica quercia cava, punto di raduno per la congrega. Si dice che le sue radici tocchino l'acqua della prima fonte.|A est, presso il Naviglio" style="cursor:pointer">
+        <circle cx="280" cy="80" r="14" fill="none" stroke="#d4a020" stroke-width="2" opacity="0.8"/>
+        <circle cx="280" cy="80" r="6" fill="#d4a020" opacity="0.9"/>
+        <path d="M280 66 L280 94 M266 80 L294 80" stroke="#d4a020" stroke-width="1" opacity="0.6"/>
+        <text x="280" y="110" fill="#d4a020" font-size="10" text-anchor="middle" font-family="Cinzel,serif" font-style="italic">Quercia</text>
+      </g>
+
+      <!-- ALTRI UTENTI (anime vicine) -->
+      <!-- Utente 1: Luna Rossa (Veggente) -->
+      <g class="utente" data-info="Luna Rossa|Veggente · t'è vicina|Ha acceso una candela questa notte" style="cursor:pointer">
+        <circle cx="100" cy="80" r="10" fill="none" stroke="#8a6aa0" stroke-width="1.5"/>
+        <circle cx="100" cy="80" r="4" fill="#8a6aa0"/>
+        <circle cx="100" cy="80" r="14" fill="none" stroke="#8a6aa0" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.5"/>
+        <text x="100" y="102" fill="#8a6aa0" font-size="9" text-anchor="middle" font-style="italic">Luna Rossa</text>
+      </g>
+
+      <!-- Utente 2: Corvo Nero (Sciamano) -->
+      <g class="utente" data-info="Corvo Nero|Sciamano · silenzioso|Nessun segnale acceso" style="cursor:pointer">
+        <circle cx="260" cy="200" r="10" fill="none" stroke="#8a6aa0" stroke-width="1.5"/>
+        <circle cx="260" cy="200" r="4" fill="#8a6aa0"/>
+        <text x="260" y="222" fill="#8a6aa0" font-size="9" text-anchor="middle" font-style="italic">Corvo Nero</text>
+      </g>
+
+      <!-- TU (la Strega) al centro -->
+      <g id="tu">
+        <circle cx="180" cy="140" r="18" fill="none" stroke="#e0c8f8" stroke-width="2"/>
+        <circle cx="180" cy="140" r="8" fill="#e0c8f8"/>
+        <circle cx="180" cy="140" r="24" fill="none" stroke="#e0c8f8" stroke-width="0.5" stroke-dasharray="3 3" opacity="0.6"/>
+        <path d="M180 118 L186 134 L174 134 Z" fill="#e0c8f8" opacity="0.7"/>
+        <text x="180" y="172" fill="#e0c8f8" font-size="10" text-anchor="middle" font-family="Cinzel,serif" font-style="italic">Tu · Strega</text>
+      </g>
+
+      <!-- Punto puntato (nascosto, appare al click) -->
+      <g id="puntato" style="display:none">
+        <circle cx="0" cy="0" r="6" fill="#c86a4a"/>
+        <circle cx="0" cy="0" r="12" fill="none" stroke="#c86a4a" stroke-width="1.5" stroke-dasharray="3 3">
+          <animate attributeName="r" values="10;16;10" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <line x1="0" y1="-20" x2="0" y2="-10" stroke="#c86a4a" stroke-width="1.5"/>
+        <text x="0" y="24" fill="#c86a4a" font-size="9" text-anchor="middle" font-family="Cinzel,serif" font-style="italic">PUNTATO</text>
+      </g>
+
+      <!-- Linea dal centro al punto puntato -->
+      <line id="linea-punta" x1="180" y1="140" x2="180" y2="140" stroke="#c86a4a" stroke-width="1" stroke-dasharray="4 3" opacity="0"/>
+    </svg>
+  </div>
+
+  <div class="poi-info" id="poiInfo"></div>
+
+  <div class="legenda">
+    <span><i class="dot tu"></i> Tu</span>
+    <span><i class="dot altro"></i> Anime vicine</span>
+    <span><i class="dot poi"></i> Luogo sacro</span>
+    <span><i class="dot puntato"></i> Il tuo puntamento</span>
+  </div>
+
+  <button class="btn-punta" id="btnPunta">✦ Punta un luogo ✦</button>
+
+  <div class="marginalia">
+    Nota: il puntamento resta acceso finché non lo cambi. Le anime vicine lo vedranno
+    come una fiamma sulla loro mappa — senza sapere chi l'ha accesa, solo dove.
+  </div>
+
+  <div class="piè">niente GPS · niente nomi veri · la mappa non ha scala</div>
+</div>
+
+<div class="back"><a href="index.html">← Torna alle skin</a> · V7: Strega — Puntamento</div>
+
+<script>
+  const mappa = document.getElementById('mappa');
+  const btn = document.getElementById('btnPunta');
+  const puntato = document.getElementById('puntato');
+  const linea = document.getElementById('linea-punta');
+  const poiInfo = document.getElementById('poiInfo');
+  let puntamentoAttivo = false;
+  let puntaX = 180, puntaY = 140;
+
+  // Click sulla mappa per piazzare il puntamento
+  mappa.addEventListener('click', function(e) {
+    if (!puntamentoAttivo) return;
+    const rect = mappa.getBoundingClientRect();
+    const scaleX = 360 / rect.width;
+    const scaleY = 280 / rect.height;
+    puntaX = (e.clientX - rect.left) * scaleX;
+    puntaY = (e.clientY - rect.top) * scaleY;
+
+    // Sposta il puntato
+    puntato.style.display = 'block';
+    puntato.setAttribute('transform', `translate(${puntaX},${puntaY})`);
+
+    // Linea dal centro al punto
+    linea.setAttribute('x2', puntaX);
+    linea.setAttribute('y2', puntaY);
+    linea.setAttribute('opacity', '0.7');
+
+    // Chiudi info POI se aperta
+    poiInfo.classList.remove('visibile');
+
+    // Disattiva modalità punta
+    puntamentoAttivo = false;
+    btn.textContent = '✦ Punta un luogo ✦';
+    btn.disabled = false;
+    mappa.style.cursor = 'crosshair';
+  });
+
+  // Bottone punta
+  btn.addEventListener('click', function() {
+    if (puntamentoAttivo) {
+      puntamentoAttivo = false;
+      btn.textContent = '✦ Punta un luogo ✦';
+      mappa.style.cursor = 'crosshair';
+    } else {
+      puntamentoAttivo = true;
+      btn.textContent = '✦ Tocca la mappa... ✦';
+      btn.disabled = true;
+      mappa.style.cursor = 'crosshair';
+    }
+  });
+
+  // Click sul POI per info
+  document.getElementById('poi').addEventListener('click', function(e) {
+    e.stopPropagation();
+    const [nome, desc, pos] = this.dataset.info.split('|');
+    poiInfo.innerHTML = `<b>${nome}</b><br/>${desc}<br/><span class="distanza">📍 ${pos}</span>`;
+    poiInfo.classList.add('visibile');
+  });
+
+  // Click sugli utenti per info
+  document.querySelectorAll('.utente').forEach(function(u) {
+    u.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const [nome, tipo, stato] = this.dataset.info.split('|');
+      poiInfo.innerHTML = `<b>${nome}</b><br/>${tipo}<br/><span class="distanza">🕯️ ${stato}</span>`;
+      poiInfo.classList.add('visibile');
+    });
+  });
+</script>
+</body>
+</html>

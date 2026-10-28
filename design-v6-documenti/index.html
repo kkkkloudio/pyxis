@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Il Crocevia — V6: Documenti Antichi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh; background:#0d0b08;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(60,45,25,.2), transparent),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    color:#c8b898; font-family:'IM Fell English', 'Cormorant Garamond', serif;
+    display:flex; flex-direction:column; align-items:center; padding:36px 16px;
+  }
+  h1 { font-family:'Cinzel',serif; font-size:22px; letter-spacing:4px; color:#c9a84c; margin-bottom:6px; font-weight:400; }
+  .sub { font-size:14px; color:#8a7050; font-style:italic; margin-bottom:32px; text-align:center; max-width:400px; }
+  .docs { display:flex; flex-direction:column; gap:14px; width:min(430px,100%); }
+  .doc {
+    display:flex; align-items:center; gap:16px; padding:18px 20px;
+    border:1px solid #2a2018; border-radius:4px; text-decoration:none; color:inherit;
+    transition:.3s; background:linear-gradient(180deg,#1a1410,#12100c);
+  }
+  .doc:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.4); }
+  .doc .icona { font-size:32px; flex-shrink:0; width:48px; text-align:center; }
+  .doc h3 { font-family:'Cinzel',serif; font-size:14px; font-weight:400; color:#d4c4a0; margin-bottom:3px; letter-spacing:1px; }
+  .doc .tipo { font-size:10px; color:#8a6a3a; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+  .doc p { font-size:12px; color:#8a7050; font-style:italic; line-height:1.4; }
+  .d1:hover{border-color:#8a1a1a;box-shadow:0 8px 24px rgba(138,26,26,.15)}
+  .d2:hover{border-color:#6b8e5a;box-shadow:0 8px 24px rgba(107,142,90,.15)}
+  .d3:hover{border-color:#6a4525;box-shadow:0 8px 24px rgba(106,69,37,.15)}
+</style>
+</head>
+<body>
+  <h1>✦ Il Crocevia ✦</h1>
+  <p class="sub">V6 — Non sono app. Sono documenti antichi. Ogni archetipo legge un tipo di documento diverso.</p>
+  <div class="docs">
+    <a class="doc d1" href="documento-a-strega-grimorio.html">
+      <span class="icona">☾</span>
+      <div><div class="tipo">Grimorio · fol. XII</div><h3>Grimorio delle Ombre</h3><p>Per la Strega. Pergamena scura, bordo miniato rosso/oro, capilettera, marginalia, candele a inchiostro.</p></div>
+    </a>
+    <a class="doc d2" href="documento-b-guaritore-erbario.html">
+      <span class="icona">❦</span>
+      <div><div class="tipo">Erbario · Tavola VII</div><h3>Erbario di Milano</h3><p>Per il Guaritore. Carta chiara, bordo verde, illustrazioni botaniche, schede manoscritte, ampolle.</p></div>
+    </a>
+    <a class="doc d3" href="documento-c-viandante-codex.html">
+      <span class="icona">🧭</span>
+      <div><div class="tipo">Codex · Cap. III</div><h3>Libro delle Strade</h3><p>Per il Viandante. Cuoio rilegato, mappa disegnata a mano, orme a inchiostro, appunti di viaggio.</p></div>
+    </a>
+  </div>
+  <p style="margin-top:24px;font-size:11px;color:#5a4a30;font-style:italic;text-align:center;">Stessi contenuti. Forme diverse. Come i manoscritti: uno stesso testo, tante copie, ognuna unica.</p>
+</body>
+</html>

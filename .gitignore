@@ -4,6 +4,16 @@ Thumbs.db
 *.log
 *.tmp
 
+# File di sistema Windows (nul, con, aux, prn, com1-9, lpt1-9)
+nul
+NUL
+con
+CON
+aux
+AUX
+prn
+PRN
+
 # Editor
 .vscode/
 .idea/
