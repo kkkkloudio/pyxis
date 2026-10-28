@@ -1,8 +1,8 @@
-// Il Crocevia — Service Worker
+// Adytum — Service Worker
 // Strategia: cache-first per asset statici, network-first per la pagina principale
 
-const CACHE_NAME = 'crocevia-v1.0.0';
-const STATIC_CACHE = 'crocevia-static-v1.0.0';
+const CACHE_NAME = 'adytum-v1.0.0';
+const STATIC_CACHE = 'adytum-static-v1.0.0';
 
 const STATIC_ASSETS = [
   '/',
@@ -120,7 +120,7 @@ self.addEventListener('push', function(event) {
     data: { url: data.url || '/' }
   };
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Il Crocevia', options)
+    self.registration.showNotification(data.title || 'Adytum', options)
   );
 });
 

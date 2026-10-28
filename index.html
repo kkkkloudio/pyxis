@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Il Crocevia</title>
+<title>Adytum</title>
 
 <!-- PWA Meta Tags -->
-<meta name="description" content="Il Crocevia — un luogo dove le luci si incontrano. Niente GPS, niente nomi veri: il cielo non misura le distanze."/>
-<meta name="theme-color" content="#0b0d1c"/>
+<meta name="description" content="🏛️ Adytum — Il santuario delle anime. Un luogo dove le luci si incontrano. Niente GPS, niente nomi veri: il cielo non misura le distanze."/>
+<meta name="theme-color" content="#2a1a0a"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Il Crocevia"/>
+<meta name="apple-mobile-web-app-title" content="Adytum"/>
 
 <!-- Favicon -->
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png"/>
@@ -301,13 +301,13 @@
 
 <div class="caption">Le luci prendono un volto: strega col cappello, stregone col cappuccio,
 sciamano con le corna &mdash; e chi non si riconosce ancora resta un punto, perch&eacute; anche l'indugiare &egrave; una via.
-Nome &laquo;Il Crocevia&raquo;.</div>
+Nome &laquo;Adytum&raquo;.</div>
 
 <!-- PWA Install Banner -->
 <div class="install-banner" id="installBanner">
-  <img src="icons/icon-72x72.png" alt="Il Crocevia" class="app-icon"/>
+  <img src="icons/icon-72x72.png" alt="Adytum" class="app-icon"/>
   <div class="app-info">
-    <div class="app-name">Il Crocevia</div>
+    <div class="app-name">Adytum</div>
     <div class="app-desc">Aggiungi alla schermata Home</div>
   </div>
   <button id="installBtn">Installa</button>
@@ -391,7 +391,7 @@ Nome &laquo;Il Crocevia&raquo;.</div>
     deferredPrompt = e;
     // Mostra dopo 3 secondi per non disturbare subito
     setTimeout(function() {
-      if (!localStorage.getItem('crocevia-install-dismissed')) {
+      if (!localStorage.getItem('adytum-install-dismissed')) {
         installBanner.classList.add('show');
       }
     }, 3000);
@@ -412,7 +412,7 @@ Nome &laquo;Il Crocevia&raquo;.</div>
 
   dismissBtn.addEventListener('click', function() {
     installBanner.classList.remove('show');
-    localStorage.setItem('crocevia-install-dismissed', '1');
+    localStorage.setItem('adytum-install-dismissed', '1');
   });
 
   // === iOS install hint (Safari non supporta beforeinstallprompt) ===
@@ -420,13 +420,13 @@ Nome &laquo;Il Crocevia&raquo;.</div>
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   if ((isIOS && isSafari) && !window.navigator.standalone) {
     setTimeout(function() {
-      if (!localStorage.getItem('crocevia-ios-hint-dismissed')) {
+      if (!localStorage.getItem('adytum-ios-hint-dismissed')) {
         installBanner.classList.add('show');
         installBtn.textContent = 'tocca \u{1F4E4} Condividi';
         installBtn.onclick = function() {
           installBanner.classList.remove('show');
-          alert('Tocca "Condividi" \u2192 "Aggiungi a Home" per installare Il Crocevia.');
-          localStorage.setItem('crocevia-ios-hint-dismissed', '1');
+          alert('Tocca "Condividi" \u2192 "Aggiungi a Home" per installare Adytum.');
+          localStorage.setItem('adytum-ios-hint-dismissed', '1');
         };
       }
     }, 3000);

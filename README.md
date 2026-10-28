@@ -1,4 +1,4 @@
-# 🌙 Il Crocevia
+# 🌙 Adytum
 
 > *Un luogo dove le luci si incontrano. Niente GPS, niente nomi veri: il cielo non misura le distanze.*
 
@@ -21,7 +21,7 @@ Una Progressive Web App (PWA) in italiano, pensata per essere **installabile** c
 
 ## 🚀 Demo
 
-Apri l'app: **[https://TUO-USERNAME.github.io/il-crocevia](https://TUO-USERNAME.github.io/il-crocevia)**
+Apri l'app: **[https://TUO-USERNAME.github.io/adytum](https://TUO-USERNAME.github.io/adytum)**
 
 *(Sostituisci `TUO-USERNAME` con il tuo username GitHub dopo il deploy.)*
 
@@ -29,7 +29,7 @@ Apri l'app: **[https://TUO-USERNAME.github.io/il-crocevia](https://TUO-USERNAME.
 
 ### Android (Chrome)
 1. Apri il sito
-2. Tocca il banner "Aggiungi Il Crocevia alla schermata Home" oppure menu ⋮ → "Installa app"
+2. Tocca il banner "Aggiungi Adytum alla schermata Home" oppure menu ⋮ → "Installa app"
 
 ### iOS (Safari)
 1. Apri il sito in Safari
@@ -41,8 +41,8 @@ Apri l'app: **[https://TUO-USERNAME.github.io/il-crocevia](https://TUO-USERNAME.
 
 ```bash
 # Clona il repository
-git clone https://github.com/TUO-USERNAME/il-crocevia.git
-cd il-crocevia
+git clone https://github.com/TUO-USERNAME/adytum.git
+cd adytum
 
 # Servi con qualsiasi server statico, es:
 python -m http.server 8000
@@ -57,7 +57,7 @@ Poi apri `http://localhost:8000`
 ## 📁 Struttura del progetto
 
 ```
-il-crocevia/
+adytum/
 ├── index.html          # App principale (tutto in un file)
 ├── manifest.json       # Configurazione PWA
 ├── sw.js               # Service Worker (offline, push, sync)
@@ -106,14 +106,14 @@ Sostituisci i file in `icons/`. Le dimensioni minime richieste per una PWA: **19
 
 ## 🚢 Deploy su GitHub Pages
 
-1. **Crea un repository** su GitHub (pubblico, nome: `il-crocevia`)
+1. **Crea un repository** su GitHub (pubblico, nome: `adytum`)
 2. **Push del codice**:
    ```bash
    git init
    git add .
-   git commit -m "🌙 Primo commit: Il Crocevia v1.0"
+   git commit -m "🌙 Primo commit: Adytum v1.0"
    git branch -M main
-   git remote add origin https://github.com/TUO-USERNAME/il-crocevia.git
+   git remote add origin https://github.com/TUO-USERNAME/adytum.git
    git push -u origin main
    ```
 3. **Abilita GitHub Pages**: Settings → Pages → Source: "GitHub Actions"
