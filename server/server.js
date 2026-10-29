@@ -85,6 +85,11 @@ function broadcast(provincia, event, data) {
 
 // ============ API ============
 const server = http.createServer(async (req, res) => {
+  // CORS su TUTTE le risposte (anche errori e SSE) — 必須 prima di tutto
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const path = url.pathname;
 
@@ -179,6 +184,7 @@ const server = http.createServer(async (req, res) => {
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
       'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'Content-Type',
     });
     res.write(`event: connesso\ndata: ${JSON.stringify({ provincia, ok: true })}\n\n`);
 
@@ -218,12 +224,12 @@ const server = http.createServer(async (req, res) => {
   const fs = require('fs');
   const pathMod = require('path');
   let filePath = pathMod.join(__dirname, '..', decodeURIComponent(path === '/' ? '/index.html' : path));
-  if (!filePath.startsWith(pathMod.join(__dirname, '..'))) { res.writeHead(403); return res.end('Forbidden'); }
+  if (!filePath.startsWith(pathMod.join(__dirname, '..'))) { res.writeHead(403, {'Access-Control-Allow-Origin':'*'}); return res.end('Forbidden'); }
   fs.readFile(filePath, (err, data) => {
-    if (err) { res.writeHead(404); return res.end('Not found'); }
+    if (err) { res.writeHead(404, {'Access-Control-Allow-Origin':'*'}); return res.end('Not found'); }
     const ext = pathMod.extname(filePath);
-    const mime = { '.html':'text/html', '.js':'text/javascript', '.json':'application/json', '.png':'image/png', '.jpg':'image/jpeg', '.css':'text/css', '.svg':'image/svg+xml' }[ext] || 'application/octet-stream';
-    res.writeHead(200, { 'Content-Type': mime });
+    const mime = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.json':'application/json', '.png':'image/png', '.jpg':'image/jpeg', '.css':'text/css', '.svg':'image/svg+xml' }[ext] || 'application/octet-stream';
+    res.writeHead(200, { 'Content-Type': mime, 'Access-Control-Allow-Origin': '*' });
     res.end(data);
   });
 });
