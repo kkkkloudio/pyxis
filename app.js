@@ -135,9 +135,9 @@ function aggiornaLancette(l, totale) {
     itemG.querySelector('.nome').textContent = l.grande.nome;
     itemG.querySelector('.dett').textContent = TIPI[l.grande.tipo] + ' · anima più vicina';
   } else {
-    itemG.querySelector('.nome').textContent = '— nessuno vicino —';
-    itemG.querySelector('.dett').textContent = 'sei il primo qui';
-    g.style.opacity = '0.15';
+    // Nessuna anima vicina: lancetta spenta, testo neutro
+    itemG.style.display = 'none';
+    g.style.opacity = '0.1';
   }
 
   if (l.media) {
@@ -146,9 +146,8 @@ function aggiornaLancette(l, totale) {
     itemM.querySelector('.nome').textContent = l.media.nome;
     itemM.querySelector('.dett').textContent = TIPI[l.media.tipo] + ' · seconda anima';
   } else {
-    itemM.querySelector('.nome').textContent = '—';
-    itemM.querySelector('.dett').textContent = 'nessuna seconda anima';
-    m.style.opacity = '0.15';
+    itemM.style.display = 'none';
+    m.style.opacity = '0.1';
   }
 
   if (l.piccola) {

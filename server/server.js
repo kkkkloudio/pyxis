@@ -37,14 +37,14 @@ db.exec(`
   );
 `);
 
-// POI di esempio (uno per alcune province)
+// POI reali del Veneto (luoghi sacri/naturali con leggenda) — si espandono provincia per provincia
 const poiSeed = [
-  ['poi-milano', 'Quercia dei Sussurri', 'Milano', 'Antica quercia cava, punto di raduno della congrega', null],
-  ['poi-roma', 'Pietra del Sole', 'Roma', 'Menir al centro del parco, segna il solstizio', null],
-  ['poi-venezia', 'Fontana delle Lagrime', 'Venezia', 'Fontana sotto il ponte, si dice che chi vi bagna le mani trovi la sua via', null],
-  ['poi-torino', 'Pietra Filosofale', 'Torino', 'Pietra miliare romana riemersa nel 1700, si narra che brilli a mezzanotte', null],
-  ['poi-napoli', 'Grotta di Virgilio', 'Napoli', 'Ingresso della grotta antica, luogo di studio dei sapienti', null],
-  ['poi-firenze', 'Giardino delle Streghe', 'Firenze', 'Giardino segreto behind Palazzo Vecchio, si entra solo a Samhain', null],
+  ['poi-vi-covoli', 'Covoli di Valstagna', 'Vicenza', 'Grotte con pitture rupestri del Paleolitico, antico luogo sacro della Valbrenta', null],
+  ['poi-vr-lessinia', 'Menhir di Giazza', 'Verona', 'Menhir cimbro nel bosco della Lessinia, segna il sorgere del sole al solstizio', null],
+  ['poi-tv-grappa', 'Cima del Grappa', 'Treviso', 'La montagna sacra, 1775 m, raduni al solstizio d\'estate', null],
+  ['poi-bl-cansiglio', 'Radura del Cansiglio', 'Belluno', 'Foresta sacra dei Cimbri, radura centrale dell\'altopiano del Cansiglio', null],
+  ['poi-pd-colli', 'Monte della Madonna', 'Padova', 'Il colle sacro dei Colli Euganei, panorama su tutta la pianura veneta', null],
+  ['poi-ve-ponte', 'Ponte Scaligero', 'Verona', 'Ponte medievale sull\'Adige, si dice che a mezzanotte mostri la via giusta', null],
 ];
 const insPoi = db.prepare('INSERT OR IGNORE INTO poi (id, nome, provincia, descrizione, creato_da, creato_il) VALUES (?, ?, ?, ?, ?, ?)');
 for (const p of poiSeed) {
