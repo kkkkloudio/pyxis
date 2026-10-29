@@ -26,7 +26,7 @@ const TIPI = {
 };
 
 const API = (location.hostname === 'kkkkloudio.github.io' || location.hostname.endsWith('github.io'))
-  ? 'http://192.168.0.196:3000'   // mini PC in rete locale (Ethernet, IP fisso 192.168.0.196)
+  ? 'https://incidence-tutorial-anna-helen.trycloudflare.com'  // tunnel pubblico HTTPS (mini PC acceso)
   : '';                          // in locale (localhost) usa stesso origin
 
 let utente = JSON.parse(localStorage.getItem('pyxis-utente') || 'null');
