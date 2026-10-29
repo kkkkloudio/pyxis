@@ -1,4 +1,5 @@
-// Province italiane (capoluoghi) — lista completa
+// Pyxis — Frontend V3: iscrizione reale via API + bussola real-time (SSE)
+
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
   "Bari","Barletta-Andria-Trani","Belluno","Benevento","Bergamo","Biella","Bologna","Bolzano",
@@ -15,70 +16,163 @@ const PROVINCE = [
   "Vercelli","Verona","Vibo Valentia","Vicenza","Viterbo"
 ];
 
-// Popola il select province
+const TIPI = {
+  strega: '☾ Strega',
+  stregone: '✦ Stregone',
+  sciamano: '🪶 Sciamano',
+  guaritore: '❦ Guaritore',
+  veggente: '👁 Veggente',
+  viandante: '◎ Viandante'
+};
+
+const API = ''; // stesso origin
+
+let utente = JSON.parse(localStorage.getItem('pyxis-utente') || 'null');
+let evtSource = null;
+
 document.addEventListener('DOMContentLoaded', function() {
-  var select = document.getElementById('provincia');
-  PROVINCE.forEach(function(p) {
-    var opt = document.createElement('option');
-    opt.value = p;
-    opt.textContent = p;
-    select.appendChild(opt);
+  const select = document.getElementById('provincia');
+  PROVINCE.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p; o.textContent = p;
+    select.appendChild(o);
   });
 
-  // Selezione tipologia (una sola)
-  var selezionata = null;
-  document.querySelectorAll('.tipologia').forEach(function(t) {
+  let selezionata = null;
+  document.querySelectorAll('.tipologia').forEach(t => {
     t.addEventListener('click', function() {
-      document.querySelectorAll('.tipologia').forEach(function(x) { x.classList.remove('sel'); });
+      document.querySelectorAll('.tipologia').forEach(x => x.classList.remove('sel'));
       this.classList.add('sel');
       selezionata = this.dataset.tipo;
     });
   });
 
-  // Bottone "Apri la bussola"
-  document.getElementById('btn-inizia').addEventListener('click', function() {
-    var nome = document.getElementById('nome').value.trim();
-    var provincia = document.getElementById('provincia').value;
+  document.getElementById('btn-inizia').addEventListener('click', async function() {
+    const nome = document.getElementById('nome').value.trim();
+    const provincia = document.getElementById('provincia').value;
 
-    // Validazione minima
-    if (!nome) { alert('Scegli un nome d\'arte'); return; }
-    if (!selezionata) { alert('Scegli la tua via'); return; }
-    if (!provincia) { alert('Scegli la provincia'); return; }
+    if (!nome) return alert("Scegli un nome d'arte");
+    if (!selezionata) return alert('Scegli la tua via');
+    if (!provincia) return alert('Scegli la provincia');
 
-    // Salva in localStorage (demo: niente backend)
-    localStorage.setItem('pyxis-utente', JSON.stringify({
-      nome: nome,
-      tipo: selezionata,
-      provincia: provincia,
-      quando: new Date().toISOString()
-    }));
+    try {
+      const resp = await fetch(API + '/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, tipo: selezionata, provincia })
+      });
+      const data = await resp.json();
 
-    // Mostra la bussola
-    document.getElementById('schermata-iscrizione').classList.remove('attiva');
-    document.getElementById('schermata-bussola').classList.add('attiva');
-    document.getElementById('sottotitolo-utente').textContent =
-      nome + ' · ' + provincia + ' · la bussola gira';
+      if (!resp.ok) {
+        alert(data.error || 'Errore nella registrazione');
+        return;
+      }
+
+      utente = data.utente;
+      localStorage.setItem('pyxis-utente', JSON.stringify(utente));
+      mostraBussola();
+      avviaSSE();
+      caricaLancette();
+    } catch (e) {
+      alert('Backend non raggiungibile: ' + e.message);
+    }
   });
 
-  // Se già iscritto, vai diretto alla bussola
-  var salvato = localStorage.getItem('pyxis-utente');
-  if (salvato) {
-    var u = JSON.parse(salvato);
-    document.getElementById('schermata-iscrizione').classList.remove('attiva');
-    document.getElementById('schermata-bussola').classList.add('attiva');
-    document.getElementById('sottotitolo-utente').textContent =
-      u.nome + ' · ' + u.provincia + ' · bentornato';
+  if (utente) {
+    mostraBussola();
+    avviaSSE();
+    caricaLancette();
   }
 
-  // Legenda cliccabile (seleziona lancetta)
-  document.querySelectorAll('.legenda-item').forEach(function(item) {
+  document.querySelectorAll('.legenda-item').forEach(item => {
     item.addEventListener('click', function() {
-      document.querySelectorAll('.legenda-item').forEach(function(i) { i.classList.remove('sel'); });
+      document.querySelectorAll('.legenda-item').forEach(i => i.classList.remove('sel'));
       this.classList.add('sel');
-      var tipo = this.dataset.tipo;
-      document.querySelectorAll('.lancetta').forEach(function(l) { l.style.opacity = '0.15'; });
-      var sel = document.querySelector('.lancetta.' + tipo);
+      const tipo = this.dataset.tipo;
+      document.querySelectorAll('.lancetta').forEach(l => l.style.opacity = '0.15');
+      const sel = document.querySelector('.lancetta.' + tipo);
       if (sel) sel.style.opacity = '1';
     });
   });
 });
+
+function mostraBussola() {
+  document.getElementById('schermata-iscrizione').classList.remove('attiva');
+  document.getElementById('schermata-bussola').classList.add('attiva');
+  const tipoTxt = TIPI[utente.tipo] || utente.tipo;
+  document.getElementById('sottotitolo-utente').textContent =
+    `${utente.nome} · ${tipoTxt} · ${utente.provincia}`;
+}
+
+async function caricaLancette() {
+  if (!utente) return;
+  try {
+    const resp = await fetch(`${API}/api/lancette?provincia=${encodeURIComponent(utente.provincia)}&id=${utente.id}`);
+    const data = await resp.json();
+    aggiornaLancette(data.lancette, data.totale_online);
+  } catch (e) {
+    console.error('Errore lancette:', e);
+  }
+}
+
+function aggiornaLancette(l, totale) {
+  const g = document.querySelector('.lancetta.grande');
+  const m = document.querySelector('.lancetta.media');
+  const p = document.querySelector('.lancetta.piccola');
+  const itemG = document.querySelector('.legenda-item[data-tipo="grande"]');
+  const itemM = document.querySelector('.legenda-item[data-tipo="media"]');
+  const itemP = document.querySelector('.legenda-item[data-tipo="piccola"]');
+
+  if (l.grande) {
+    g.style.transform = `rotate(${l.grande.angolo}deg)`;
+    g.style.opacity = '1';
+    itemG.querySelector('.nome').textContent = l.grande.nome;
+    itemG.querySelector('.dett').textContent = TIPI[l.grande.tipo] + ' · anima più vicina';
+  } else {
+    itemG.querySelector('.nome').textContent = '— nessuno vicino —';
+    itemG.querySelector('.dett').textContent = 'sei il primo qui';
+    g.style.opacity = '0.15';
+  }
+
+  if (l.media) {
+    m.style.transform = `rotate(${l.media.angolo}deg)`;
+    m.style.opacity = '1';
+    itemM.querySelector('.nome').textContent = l.media.nome;
+    itemM.querySelector('.dett').textContent = TIPI[l.media.tipo] + ' · seconda anima';
+  } else {
+    itemM.querySelector('.nome').textContent = '—';
+    itemM.querySelector('.dett').textContent = 'nessuna seconda anima';
+    m.style.opacity = '0.15';
+  }
+
+  if (l.piccola) {
+    p.style.transform = `rotate(${l.piccola.angolo}deg)`;
+    p.style.opacity = '1';
+    itemP.querySelector('.nome').textContent = l.piccola.nome;
+    itemP.querySelector('.dett').textContent = 'luogo sacro · ' + l.piccola.provincia;
+  }
+
+  const nota = document.querySelector('#schermata-bussola .nota');
+  if (nota) nota.textContent = `${totale} anime online a ${utente.provincia} · niente GPS · solo la bussola sa`;
+}
+
+function avviaSSE() {
+  if (!utente) return;
+  if (evtSource) evtSource.close();
+
+  evtSource = new EventSource(`${API}/api/events?provincia=${encodeURIComponent(utente.provincia)}&id=${utente.id}`);
+
+  evtSource.addEventListener('connesso', e => {
+    console.log('SSE connesso:', JSON.parse(e.data));
+  });
+
+  evtSource.addEventListener('nuovo-utente', e => {
+    const d = JSON.parse(e.data);
+    console.log('Nuovo utente:', d);
+    caricaLancette();
+  });
+
+  evtSource.onerror = () => {
+    console.log('SSE disconnesso, riconnetto...');
+  };
+}

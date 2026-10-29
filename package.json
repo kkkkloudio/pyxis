@@ -1,0 +1,10 @@
+{
+  "name": "pyxis",
+  "version": "3.0.0",
+  "description": "🧭 Pyxis — La bussola delle anime. Backend reale + frontend real-time.",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js"
+  },
+  "license": "MIT"
+}
