@@ -25,7 +25,9 @@ const TIPI = {
   viandante: '◎ Viandante'
 };
 
-const API = ''; // stesso origin
+const API = (location.hostname === 'kkkkloudio.github.io' || location.hostname.endsWith('github.io'))
+  ? 'http://192.168.0.196:3000'   // mini PC in rete locale (Ethernet, IP fisso 192.168.0.196)
+  : '';                          // in locale (localhost) usa stesso origin
 
 let utente = JSON.parse(localStorage.getItem('pyxis-utente') || 'null');
 let evtSource = null;
@@ -61,7 +63,11 @@ document.addEventListener('DOMContentLoaded', function() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nome, tipo: selezionata, provincia })
       });
-      const data = await resp.json();
+      const testo = await resp.text();
+      let data;
+      try { data = JSON.parse(testo); } catch (e) {
+        throw new Error('Il server non risponde (HTML ricevuto). Sei sulla stessa rete del mini PC?');
+      }
 
       if (!resp.ok) {
         alert(data.error || 'Errore nella registrazione');

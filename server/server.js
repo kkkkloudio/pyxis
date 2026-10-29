@@ -228,7 +228,7 @@ const server = http.createServer(async (req, res) => {
   });
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`🧭 Pyxis backend in ascolto su http://localhost:${PORT}`);
   console.log(`   Database: ${DB_PATH}`);
   console.log(`   Frontend servito da: ${__dirname}/..`);
