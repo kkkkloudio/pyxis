@@ -2,435 +2,251 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Adytum</title>
-
-<!-- PWA Meta Tags -->
-<meta name="description" content="🏛️ Adytum — Il santuario delle anime. Un luogo dove le luci si incontrano. Niente GPS, niente nomi veri: il cielo non misura le distanze."/>
-<meta name="theme-color" content="#2a1a0a"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Adytum"/>
-
-<!-- Favicon -->
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png"/>
-<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png"/>
-
-<!-- Apple Touch Icon -->
-<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png"/>
-
-<!-- PWA Manifest -->
-<link rel="manifest" href="manifest.json"/>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pyxis — La Bussola</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    min-height:100vh;
-    min-height:100dvh;
-    background:#070912;
-    background-image:
-      radial-gradient(1.5px 1.5px at 12% 18%, rgba(216,210,200,.55) 50%, transparent 51%),
-      radial-gradient(1px 1px at 78% 12%, rgba(216,210,200,.4) 50%, transparent 51%),
-      radial-gradient(1px 1px at 55% 40%, rgba(216,210,200,.35) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 90% 55%, rgba(216,210,200,.45) 50%, transparent 51%),
-      radial-gradient(1px 1px at 30% 70%, rgba(216,210,200,.3) 50%, transparent 51%),
-      radial-gradient(1px 1px at 65% 85%, rgba(216,210,200,.4) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 8% 92%, rgba(216,210,200,.5) 50%, transparent 51%),
-      radial-gradient(1px 1px at 42% 8%, rgba(216,210,200,.35) 50%, transparent 51%);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:24px 12px;
-    font-family: Georgia, 'Palatino Linotype', serif;
-    color:#d8d2c8;
-  }
-  .frame {
-    width:min(430px, 100%);
-    border-radius:32px;
-    border:1px solid #2a2440;
-    background:linear-gradient(180deg,#150f29 0%, #0b0d1c 100%);
-    box-shadow:0 0 70px rgba(110,75,190,.16), inset 0 0 50px rgba(0,0,0,.45);
-    padding:18px 16px 16px;
-  }
-  .topbar { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .moonchip { display:flex; align-items:center; gap:8px; font-size:13px; color:#b8b2ce; font-style:italic; }
-  .moonchip svg { width:18px; height:18px; }
-  .bellwrap { position:relative; }
-  .bellwrap svg { width:20px; height:20px; }
-  .belldot { position:absolute; top:-2px; right:-3px; width:8px; height:8px; border-radius:50%;
-    background:#e8a54b; box-shadow:0 0 6px #e8a54b; }
-  .zone {
-    margin:12px 0 10px; text-align:center; font-size:13px; letter-spacing:.4px;
-    color:#a49dd4; border:1px dashed #3b3357; border-radius:14px; padding:7px 10px;
-    background:rgba(27,20,50,.5);
-  }
-  .zone b { color:#d8d2c8; }
-  .count { text-align:center; font-size:12px; color:#8f8aa8; margin-bottom:4px; font-style:italic; }
-  svg.field { width:100%; height:auto; display:block; }
-  .legend { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin:10px 0 12px; }
-  .chip { display:flex; align-items:center; gap:6px; font-size:11px; color:#a49dd4;
-    border:1px solid #2e2850; border-radius:12px; padding:4px 9px; background:rgba(20,15,42,.6); }
-  .chip svg { width:13px; height:13px; }
-  .detail {
-    min-height:86px; border:1px solid #332b58; border-radius:16px; padding:12px 14px;
-    background:rgba(24,18,48,.7); font-size:13px; line-height:1.5; margin-bottom:12px;
-  }
-  .detail h4 { font-size:14px; color:#e8a54b; font-weight:normal; margin-bottom:4px; letter-spacing:.3px; }
-  .detail .sub { color:#8f8aa8; font-size:12px; font-style:italic; }
-  .detail .act { margin-top:8px; display:inline-block; font-size:12px; color:#e8a54b;
-    border:1px solid #6b4f2a; border-radius:12px; padding:4px 12px; background:rgba(60,42,16,.35);
-    letter-spacing:.3px; }
-  .letter {
-    border-left:3px solid #e8a54b; border-radius:12px; padding:12px 14px;
-    background:linear-gradient(180deg, rgba(46,34,78,.75), rgba(30,22,56,.75));
-    margin-bottom:12px; font-size:13px; line-height:1.55;
-  }
-  .letter h4 { font-size:14px; color:#e8a54b; font-weight:normal; letter-spacing:.4px; margin-bottom:5px; }
-  .letter .when { font-size:11px; color:#8f8aa8; font-style:italic; }
-  .letter .unite { margin-top:7px; color:#d8d2c8; }
-  .letter .unite b { color:#e8a54b; font-weight:normal; }
-  .letter .fine { margin-top:7px; font-size:10.5px; color:#8f8aa8; font-style:italic; }
-  .vie { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
-  .via { display:flex; align-items:center; gap:9px; font-size:13px; color:#d8d2c8;
-    border:1px solid #3b3357; border-radius:13px; padding:9px 12px; background:rgba(24,18,48,.6); }
-  .via svg { width:22px; height:22px; }
-  .ctas { display:flex; gap:10px; }
-  .cta { flex:1; text-align:center; font-size:13px; letter-spacing:.4px; padding:10px 6px;
-    border-radius:14px; font-family:inherit; cursor:pointer; }
-  .cta.signal { color:#e8a54b; border:1px solid #6b4f2a; background:rgba(60,42,16,.3); }
-  .cta.write { color:#b8b2ce; border:1px solid #3b3357; background:rgba(27,20,50,.5); }
-  .pietre { text-align:center; font-size:10.5px; color:#6f6a8a; margin-top:12px; letter-spacing:.5px; }
-  .caption { margin-top:14px; font-size:11px; color:#6f6a8a; font-style:italic; text-align:center; max-width:430px; }
-  .soul { cursor:pointer; }
-  .soul .starglow { transition:.25s; }
-  .soul:hover .starglow, .soul.sel .starglow { opacity:.55; }
+  @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
-  /* PWA install prompt */
-  .install-banner {
-    position:fixed; bottom:0; left:0; right:0; z-index:100;
-    background:linear-gradient(180deg, #1a1433, #0b0d1c);
-    border-top:1px solid #3b3357; padding:14px 16px;
-    display:none; align-items:center; gap:12px;
-    padding-bottom:calc(14px + env(safe-area-inset-bottom));
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    background:#f5efe0;
+    background-image:url('assets/parchment.jpg');
+    background-size:cover;
+    display:flex; justify-content:center; align-items:center;
+    padding:20px;
+    font-family:'Cormorant Garamond', Georgia, serif;
+    overflow:hidden;
   }
-  .install-banner.show { display:flex; }
-  .install-banner .app-icon { width:44px; height:44px; border-radius:10px; flex-shrink:0; }
-  .install-banner .app-info { flex:1; min-width:0; }
-  .install-banner .app-name { font-size:14px; color:#e8a54b; }
-  .install-banner .app-desc { font-size:11px; color:#8f8aa8; font-style:italic; }
-  .install-banner button {
-    font-family:inherit; font-size:12px; padding:8px 14px; border-radius:12px;
-    border:1px solid #6b4f2a; background:rgba(60,42,16,.4); color:#e8a54b; cursor:pointer;
+
+  /* ===== SMARTPHONE ===== */
+  .phone {
+    position:relative;
+    width:390px; height:844px;
+    border-radius:44px;
+    background:#0a0a0a;
+    box-shadow:
+      0 0 0 4px #1a1a1a,
+      0 0 0 8px #000,
+      0 40px 100px rgba(0,0,0,.7),
+      inset 0 0 80px rgba(0,0,0,.4);
+    overflow:hidden;
   }
-  .install-banner .dismiss {
-    background:transparent; border-color:#3b3357; color:#8f8aa8;
+  .phone::before {
+    content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:150px; height:28px; background:#000; border-radius:0 0 18px 18px; z-index:200;
+  }
+
+  /* ===== SCHERMO ===== */
+  .screen {
+    position:absolute; inset:10px;
+    border-radius:36px; overflow:hidden;
+    background:#fdfbf5;
+    background-image:url('assets/parchment-mobile.jpg');
+    background-size:cover;
+  }
+  .screen::after {
+    content:''; position:absolute; inset:0;
+    background:rgba(252, 248, 238, 0.55);
+    pointer-events:none;
+  }
+  .vignette {
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at center, transparent 55%, rgba(60,40,20,.18) 100%);
+    pointer-events:none; z-index:5;
+  }
+
+  /* ===== CONTENUTO ===== */
+  .content {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:60px 24px 24px;
+    z-index:10;
+  }
+
+  /* ===== TITOLO ===== */
+  .titolo {
+    font-family:'Cinzel', serif;
+    font-size:26px; font-weight:700; letter-spacing:6px;
+    color:#1a0f08; text-align:center;
+    text-shadow:0 1px 3px rgba(255,255,255,.9);
+    margin-bottom:4px;
+  }
+  .sottotitolo {
+    font-family:'IM Fell English', serif;
+    font-size:13px; color:#4a3520; font-style:italic; text-align:center;
+    text-shadow:0 1px 2px rgba(255,255,255,.8);
+    margin-bottom:24px;
+  }
+
+  /* ===== BUSSOLA GRANDE ===== */
+  .bussola-wrap {
+    position:relative;
+    width:300px; height:300px;
+    filter:drop-shadow(3px 6px 10px rgba(40,25,10,.35));
+  }
+  .bussola-bg {
+    position:absolute; inset:0;
+    background:url('assets/compass-big.png') center/contain no-repeat;
+  }
+  .lancetta {
+    position:absolute; bottom:50%; left:50%;
+    transform-origin:bottom center;
+    transition:transform 1.2s cubic-bezier(.4,0,.2,1), opacity .3s;
+  }
+  .lancetta img { display:block; filter:drop-shadow(1px 2px 3px rgba(0,0,0,.4)); }
+
+  .lancetta.grande { width:44px; margin-left:-22px; transform:rotate(-50deg); z-index:4; }
+  .lancetta.grande img { width:44px; }
+  .lancetta.media { width:34px; margin-left:-17px; transform:rotate(40deg); z-index:3; }
+  .lancetta.media img { width:34px; }
+  .lancetta.piccola { width:26px; margin-left:-13px; transform:rotate(160deg); z-index:5; }
+  .lancetta.piccola img { width:26px; }
+
+  .perno {
+    position:absolute; top:50%; left:50%;
+    width:24px; height:24px; margin:-12px 0 0 -12px;
+    background:radial-gradient(circle at 35% 30%, #b8963e, #6b5230);
+    border:3px solid #1a0f08; border-radius:50%;
+    box-shadow:0 2px 6px rgba(0,0,0,.5);
+    z-index:10;
+  }
+
+  /* ===== LEGENDA ===== */
+  .legenda {
+    margin-top:28px;
+    width:100%; max-width:320px;
+    background:rgba(255,252,245,.92);
+    border:2px solid #2a1a0a;
+    border-radius:10px;
+    padding:14px 18px;
+    box-shadow:0 4px 12px rgba(40,25,10,.2);
+  }
+  .legenda-titolo {
+    font-family:'Cinzel', serif;
+    font-size:11px; font-weight:700; letter-spacing:2px;
+    color:#1a0f08; text-align:center; margin-bottom:10px;
+    text-transform:uppercase;
+  }
+  .legenda-item {
+    display:flex; align-items:center; gap:12px;
+    padding:8px 6px;
+    border-bottom:1px solid #d4c4a0;
+    cursor:pointer; transition:.15s;
+    border-radius:4px;
+  }
+  .legenda-item:last-child { border-bottom:none; }
+  .legenda-item:hover, .legenda-item.sel { background:#f0e6cc; }
+
+  .legenda-item .barra {
+    width:34px; flex-shrink:0; border-radius:3px;
+    border:2px solid #1a0f08;
+  }
+  .barra.grande { height:10px; background:#8270b4; }
+  .barra.media { height:8px; background:#5a4189; }
+  .barra.piccola { height:6px; background:#b8963e; }
+
+  .legenda-item .testo { flex:1; }
+  .legenda-item .nome {
+    font-family:'Cormorant Garamond', serif;
+    font-size:16px; font-weight:700; color:#1a0f08;
+  }
+  .legenda-item .dett {
+    font-family:'IM Fell English', serif;
+    font-size:12px; color:#4a3520; font-style:italic;
+  }
+  .legenda-item .tag {
+    font-family:'Cinzel', serif;
+    font-size:9px; font-weight:600; letter-spacing:.5px;
+    color:#5a4530; text-transform:uppercase;
+    background:#e8dcc0; padding:2px 8px; border-radius:10px;
+    border:1px solid #c4b088;
+  }
+
+  /* ===== NOTA ===== */
+  .nota {
+    position:absolute; bottom:24px; left:0; right:0;
+    text-align:center;
+    font-family:'IM Fell English', serif;
+    font-size:11px; color:#4a3520; font-style:italic;
+    text-shadow:0 1px 2px rgba(255,255,255,.8);
+    z-index:10;
+  }
+
+  .pyxis-label {
+    position:absolute; bottom:8px; left:20px;
+    font-family:'IM Fell English', serif;
+    font-size:9px; color:#8a7a5a; z-index:10;
   }
 </style>
 </head>
 <body>
 
-<svg width="0" height="0" style="position:absolute">
-  <defs>
-    <symbol id="i-moon" viewBox="0 0 24 24">
-      <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="#cfd6e6"/>
-    </symbol>
-    <symbol id="i-bell" viewBox="0 0 24 24">
-      <path d="M12 3c-3.5 0-5 2.5-5 6 0 4-1.5 5.5-2.5 6.5h15C18.5 14.5 17 13 17 9c0-3.5-1.5-6-5-6z"
-        fill="none" stroke="#cfd6e6" stroke-width="1.6" stroke-linejoin="round"/>
-      <path d="M10 19a2 2 0 0 0 4 0" fill="none" stroke="#cfd6e6" stroke-width="1.6" stroke-linecap="round"/>
-    </symbol>
-    <symbol id="i-flame" viewBox="0 0 24 24">
-      <path d="M12 2c1.6 3.6 5 5.6 5 9.6a5 5 0 0 1-10 0c0-2 .9-3.4 1.9-4.6.2 1.8.9 2.8 2 3.2C11 8 11.2 5 12 2z" fill="#e8a54b"/>
-    </symbol>
-    <symbol id="i-candle" viewBox="0 0 24 24">
-      <rect x="9.2" y="10" width="5.6" height="11" rx="1.2" fill="#cfd6e6"/>
-      <path d="M12 2c1.2 2.4 2.6 3.4 2.6 5.2a2.6 2.6 0 0 1-5.2 0c0-.9.4-1.6 1-2.3.1 1 .5 1.6 1 1.8-.2-1.4-.2-3 .6-4.7z" fill="#e8a54b"/>
-    </symbol>
-    <symbol id="i-smoke" viewBox="0 0 24 24">
-      <path d="M12 4c-1.8 1.6-1.8 3.4 0 5s1.8 3.4 0 5-1.8 3.4 0 5" fill="none" stroke="#9aa0c8" stroke-width="1.7" stroke-linecap="round"/>
-      <path d="M17 5c-1.5 1.3-1.5 2.8 0 4.2s1.5 2.8 0 4.2-1.5 2.8 0 4.2" fill="none" stroke="#9aa0c8" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>
-    </symbol>
-    <symbol id="i-warn" viewBox="0 0 24 24">
-      <path d="M12 3c2.2 4.6 6 7 6 12a6 6 0 0 1-12 0c0-2.4 1-4 2.3-5.6.2 2.2 1.1 3.5 2.4 4-1.4-4.6-1-8.4 1.3-10.4z" fill="#d05656"/>
-    </symbol>
-    <symbol id="i-strega" viewBox="0 0 24 24">
-      <path d="M12 3l4.5 12h-9z" fill="#b8b2ce"/>
-      <rect x="4.5" y="15" width="15" height="3" rx="1.5" fill="#b8b2ce"/>
-      <rect x="10" y="12.2" width="4" height="2" rx="1" fill="#e8a54b"/>
-    </symbol>
-    <symbol id="i-stregone" viewBox="0 0 24 24">
-      <path d="M12 2.5c-4 0-6.5 3.5-6.5 8.5 0 3.5.8 6 1.5 8h10c.7-2 1.5-4.5 1.5-8 0-5-2.5-8.5-6.5-8.5z" fill="#8f8aa8"/>
-      <circle cx="12" cy="10" r="2.6" fill="#0b0d1c"/>
-    </symbol>
-    <symbol id="i-sciamano" viewBox="0 0 24 24">
-      <circle cx="12" cy="11" r="3.4" fill="#b8b2ce"/>
-      <path d="M9 8.5C7 7 6.2 5.5 6.2 3.4M9.5 10C7.5 9.5 6 8.5 5 6.6M15 8.5c2-1.5 2.8-3 2.8-5.1M14.5 10c2-.5 3.5-1.5 4.5-3.4"
-        fill="none" stroke="#b8b2ce" stroke-width="1.5" stroke-linecap="round"/>
-      <path d="M6.5 20c.8-3.4 3-5 5.5-5s4.7 1.6 5.5 5z" fill="#8f8aa8" opacity=".85"/>
-    </symbol>
-    <symbol id="i-via" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="4" fill="#b8b2ce" opacity=".8"/>
-    </symbol>
-  </defs>
-</svg>
+<div class="phone">
+  <div class="screen">
+    <div class="vignette"></div>
 
-<div class="frame">
-  <div class="topbar">
-    <div class="moonchip">
-      <svg><use href="#i-moon"/></svg>
-      <span>Luna calante &middot; Samhain fra 4 giorni</span>
+    <div class="content">
+      <div class="titolo">PYXIS</div>
+      <div class="sottotitolo">la bussola delle anime</div>
+
+      <!-- BUSSOLA GRANDE CENTRALE -->
+      <div class="bussola-wrap">
+        <div class="bussola-bg"></div>
+        <div class="lancetta piccola" data-tipo="piccola"><img src="assets/hand-small.png" alt=""></div>
+        <div class="lancetta media" data-tipo="media"><img src="assets/hand-medium.png" alt=""></div>
+        <div class="lancetta grande" data-tipo="grande"><img src="assets/hand-large.png" alt=""></div>
+        <div class="perno"></div>
+      </div>
+
+      <!-- LEGENDA: SOLO LE 3 LANCETTE -->
+      <div class="legenda">
+        <div class="legenda-titolo">Le tre lancette</div>
+        <div class="legenda-item sel" data-tipo="grande">
+          <div class="barra grande"></div>
+          <div class="testo">
+            <div class="nome">Luna Rossa</div>
+            <div class="dett">anima più vicina</div>
+          </div>
+          <div class="tag">vicina</div>
+        </div>
+        <div class="legenda-item" data-tipo="media">
+          <div class="barra media"></div>
+          <div class="testo">
+            <div class="nome">Corvo Nero</div>
+            <div class="dett">seconda anima</div>
+          </div>
+          <div class="tag">dopo</div>
+        </div>
+        <div class="legenda-item" data-tipo="piccola">
+          <div class="barra piccola"></div>
+          <div class="testo">
+            <div class="nome">Quercia dei Sussurri</div>
+            <div class="dett">luogo sacro più vicino</div>
+          </div>
+          <div class="tag">il sacro</div>
+        </div>
+      </div>
+
+      <div class="nota">niente GPS · niente distanze · solo la bussola sa</div>
     </div>
-    <div class="bellwrap">
-      <svg><use href="#i-bell"/></svg>
-      <span class="belldot"></span>
-    </div>
+
+    <div class="pyxis-label">Pyxis · V1</div>
   </div>
-
-  <div class="zone"><b>Il tuo cielo</b> &middot; zona autodichiarata &middot; niente GPS</div>
-  <div class="count">Stasera nel tuo cielo: 6 luci</div>
-
-  <svg class="field" viewBox="0 0 360 360">
-    <defs>
-      <radialGradient id="neb" cx="50%" cy="50%" r="55%">
-        <stop offset="0%" stop-color="#241a4a" stop-opacity=".7"/>
-        <stop offset="60%" stop-color="#181233" stop-opacity=".35"/>
-        <stop offset="100%" stop-color="#0b0d1c" stop-opacity="0"/>
-      </radialGradient>
-    </defs>
-
-    <ellipse cx="180" cy="180" rx="175" ry="160" fill="url(#neb)"/>
-
-    <circle cx="62" cy="78" r="1" fill="#cfd6e6" opacity=".4"/>
-    <circle cx="304" cy="58" r="1.2" fill="#cfd6e6" opacity=".5"/>
-    <circle cx="42" cy="252" r="1" fill="#cfd6e6" opacity=".35"/>
-    <circle cx="322" cy="138" r="1" fill="#cfd6e6" opacity=".4"/>
-    <circle cx="150" cy="38" r="1" fill="#cfd6e6" opacity=".3"/>
-    <circle cx="252" cy="52" r="1" fill="#cfd6e6" opacity=".45"/>
-    <circle cx="70" cy="330" r="1" fill="#cfd6e6" opacity=".4"/>
-    <circle cx="206" cy="332" r="1.2" fill="#cfd6e6" opacity=".35"/>
-    <circle cx="332" cy="296" r="1" fill="#cfd6e6" opacity=".4"/>
-
-    <g stroke="rgba(140,125,205,.28)" stroke-dasharray="1 5" fill="none">
-      <path d="M180 180 L218 118"/>
-      <path d="M180 180 L124 142"/>
-      <path d="M180 180 L258 206"/>
-      <path d="M180 180 L98 212"/>
-      <path d="M180 180 L186 50"/>
-      <path d="M180 180 L256 288"/>
-    </g>
-
-    <g class="soul sel" data-id="tu">
-      <circle cx="180" cy="180" r="44" fill="rgba(232,165,75,.10)"/>
-      <circle cx="180" cy="180" r="24" fill="#1f1938" stroke="#e8a54b"/>
-      <use href="#i-flame" x="169" y="169" width="22" height="22"/>
-      <text x="180" y="224" fill="#e8a54b" font-size="12" text-anchor="middle" font-style="italic">tu</text>
-    </g>
-
-    <g class="soul" data-id="anguana">
-      <circle class="starglow" cx="218" cy="118" r="19" fill="#8f7dd8" opacity=".35"/>
-      <use href="#i-strega" x="206" y="106" width="24" height="24"/>
-      <circle cx="236" cy="104" r="8" fill="#2b2246" stroke="#6b4f2a"/>
-      <use href="#i-candle" x="232.5" y="100.5" width="7" height="7"/>
-    </g>
-    <g class="soul" data-id="viandante">
-      <circle class="starglow" cx="124" cy="142" r="13" fill="#8f7dd8" opacity=".28"/>
-      <use href="#i-via" x="113" y="131" width="22" height="22"/>
-    </g>
-    <g class="soul" data-id="salice">
-      <circle class="starglow" cx="258" cy="206" r="14" fill="#8f7dd8" opacity=".3"/>
-      <use href="#i-strega" x="246" y="194" width="24" height="24"/>
-      <circle cx="276" cy="198" r="8" fill="#1a1c30" stroke="#4a5480"/>
-      <use href="#i-smoke" x="272.5" y="194.5" width="7" height="7"/>
-    </g>
-    <g class="soul" data-id="corvo">
-      <circle class="starglow" cx="98" cy="212" r="13" fill="#8f7dd8" opacity=".26"/>
-      <use href="#i-sciamano" x="86" y="200" width="24" height="24"/>
-    </g>
-    <g class="soul" data-id="lunaveneta">
-      <circle class="starglow" cx="186" cy="50" r="13" fill="#8f7dd8" opacity=".27"/>
-      <use href="#i-stregone" x="174" y="38" width="24" height="24"/>
-      <circle cx="204" cy="42" r="8" fill="#2b2246" stroke="#6b4f2a"/>
-      <use href="#i-candle" x="200.5" y="38.5" width="7" height="7"/>
-    </g>
-    <g class="soul" data-id="fontanile">
-      <circle class="starglow" cx="256" cy="288" r="13" fill="#8f7dd8" opacity=".25"/>
-      <use href="#i-sciamano" x="244" y="276" width="24" height="24"/>
-    </g>
-  </svg>
-
-  <div class="legend">
-    <span class="chip"><svg><use href="#i-candle"/></svg> candela: rituale condiviso</span>
-    <span class="chip"><svg><use href="#i-smoke"/></svg> fumo: chiede una mano</span>
-    <span class="chip"><svg><use href="#i-warn"/></svg> fiamma: avvertimento</span>
-    <span class="chip"><svg><use href="#i-bell"/></svg> campana: lettera della comunit&agrave;</span>
-  </div>
-
-  <div class="detail" id="detail">
-    <h4>Ogni luce &egrave; una presenza.</h4>
-    <div class="sub">Quella che brilla di pi&ugrave; &egrave; la pi&ugrave; vicina a te &mdash; ma il cielo non dice quanto sia lontana. E non lo dir&agrave; mai.</div>
-  </div>
-
-  <div class="letter">
-    <div class="when">Campana &middot; 28 ottobre</div>
-    <h4>Samhain si avvicina</h4>
-    La porta si assottiglia: finestra favorevole ai lavori di purificazione e alla memoria
-    degli antenati, secondo le tradizioni venete, slave e celtiche dell'Almanacco.
-    <div class="unite">Unisciti anche tu: <b>candela rossa, questa sera alle 21:00</b> &mdash; ciascuna a casa propria.</div>
-    <div class="fine">Calendario curato dall'Almanacco &middot; nessun'altra ragione che la tradizione</div>
-  </div>
-
-  <div class="letter">
-    <div class="when">L'ingresso &middot; abbozzo</div>
-    <h4>Chi sei sulla tua via?</h4>
-    All'iscrizione si chiede solo questo. In base alla risposta, il cielo ti d&agrave; un volto.
-    <div class="vie">
-      <span class="via"><svg><use href="#i-strega"/></svg> Strega</span>
-      <span class="via"><svg><use href="#i-stregone"/></svg> Stregone</span>
-      <span class="via"><svg><use href="#i-sciamano"/></svg> Sciamano</span>
-      <span class="via"><svg><use href="#i-via"/></svg> Nessuna, per ora</span>
-    </div>
-    <div class="fine">Nient'altro viene chiesto: né nome vero, né dove sei davvero.</div>
-  </div>
-
-  <div class="ctas">
-    <button class="cta signal">Alza un segnale</button>
-    <button class="cta write">Scrivi una lettera</button>
-  </div>
-
-  <div class="pietre">niente GPS &middot; niente nomi veri &middot; il cielo non misura le distanze</div>
-</div>
-
-<div class="caption">Le luci prendono un volto: strega col cappello, stregone col cappuccio,
-sciamano con le corna &mdash; e chi non si riconosce ancora resta un punto, perch&eacute; anche l'indugiare &egrave; una via.
-Nome &laquo;Adytum&raquo;.</div>
-
-<!-- PWA Install Banner -->
-<div class="install-banner" id="installBanner">
-  <img src="icons/icon-72x72.png" alt="Adytum" class="app-icon"/>
-  <div class="app-info">
-    <div class="app-name">Adytum</div>
-    <div class="app-desc">Aggiungi alla schermata Home</div>
-  </div>
-  <button id="installBtn">Installa</button>
-  <button class="dismiss" id="dismissBtn">&times;</button>
 </div>
 
 <script>
-  const souls = {
-    tu: {
-      name: "Tu — lo Sciamano del Vento",
-      sub: "Il tuo cielo · nessun dato personale registrato · il fumo che vedi è solo quello che alzi tu",
-      act: "Alza un segnale"
-    },
-    anguana: {
-      name: "Congrega dell'Anguana · strega",
-      sub: "Sta accendendo una candela: lavoro di purificazione in corso, questa sera. È la presenza più vicina al tuo cielo.",
-      act: "Accendi una candela con lei"
-    },
-    viandante: {
-      name: "Il Viandante · nessuna figura, per ora",
-      sub: "Silenzioso. Nessun segnale alzato. A volte basta sapere che c'è qualcuno.",
-      act: "Manda un saluto di fumo"
-    },
-    salice: {
-      name: "Sorella del Salice · strega",
-      sub: "Fumo: chiede una mano magica per una purificazione. Aiuto a distanza, in remoto.",
-      act: "Lancia con lei in remoto"
-    },
-    corvo: {
-      name: "Il Corvo Bianco · sciamano",
-      sub: "Silenzioso. Nessun segnale alzato.",
-      act: "Manda un saluto di fumo"
-    },
-    lunaveneta: {
-      name: "Congrega della Luna Veneta · stregone",
-      sub: "Candela accesa: rituale di memoria per gli antenati, per Samhain.",
-      act: "Accendi una candela con loro"
-    },
-    fontanile: {
-      name: "Custode del Fontanile · sciamano",
-      sub: "Silenzioso. Nessun segnale alzato.",
-      act: "Manda un saluto di fumo"
-    }
-  };
-
-  const detail = document.getElementById("detail");
-  document.querySelectorAll(".soul").forEach(function (el) {
-    el.addEventListener("click", function () {
-      document.querySelectorAll(".soul").forEach(function (s) { s.classList.remove("sel"); });
-      el.classList.add("sel");
-      const d = souls[el.dataset.id];
-      detail.innerHTML =
-        "<h4>" + d.name + "</h4><div class='sub'>" + d.sub + "</div>" +
-        "<span class='act'>" + d.act + "</span>";
+  // Legenda cliccabile: seleziona la lancetta
+  document.querySelectorAll('.legenda-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.legenda-item').forEach(function(i) { i.classList.remove('sel'); });
+      this.classList.add('sel');
+      var tipo = this.dataset.tipo;
+      document.querySelectorAll('.lancetta').forEach(function(l) { l.style.opacity = '0.15'; });
+      var sel = document.querySelector('.lancetta.' + tipo);
+      if (sel) sel.style.opacity = '1';
     });
   });
-
-  // === PWA: Service Worker Registration ===
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('sw.js')
-        .then(function(reg) { console.log('SW registrato:', reg.scope); })
-        .catch(function(err) { console.log('SW errore:', err); });
-    });
-  }
-
-  // === PWA: Install Prompt ===
-  let deferredPrompt;
-  const installBanner = document.getElementById('installBanner');
-  const installBtn = document.getElementById('installBtn');
-  const dismissBtn = document.getElementById('dismissBtn');
-
-  // Nascondi se già installata
-  if (window.matchMedia('(display-mode: standalone)').matches ||
-      window.navigator.standalone === true) {
-    installBanner.style.display = 'none';
-  }
-
-  window.addEventListener('beforeinstallprompt', function(e) {
-    e.preventDefault();
-    deferredPrompt = e;
-    // Mostra dopo 3 secondi per non disturbare subito
-    setTimeout(function() {
-      if (!localStorage.getItem('adytum-install-dismissed')) {
-        installBanner.classList.add('show');
-      }
-    }, 3000);
-  });
-
-  installBtn.addEventListener('click', function() {
-    installBanner.classList.remove('show');
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function(choice) {
-        if (choice.outcome === 'accepted') {
-          console.log('PWA installata');
-        }
-        deferredPrompt = null;
-      });
-    }
-  });
-
-  dismissBtn.addEventListener('click', function() {
-    installBanner.classList.remove('show');
-    localStorage.setItem('adytum-install-dismissed', '1');
-  });
-
-  // === iOS install hint (Safari non supporta beforeinstallprompt) ===
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  if ((isIOS && isSafari) && !window.navigator.standalone) {
-    setTimeout(function() {
-      if (!localStorage.getItem('adytum-ios-hint-dismissed')) {
-        installBanner.classList.add('show');
-        installBtn.textContent = 'tocca \u{1F4E4} Condividi';
-        installBtn.onclick = function() {
-          installBanner.classList.remove('show');
-          alert('Tocca "Condividi" \u2192 "Aggiungi a Home" per installare Adytum.');
-          localStorage.setItem('adytum-ios-hint-dismissed', '1');
-        };
-      }
-    }, 3000);
-  }
 </script>
 </body>
 </html>
