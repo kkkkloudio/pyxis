@@ -178,6 +178,92 @@
     font-family:'IM Fell English', serif;
     font-size:9px; color:#8a7a5a; z-index:10;
   }
+
+  /* ===== SCHERMATE ===== */
+  .schermata { display:none; width:100%; }
+  .schermata.attiva { display:flex; flex-direction:column; align-items:center; }
+
+  /* ===== ISCRIZIONE ===== */
+  .iscrizione-box {
+    width:100%; max-width:320px;
+    background:rgba(255,252,245,.92);
+    border:2px solid #2a1a0a;
+    border-radius:10px;
+    padding:24px 20px;
+    box-shadow:0 4px 12px rgba(40,25,10,.2);
+    margin-top:8px;
+  }
+  .iscrizione-box h3 {
+    font-family:'Cinzel', serif;
+    font-size:15px; font-weight:700; letter-spacing:2px;
+    color:#1a0f08; text-align:center; margin-bottom:4px;
+    text-transform:uppercase;
+  }
+  .iscrizione-box .sub {
+    font-family:'IM Fell English', serif;
+    font-size:12px; color:#4a3520; font-style:italic; text-align:center;
+    margin-bottom:18px;
+  }
+  .campo { margin-bottom:14px; }
+  .campo label {
+    display:block;
+    font-family:'Cinzel', serif;
+    font-size:10px; font-weight:600; letter-spacing:1px;
+    color:#5a4530; text-transform:uppercase;
+    margin-bottom:5px;
+  }
+  .campo input, .campo select {
+    width:100%;
+    padding:10px 12px;
+    font-family:'Cormorant Garamond', serif;
+    font-size:16px; color:#1a0f08;
+    background:#fff;
+    border:2px solid #2a1a0a;
+    border-radius:6px;
+    outline:none;
+  }
+  .campo input:focus, .campo select:focus {
+    border-color:#b8963e;
+    box-shadow:0 0 0 2px rgba(184,150,62,.2);
+  }
+  .tipologie {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+  }
+  .tipologia {
+    padding:10px 4px;
+    text-align:center;
+    font-family:'Cormorant Garamond', serif;
+    font-size:14px; font-weight:600; color:#4a3520;
+    background:#fff;
+    border:2px solid #8a6a3a;
+    border-radius:8px;
+    cursor:pointer; transition:.15s;
+  }
+  .tipologia:hover { border-color:#b8963e; }
+  .tipologia.sel {
+    background:#2a1a0a; color:#f5efe0;
+    border-color:#1a0f08;
+  }
+  .btn-inizia {
+    width:100%;
+    padding:14px;
+    margin-top:8px;
+    font-family:'Cinzel', serif;
+    font-size:14px; font-weight:700; letter-spacing:2px;
+    color:#f5efe0;
+    background:#2a1a0a;
+    border:2px solid #1a0f08;
+    border-radius:8px;
+    cursor:pointer;
+    text-transform:uppercase;
+    transition:.15s;
+  }
+  .btn-inizia:hover { background:#4a3520; }
+  .privacy {
+    margin-top:12px;
+    font-family:'IM Fell English', serif;
+    font-size:10px; color:#6a5a40; font-style:italic; text-align:center;
+  }
 </style>
 </head>
 <body>
@@ -187,66 +273,93 @@
     <div class="vignette"></div>
 
     <div class="content">
-      <div class="titolo">PYXIS</div>
-      <div class="sottotitolo">la bussola delle anime</div>
+      <!-- ===== SCHERMATA 1: ISCRIZIONE ===== -->
+      <div class="schermata attiva" id="schermata-iscrizione">
+        <div class="titolo">PYXIS</div>
+        <div class="sottotitolo">la bussola delle anime</div>
 
-      <!-- BUSSOLA GRANDE CENTRALE -->
-      <div class="bussola-wrap">
-        <div class="bussola-bg"></div>
-        <div class="lancetta piccola" data-tipo="piccola"><img src="assets/hand-small.png" alt=""></div>
-        <div class="lancetta media" data-tipo="media"><img src="assets/hand-medium.png" alt=""></div>
-        <div class="lancetta grande" data-tipo="grande"><img src="assets/hand-large.png" alt=""></div>
-        <div class="perno"></div>
-      </div>
+        <div class="iscrizione-box">
+          <h3>Entra nello scrigno</h3>
+          <div class="sub">tre cose bastano, poi la bussola gira</div>
 
-      <!-- LEGENDA: SOLO LE 3 LANCETTE -->
-      <div class="legenda">
-        <div class="legenda-titolo">Le tre lancette</div>
-        <div class="legenda-item sel" data-tipo="grande">
-          <div class="barra grande"></div>
-          <div class="testo">
-            <div class="nome">Luna Rossa</div>
-            <div class="dett">anima più vicina</div>
+          <div class="campo">
+            <label for="nome">Nome d'arte</label>
+            <input type="text" id="nome" placeholder="es. LunaNera" maxlength="20" autocomplete="off">
           </div>
-          <div class="tag">vicina</div>
-        </div>
-        <div class="legenda-item" data-tipo="media">
-          <div class="barra media"></div>
-          <div class="testo">
-            <div class="nome">Corvo Nero</div>
-            <div class="dett">seconda anima</div>
+
+          <div class="campo">
+            <label>La tua via</label>
+            <div class="tipologie" id="tipologie">
+              <div class="tipologia" data-tipo="strega">☾ Strega</div>
+              <div class="tipologia" data-tipo="stregone">✦ Stregone</div>
+              <div class="tipologia" data-tipo="sciamano">🪶 Sciamano</div>
+              <div class="tipologia" data-tipo="guaritore">❦ Guaritore</div>
+              <div class="tipologia" data-tipo="veggente">👁 Veggente</div>
+              <div class="tipologia" data-tipo="viandante">◎ Viandante</div>
+            </div>
           </div>
-          <div class="tag">dopo</div>
-        </div>
-        <div class="legenda-item" data-tipo="piccola">
-          <div class="barra piccola"></div>
-          <div class="testo">
-            <div class="nome">Quercia dei Sussurri</div>
-            <div class="dett">luogo sacro più vicino</div>
+
+          <div class="campo">
+            <label for="provincia">Provincia</label>
+            <select id="provincia">
+              <option value="">— scegli —</option>
+            </select>
           </div>
-          <div class="tag">il sacro</div>
+
+          <button class="btn-inizia" id="btn-inizia">Apri la bussola</button>
+          <div class="privacy">nessun nome vero · nessuna email · niente GPS</div>
         </div>
       </div>
 
-      <div class="nota">niente GPS · niente distanze · solo la bussola sa</div>
+      <!-- ===== SCHERMATA 2: BUSSOLA ===== -->
+      <div class="schermata" id="schermata-bussola">
+        <div class="titolo">PYXIS</div>
+        <div class="sottotitolo" id="sottotitolo-utente">la bussola delle anime</div>
+
+        <div class="bussola-wrap">
+          <div class="bussola-bg"></div>
+          <div class="lancetta piccola" data-tipo="piccola"><img src="assets/hand-small.png" alt=""></div>
+          <div class="lancetta media" data-tipo="media"><img src="assets/hand-medium.png" alt=""></div>
+          <div class="lancetta grande" data-tipo="grande"><img src="assets/hand-large.png" alt=""></div>
+          <div class="perno"></div>
+        </div>
+
+        <div class="legenda">
+          <div class="legenda-titolo">Le tre lancette</div>
+          <div class="legenda-item sel" data-tipo="grande">
+            <div class="barra grande"></div>
+            <div class="testo">
+              <div class="nome">Luna Rossa</div>
+              <div class="dett">anima più vicina</div>
+            </div>
+            <div class="tag">vicina</div>
+          </div>
+          <div class="legenda-item" data-tipo="media">
+            <div class="barra media"></div>
+            <div class="testo">
+              <div class="nome">Corvo Nero</div>
+              <div class="dett">seconda anima</div>
+            </div>
+            <div class="tag">dopo</div>
+          </div>
+          <div class="legenda-item" data-tipo="piccola">
+            <div class="barra piccola"></div>
+            <div class="testo">
+              <div class="nome">Quercia dei Sussurri</div>
+              <div class="dett">luogo sacro più vicino</div>
+            </div>
+            <div class="tag">il sacro</div>
+          </div>
+        </div>
+
+        <div class="nota">niente GPS · niente distanze · solo la bussola sa</div>
+      </div>
     </div>
 
     <div class="pyxis-label">Pyxis · V1</div>
   </div>
 </div>
 
-<script>
-  // Legenda cliccabile: seleziona la lancetta
-  document.querySelectorAll('.legenda-item').forEach(function(item) {
-    item.addEventListener('click', function() {
-      document.querySelectorAll('.legenda-item').forEach(function(i) { i.classList.remove('sel'); });
-      this.classList.add('sel');
-      var tipo = this.dataset.tipo;
-      document.querySelectorAll('.lancetta').forEach(function(l) { l.style.opacity = '0.15'; });
-      var sel = document.querySelector('.lancetta.' + tipo);
-      if (sel) sel.style.opacity = '1';
-    });
-  });
-</script>
+<script src="app.js"></script>
 </body>
 </html>
