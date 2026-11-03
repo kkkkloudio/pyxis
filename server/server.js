@@ -2,6 +2,8 @@
 // - Database: node:sqlite (integrato)
 // - Real-time: SSE (Server-Sent Events)
 // - API: POST /api/register, GET /api/lancette?provincia=X, GET /api/events?provincia=X
+//        POST /api/lettera (il corvo), GET /api/lettere?id=X (la posta)
+// - V4: nessuna categoria (tipo default "utente"), lettere tra vicini via corvo
 
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
@@ -16,10 +18,10 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS utenti (
     id TEXT PRIMARY KEY,
     nome TEXT NOT NULL UNIQUE,
-    tipo TEXT NOT NULL,
+    tipo TEXT NOT NULL DEFAULT 'utente',
     provincia TEXT NOT NULL,
     creato_il TEXT NOT NULL,
-    ultimo_ Republican TEXT
+    ultimo_accesso TEXT
   );
   CREATE TABLE IF NOT EXISTS presenze (
     utente_id TEXT PRIMARY KEY,
@@ -34,6 +36,15 @@ db.exec(`
     descrizione TEXT,
     creato_da TEXT,
     creato_il TEXT NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS lettere (
+    id TEXT PRIMARY KEY,
+    mittente_id TEXT NOT NULL,
+    destinatario_id TEXT NOT NULL,
+    mittente_nome TEXT NOT NULL,
+    testo TEXT NOT NULL,
+    creata_il TEXT NOT NULL,
+    letta INTEGER NOT NULL DEFAULT 0
   );
 `);
 
@@ -85,7 +96,7 @@ function broadcast(provincia, event, data) {
 
 // ============ API ============
 const server = http.createServer(async (req, res) => {
-  // CORS su TUTTE le risposte (anche errori e SSE) — 必須 prima di tutto
+  // CORS su TUTTE le risposte (anche errori e SSE) — prima di tutto
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -97,13 +108,15 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { json(res, 204, {}); return; }
 
   // ---- POST /api/register ----
+  // V4: la "via" non si chiede più — se un vecchio client la manda, viene accettata;
+  // se non la manda, il tipo è semplicemente "utente".
   if (path === '/api/register' && req.method === 'POST') {
     try {
       const body = await readBody(req);
-      const { nome, tipo, provincia } = body;
+      const { nome, provincia } = body;
+      const tipo = (typeof body.tipo === 'string' && body.tipo.trim()) ? body.tipo.trim().slice(0, 20) : 'utente';
 
       if (!nome || nome.length < 2 || nome.length > 20) return json(res, 400, { error: 'Nome non valido (2-20 caratteri)' });
-      if (!['strega','stregone','sciamano','guaritore','veggente','viandante'].includes(tipo)) return json(res, 400, { error: 'Via non valida' });
       if (!provincia) return json(res, 400, { error: 'Provincia mancante' });
 
       const id = crypto.randomUUID();
@@ -121,7 +134,7 @@ const server = http.createServer(async (req, res) => {
       db.prepare('INSERT OR REPLACE INTO presenze (utente_id, provincia, online_da) VALUES (?, ?, ?)')
         .run(id, provincia, now);
 
-      broadcast(provincia, 'nuovo-utente', { nome, tipo, provincia });
+      broadcast(provincia, 'nuovo-utente', { nome: nome.trim(), tipo, provincia });
 
       return json(res, 201, {
         ok: true,
@@ -130,6 +143,48 @@ const server = http.createServer(async (req, res) => {
     } catch (e) {
       return json(res, 500, { error: e.message });
     }
+  }
+
+  // ---- POST /api/lettera ---- (il corvo: lettera al vicino)
+  if (path === '/api/lettera' && req.method === 'POST') {
+    try {
+      const body = await readBody(req);
+      const { mittente_id, destinatario_id, testo } = body;
+
+      if (!mittente_id || !destinatario_id) return json(res, 400, { error: 'Mittente o destinatario mancante' });
+      if (!testo || !testo.trim()) return json(res, 400, { error: 'La lettera è vuota' });
+      if (testo.length > 500) return json(res, 400, { error: 'La lettera è troppo lunga (max 500 caratteri)' });
+
+      const mittente = db.prepare('SELECT nome, provincia FROM utenti WHERE id = ?').get(mittente_id);
+      const destinatario = db.prepare('SELECT id, provincia FROM utenti WHERE id = ?').get(destinatario_id);
+      if (!mittente) return json(res, 404, { error: 'Mittente sconosciuto' });
+      if (!destinatario) return json(res, 404, { error: 'Destinatario sconosciuto' });
+
+      const id = crypto.randomUUID();
+      const now = new Date().toISOString();
+      db.prepare('INSERT INTO lettere (id, mittente_id, destinatario_id, mittente_nome, testo, creata_il, letta) VALUES (?, ?, ?, ?, ?, ?, 0)')
+        .run(id, mittente_id, destinatario_id, mittente.nome, testo.trim(), now);
+
+      // Il corvo vola: sveglia il destinatario se è online nella sua provincia
+      broadcast(destinatario.provincia, 'lettera', {
+        destinatario_id,
+        da: mittente.nome,
+        anteprima: testo.trim().slice(0, 60)
+      });
+
+      return json(res, 201, { ok: true, id });
+    } catch (e) {
+      return json(res, 500, { error: e.message });
+    }
+  }
+
+  // ---- GET /api/lettere?id=TUO ---- (la posta: lettere ricevute)
+  if (path === '/api/lettere' && req.method === 'GET') {
+    const mioId = url.searchParams.get('id');
+    if (!mioId) return json(res, 400, { error: 'id mancante' });
+    const inArrivo = db.prepare('SELECT id, mittente_nome, testo, creata_il, letta FROM lettere WHERE destinatario_id = ? ORDER BY creata_il DESC').all(mioId);
+    db.prepare('UPDATE lettere SET letta = 1 WHERE destinatario_id = ?').run(mioId);
+    return json(res, 200, { lettere: inArrivo });
   }
 
   // ---- GET /api/lancette?provincia=X&id=TUO ----
