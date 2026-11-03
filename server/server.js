@@ -4,6 +4,7 @@
 // - API: POST /api/register, GET /api/lancette?provincia=X, GET /api/events?provincia=X
 //        POST /api/lettera (il corvo), GET /api/lettere?id=X (la posta)
 // - V4: nessuna categoria (tipo default "utente"), lettere tra vicini via corvo
+// - V4.1: seminati i POI di Rovigo — il Polesine entra nella bussola
 
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
@@ -55,7 +56,10 @@ const poiSeed = [
   ['poi-tv-grappa', 'Cima del Grappa', 'Treviso', 'La montagna sacra, 1775 m, raduni al solstizio d\'estate', null],
   ['poi-bl-cansiglio', 'Radura del Cansiglio', 'Belluno', 'Foresta sacra dei Cimbri, radura centrale dell\'altopiano del Cansiglio', null],
   ['poi-pd-colli', 'Monte della Madonna', 'Padova', 'Il colle sacro dei Colli Euganei, panorama su tutta la pianura veneta', null],
-  ['poi-ve-ponte', 'Ponte Scaligero', 'Verona', 'Ponte medievale sull\'Adige, si dice che a mezzanotte mostri la via giusta', null],
+  ['poi-ve-ponte', 'Ponte Scaligero', 'Verona', 'Ponte medieval  ['poi-ro-gorino', 'Po di Gorino', 'Rovigo', 'La bocca del Grande Fiume nel Delta, dove il Po si perde nell\'Adriatico tra nebbie e voci', null],
+  ['poi-ro-rotonda', 'La Rotonda', 'Rovigo', 'Il tempio ottagonale della Beata Vergine del Soccorso, cuore sacro di Rovigo', null],
+  ['poi-ro-panarella', 'Bosco Panarella', 'Rovigo', 'L\'ultima foresta planiziale del Polesine, resto dell\'antico bosco che copriva la pianura', null],
+e sull\'Adige, si dice che a mezzanotte mostri la via giusta', null],
 ];
 const insPoi = db.prepare('INSERT OR IGNORE INTO poi (id, nome, provincia, descrizione, creato_da, creato_il) VALUES (?, ?, ?, ?, ?, ?)');
 for (const p of poiSeed) {
