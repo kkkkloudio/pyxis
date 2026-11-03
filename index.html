@@ -163,6 +163,24 @@
     border:1px solid #c4b088;
   }
 
+  /* ===== IL CORVO (lettera al vicino) ===== */
+  .btn-corvo {
+    margin-top:18px; width:100%; max-width:320px;
+    padding:12px;
+    font-family:'Cinzel', serif; font-size:12px; font-weight:700; letter-spacing:2px;
+    color:#f5efe0; background:#2a1a0a;
+    border:2px solid #b8963e; border-radius:8px;
+    cursor:pointer; text-transform:uppercase; transition:.15s;
+  }
+  .btn-corvo:hover { background:#4a3520; box-shadow:0 0 14px rgba(184,150,62,.35); }
+  .btn-corvo:disabled { opacity:.35; cursor:not-allowed; box-shadow:none; }
+  .btn-posta {
+    margin-top:8px;
+    background:transparent; border:none; cursor:pointer;
+    font-family:'IM Fell English', serif; font-style:italic; font-size:12px;
+    color:#5a4530; text-decoration:underline;
+  }
+
   /* ===== NOTA ===== */
   .nota {
     position:absolute; bottom:24px; left:0; right:0;
@@ -226,24 +244,6 @@
     border-color:#b8963e;
     box-shadow:0 0 0 2px rgba(184,150,62,.2);
   }
-  .tipologie {
-    display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
-  }
-  .tipologia {
-    padding:10px 4px;
-    text-align:center;
-    font-family:'Cormorant Garamond', serif;
-    font-size:14px; font-weight:600; color:#4a3520;
-    background:#fff;
-    border:2px solid #8a6a3a;
-    border-radius:8px;
-    cursor:pointer; transition:.15s;
-  }
-  .tipologia:hover { border-color:#b8963e; }
-  .tipologia.sel {
-    background:#2a1a0a; color:#f5efe0;
-    border-color:#1a0f08;
-  }
   .btn-inizia {
     width:100%;
     padding:14px;
@@ -264,12 +264,172 @@
     font-family:'IM Fell English', serif;
     font-size:10px; color:#6a5a40; font-style:italic; text-align:center;
   }
+
+  /* ===== APERTURA (lo scrigno che si apre) ===== */
+  .apertura {
+    position:absolute; inset:0; z-index:150;
+    background:#0c0a07;
+    cursor:pointer;
+    animation: sipario-via .8s ease 2.4s forwards;
+  }
+  .apertura-medaglione {
+    position:absolute; left:50%; top:50%;
+    width:300px; height:300px; margin-left:-150px; margin-top:-150px;
+    border-radius:50%;
+    background:#16110a;
+    border:6px solid #b8963e;
+    box-shadow:0 0 70px rgba(184,150,62,.28), inset 0 0 40px rgba(0,0,0,.85);
+    overflow:hidden;
+    animation: bussola-si-sveglia 2.2s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .apertura-medaglione img { width:100%; height:100%; object-fit:cover; }
+  .apertura-cera {
+    position:absolute; left:50%; top:50%;
+    width:110px; height:110px; margin-left:-55px; margin-top:-55px;
+    animation: cera-si-spezza .7s ease .9s forwards;
+    filter:drop-shadow(0 5px 12px rgba(0,0,0,.6));
+  }
+  .apertura-scritte {
+    position:absolute; left:0; right:0; top:calc(50% + 180px);
+    text-align:center;
+  }
+  .apertura-titolo {
+    font-family:'Cinzel', serif;
+    font-size:30px; font-weight:700; letter-spacing:10px;
+    color:#b8963e;
+    text-shadow:0 0 18px rgba(184,150,62,.5);
+    animation: titolo-appare 1.4s ease .8s both;
+  }
+  .apertura-sub {
+    font-family:'IM Fell English', serif; font-style:italic;
+    font-size:13px; color:#8a7a5a; margin-top:6px;
+    animation: titolo-appare 1.4s ease 1.2s both;
+  }
+  .apertura-nota {
+    position:absolute; bottom:26px; left:0; right:0; text-align:center;
+    font-family:'IM Fell English', serif; font-style:italic;
+    font-size:10px; color:#5a4a30;
+    animation: titolo-appare 1.4s ease 2s both;
+  }
+  @keyframes bussola-si-sveglia {
+    0%   { transform:scale(.55) rotate(-30deg); opacity:0; }
+    55%  { opacity:1; }
+    100% { transform:scale(1) rotate(0deg); opacity:1; }
+  }
+  @keyframes cera-si-spezza {
+    0%   { transform:scale(1) rotate(-6deg); opacity:1; }
+    100% { transform:scale(1.7) rotate(9deg); opacity:0; }
+  }
+  @keyframes titolo-appare {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes sipario-via {
+    to { opacity:0; visibility:hidden; }
+  }
+
+  /* ===== MODALI (lettera e posta) ===== */
+  .modale {
+    position:absolute; inset:0; z-index:120;
+    background:rgba(15,10,5,.55);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+  }
+  .modale.nascosto { display:none; }
+  .modale-box {
+    width:100%; max-width:320px; max-height:78%;
+    background:rgba(255,252,245,.97);
+    border:2px solid #2a1a0a; border-radius:10px;
+    padding:20px 18px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+    display:flex; flex-direction:column;
+  }
+  .modale-box h3 {
+    font-family:'Cinzel', serif;
+    font-size:13px; font-weight:700; letter-spacing:2px;
+    color:#1a0f08; text-align:center; text-transform:uppercase; margin-bottom:4px;
+  }
+  .modale-box .sub {
+    font-family:'IM Fell English', serif;
+    font-size:12px; color:#4a3520; font-style:italic; text-align:center; margin-bottom:14px;
+  }
+  .modale-box textarea {
+    width:100%; height:110px; padding:10px 12px; resize:none;
+    font-family:'Cormorant Garamond', serif; font-size:15px; color:#1a0f08;
+    background:#fdfbf5; border:2px solid #2a1a0a; border-radius:6px; outline:none; margin-bottom:12px;
+  }
+  .modale-box textarea:focus { border-color:#b8963e; }
+  .btn-modale {
+    width:100%; padding:11px; margin-bottom:8px;
+    font-family:'Cinzel', serif; font-size:12px; font-weight:700; letter-spacing:2px;
+    color:#f5efe0; background:#2a1a0a; border:2px solid #1a0f08; border-radius:8px;
+    cursor:pointer; text-transform:uppercase; transition:.15s;
+  }
+  .btn-modale:hover { background:#4a3520; }
+  .btn-modale.fantasma { background:transparent; color:#4a3520; border-color:#8a6a3a; }
+  #posta-lista { overflow-y:auto; }
+
+  .lettera-ricevuta {
+    background:#fdfbf5; border:1px solid #c4b088; border-radius:8px;
+    padding:10px 12px; margin-bottom:10px;
+  }
+  .lettera-ricevuta .da {
+    font-family:'Cinzel', serif; font-size:10px; font-weight:700; letter-spacing:1px;
+    color:#5a4189; text-transform:uppercase; margin-bottom:4px;
+  }
+  .lettera-ricevuta .testo {
+    font-family:'Cormorant Garamond', serif; font-size:15px; color:#1a0f08; font-style:italic;
+  }
+  .lettera-ricevuta .quando {
+    font-family:'IM Fell English', serif; font-size:10px; color:#8a7a5a; margin-top:4px;
+  }
+
+  /* il corvo in volo */
+  .corvo-volo {
+    position:absolute; top:22%; left:-80px; z-index:160;
+    font-size:34px; pointer-events:none;
+    animation: volo-corvo 1.6s ease-in forwards;
+  }
+  @keyframes volo-corvo {
+    0%   { transform:translate(0,0) rotate(-8deg); opacity:0; }
+    15%  { opacity:1; }
+    100% { transform:translate(460px, 130px) rotate(6deg); opacity:0; }
+  }
+
+  /* il tocco del corvo (toast) */
+  .toast-corvo {
+    position:absolute; top:64px; left:50%; transform:translateX(-50%);
+    z-index:130; max-width:300px; text-align:center;
+    background:rgba(42,26,10,.95); color:#f5efe0;
+    border:2px solid #b8963e; border-radius:10px;
+    padding:10px 18px;
+    font-family:'IM Fell English', serif; font-style:italic; font-size:13px;
+    cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,.4);
+    animation: toast-appare .4s ease both;
+  }
+  .toast-corvo.spegni { opacity:0; transition:opacity .5s; pointer-events:none; }
+  @keyframes toast-appare {
+    from { opacity:0; transform:translate(-50%,-10px); }
+    to   { opacity:1; transform:translate(-50%,0); }
+  }
 </style>
 </head>
 <body>
 
 <div class="phone">
   <div class="screen">
+
+    <!-- ===== IL SIPARIO: LO SCRIGNO SI APRE ===== -->
+    <div class="apertura" id="apertura">
+      <div class="apertura-medaglione"><img src="assets/compass-big.png" alt="La bussola"></div>
+      <img src="assets/wax.png" class="apertura-cera" alt="Sigillo di cera">
+      <div class="apertura-scritte">
+        <div class="apertura-titolo">PYXIS</div>
+        <div class="apertura-sub">lo scrigno antico che punta</div>
+      </div>
+      <div class="apertura-nota">tocca per aprire</div>
+    </div>
+
     <div class="vignette"></div>
 
     <div class="content">
@@ -280,23 +440,11 @@
 
         <div class="iscrizione-box">
           <h3>Entra nello scrigno</h3>
-          <div class="sub">tre cose bastano, poi la bussola gira</div>
+          <div class="sub">due cose bastano, poi la bussola gira</div>
 
           <div class="campo">
             <label for="nome">Nome d'arte</label>
             <input type="text" id="nome" placeholder="es. LunaNera" maxlength="20" autocomplete="off">
-          </div>
-
-          <div class="campo">
-            <label>La tua via</label>
-            <div class="tipologie" id="tipologie">
-              <div class="tipologia" data-tipo="strega">☾ Strega</div>
-              <div class="tipologia" data-tipo="stregone">✦ Stregone</div>
-              <div class="tipologia" data-tipo="sciamano">🪶 Sciamano</div>
-              <div class="tipologia" data-tipo="guaritore">❦ Guaritore</div>
-              <div class="tipologia" data-tipo="veggente">👁 Veggente</div>
-              <div class="tipologia" data-tipo="viandante">◎ Viandante</div>
-            </div>
           </div>
 
           <div class="campo">
@@ -307,7 +455,7 @@
           </div>
 
           <button class="btn-inizia" id="btn-inizia">Apri la bussola</button>
-          <div class="privacy">nessun nome vero · nessuna email · niente GPS</div>
+          <div class="privacy">nessuna via da scegliere · nessun nome vero · nessuna email · niente GPS</div>
         </div>
       </div>
 
@@ -352,11 +500,35 @@
           </div>
         </div>
 
+        <button class="btn-corvo" id="btn-lettera" disabled>🐦‍⬛ Scrivi una lettera al vicino</button>
+        <button class="btn-posta" id="btn-posta">la posta — le lettere ricevute</button>
+
         <div class="nota">niente GPS · niente distanze · solo la bussola sa</div>
       </div>
     </div>
 
-    <div class="pyxis-label">Pyxis · V1</div>
+    <!-- ===== MODALE: SCRITTURA DELLA LETTERA ===== -->
+    <div class="modale nascosto" id="modale-scrittura">
+      <div class="modale-box">
+        <h3>Una lettera al vicino</h3>
+        <div class="sub">il corvo la porterà a <strong id="lettera-dest">…</strong></div>
+        <textarea id="lettera-testo" maxlength="500" placeholder="Scrivi con l'inchiostro della notte…"></textarea>
+        <button class="btn-modale" id="btn-affida">🐦‍⬛ Affida al corvo</button>
+        <button class="btn-modale fantasma" id="btn-annulla-lettera">Rimetti la penna</button>
+      </div>
+    </div>
+
+    <!-- ===== MODALE: LA POSTA ===== -->
+    <div class="modale nascosto" id="modale-posta">
+      <div class="modale-box">
+        <h3>La posta</h3>
+        <div class="sub">i corvi che sono giunti fin qui</div>
+        <div id="posta-lista"></div>
+        <button class="btn-modale fantasma" id="btn-chiudi-posta">Chiudi</button>
+      </div>
+    </div>
+
+    <div class="pyxis-label">Pyxis · V4</div>
   </div>
 </div>
 
