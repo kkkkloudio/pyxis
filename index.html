@@ -91,7 +91,6 @@
     filter:drop-shadow(0 0 16px rgba(184,150,62,.14));
   }
   .quadrante { position:absolute; inset:0; width:100%; height:100%; }
-  /* l'alloggiamento dell'immagine vera (assets/quadrante.png): quando arriva copre l'SVG */
   .quadrante-img {
     position:absolute; inset:0; border-radius:50%;
     background:url('assets/quadrante.png') center/cover no-repeat;
@@ -112,7 +111,7 @@
   .fiammella.f3 { top:42%; right:2%; animation-delay:1.8s; }
   @keyframes tremolio { 0%,100% { opacity:.3; transform:scale(.9); } 50% { opacity:.85; transform:scale(1.05); } }
 
-  /* ===== LE LANCETTE ===== */
+  /* ===== LE LANCETTE: avorio e oro, leggibili sul quadrante scuro ===== */
   .lancetta {
     position:absolute; bottom:50%; left:50%; width:0; height:0;
     transform-origin:50% 100%;
@@ -124,80 +123,74 @@
   .ago { position:absolute; bottom:-1px; border-radius:2px; }
   .ago-grande {
     left:-4px; width:8px; height:118px;
-    background:linear-gradient(to top,#0e0b08 20%,#221a12 62%,#b8963e 96%);
+    background:linear-gradient(to top,#c9b896 0%,#efe6cd 45%,#b8963e 100%);
     clip-path:polygon(50% 0,86% 6%,80% 100%,20% 100%,14% 6%);
-    filter:drop-shadow(0 0 4px rgba(217,185,106,.25));
+    filter:drop-shadow(0 0 2px rgba(0,0,0,.95)) drop-shadow(0 0 6px rgba(232,205,133,.35));
   }
   .ago-media {
-    left:-3px; width:6px; height:94px; opacity:.85;
-    background:linear-gradient(to top,#0e0b08 20%,#33281c 70%,#8a7a5a 96%);
+    left:-3px; width:6px; height:94px; opacity:.9;
+    background:linear-gradient(to top,#8a7a60 0%,#c4b898 55%,#a89370 100%);
     clip-path:polygon(50% 0,86% 8%,80% 100%,20% 100%,14% 8%);
+    filter:drop-shadow(0 0 2px rgba(0,0,0,.9));
   }
   .ago-piccola {
     left:-3px; width:6px; height:72px;
-    background:linear-gradient(to top,#6a4f1c 10%,#c9a24b 70%,#e8cd85 100%);
+    background:linear-gradient(to top,#8a6a2e 10%,#e8cd85 70%,#fff2c8 100%);
     clip-path:polygon(50% 0,86% 8%,80% 100%,20% 100%,14% 8%);
-    filter:drop-shadow(0 0 5px rgba(232,205,133,.45));
+    filter:drop-shadow(0 0 2px rgba(0,0,0,.9)) drop-shadow(0 0 7px rgba(232,205,133,.55));
   }
   .perno {
     position:absolute; top:50%; left:50%;
     width:22px; height:22px; margin:-11px 0 0 -11px;
-    background:radial-gradient(circle at 35% 30%, #e8cd85, #8a6a2e);
+    background:radial-gradient(circle at 35% 30%, #fff2c8, #b8963e);
     border:2px solid #2a1c08; border-radius:50%;
     box-shadow:0 2px 8px rgba(0,0,0,.6);
     z-index:10;
   }
 
-  /* ===== LEGENDA ===== */
+  /* ===== LEGENDA: cartiglio di pergamena ===== */
   .legenda {
-    margin-top:26px; width:100%; max-width:320px;
-    background:linear-gradient(170deg, rgba(20,17,12,.88), rgba(12,11,8,.92));
-    border:1px solid rgba(184,150,62,.45);
-    border-radius:6px;
-    padding:13px 16px;
-    box-shadow:0 8px 24px rgba(0,0,0,.5), inset 0 0 30px rgba(184,150,62,.04);
+    margin-top:22px; width:100%; max-width:320px;
+    background:linear-gradient(170deg,#f3ead2,#e6d4ac);
+    border:1px solid #8a6a3a; border-radius:6px;
+    padding:11px 16px;
+    box-shadow:0 0 0 3px rgba(20,16,10,.3), 0 10px 26px rgba(0,0,0,.5);
   }
   .legenda-titolo {
     font-family:'Cinzel', serif; font-size:10px; font-weight:700;
-    letter-spacing:3px; color:#d9b96a; text-align:center;
+    letter-spacing:3px; color:#5a4530; text-align:center;
     margin-bottom:8px; text-transform:uppercase;
   }
   .legenda-item {
     display:flex; align-items:center; gap:12px;
     padding:8px 6px; cursor:pointer; transition:.15s; border-radius:4px;
-    border-bottom:1px solid rgba(184,150,62,.15);
+    border-bottom:1px solid #c4b088;
   }
   .legenda-item:last-child { border-bottom:none; }
-  .legenda-item:hover, .legenda-item.sel { background:rgba(184,150,62,.08); }
+  .legenda-item:hover, .legenda-item.sel { background:rgba(138,106,58,.12); }
   .legenda-item .barra { width:3px; height:24px; flex-shrink:0; }
   .barra.grande {
-    background:linear-gradient(to top,#0e0b08,#221a12 55%,#d9b96a);
+    background:linear-gradient(to top,#c9b896,#efe6cd 55%,#b8963e);
     clip-path:polygon(50% 0,86% 10%,70% 100%,30% 100%,14% 10%);
   }
   .barra.media {
-    height:20px; opacity:.8;
-    background:linear-gradient(to top,#0e0b08,#33281c 55%,#8a7a5a);
+    height:20px; opacity:.9;
+    background:linear-gradient(to top,#8a7a60,#c4b898 55%,#a89370);
     clip-path:polygon(50% 0,86% 10%,70% 100%,30% 100%,14% 10%);
   }
   .barra.piccola {
     height:16px;
-    background:linear-gradient(to top,#6a4f1c,#e8cd85);
+    background:linear-gradient(to top,#8a6a2e,#e8cd85);
     clip-path:polygon(50% 0,86% 10%,70% 100%,30% 100%,14% 10%);
   }
   .legenda-item .testo { flex:1; }
   .legenda-item .nome {
     font-family:'Cormorant Garamond', serif;
-    font-size:15px; font-weight:700; color:#efe6cd;
+    font-size:15px; font-weight:700; color:#221a10;
   }
   .legenda-item .dett {
     font-family:'IM Fell English', serif; font-style:italic;
-    font-size:12px; color:#a8987a;
-  }
-  .legenda-item .tag {
-    font-family:'Cinzel', serif; font-size:8px; font-weight:600; letter-spacing:1px;
-    color:#b8a878; text-transform:uppercase;
-    border:1px solid rgba(184,150,62,.35);
-    padding:2px 7px; border-radius:2px; background:transparent;
+    font-size:12px; color:#5a4530;
   }
 
   /* ===== IL CORVO ===== */
@@ -286,7 +279,7 @@
     font-size:10px; color:#6a5a40; font-style:italic; text-align:center;
   }
 
-  /* ===== L'APERTURA: lo scrigno che si accende ===== */
+  /* ===== L'APERTURA ===== */
   .apertura {
     position:absolute; inset:0; z-index:150; cursor:pointer;
     background:radial-gradient(100% 70% at 50% 30%, #101628, #07090f 70%);
@@ -316,7 +309,6 @@
   .scrigno-fondo .quadrante {
     position:static; width:100%; height:100%; display:block; border-radius:50%;
   }
-  /* l'alloggiamento dell'immagine vera (assets/scrigno.png): quando arriva copre l'SVG */
   .scrigno-img {
     position:absolute; inset:9px; border-radius:50%; z-index:2;
     background:url('assets/scrigno.png') center/cover no-repeat;
@@ -415,7 +407,6 @@
     font-family:'IM Fell English', serif; font-size:10px; color:#8a7a5a; margin-top:4px;
   }
 
-  /* il corvo in volo */
   .corvo-volo {
     position:absolute; top:22%; left:-80px; z-index:160;
     font-size:32px; pointer-events:none;
@@ -428,7 +419,6 @@
     100% { transform:translate(460px,130px) rotate(6deg); opacity:0; }
   }
 
-  /* il tocco del corvo */
   .toast-corvo {
     position:absolute; top:64px; left:50%; transform:translateX(-50%);
     z-index:130; max-width:300px; text-align:center;
@@ -464,7 +454,6 @@
 <div class="phone">
   <div class="screen">
 
-    <!-- ===== IL SIPARIO ===== -->
     <div class="apertura" id="apertura">
       <div class="scrigno">
         <div class="scrigno-fondo">
@@ -483,7 +472,6 @@
     <div class="vignette"></div>
 
     <div class="content">
-      <!-- ===== ISCRIZIONE ===== -->
       <div class="schermata attiva" id="schermata-iscrizione">
         <div class="titolo">PIXIE</div>
         <div class="sottotitolo">la bussola delle presenze</div>
@@ -509,7 +497,6 @@
         </div>
       </div>
 
-      <!-- ===== LA BUSSOLA ===== -->
       <div class="schermata" id="schermata-bussola">
         <div class="titolo">PIXIE</div>
         <div class="sottotitolo" id="sottotitolo-utente">la bussola delle presenze</div>
@@ -534,7 +521,6 @@
               <div class="nome">Luna Rossa</div>
               <div class="dett">anima più vicina</div>
             </div>
-            <div class="tag">vicina</div>
           </div>
           <div class="legenda-item" data-tipo="media">
             <div class="barra media"></div>
@@ -542,7 +528,6 @@
               <div class="nome">Corvo Nero</div>
               <div class="dett">seconda anima</div>
             </div>
-            <div class="tag">dopo</div>
           </div>
           <div class="legenda-item" data-tipo="piccola">
             <div class="barra piccola"></div>
@@ -550,7 +535,6 @@
               <div class="nome">Quercia dei Sussurri</div>
               <div class="dett">luogo sacro più vicino</div>
             </div>
-            <div class="tag">il sacro</div>
           </div>
         </div>
 
@@ -561,7 +545,6 @@
       </div>
     </div>
 
-    <!-- ===== MODALE: SCRITTURA ===== -->
     <div class="modale nascosto" id="modale-scrittura">
       <div class="modale-box">
         <h3>Una lettera al vicino</h3>
@@ -572,7 +555,6 @@
       </div>
     </div>
 
-    <!-- ===== MODALE: LA POSTA ===== -->
     <div class="modale nascosto" id="modale-posta">
       <div class="modale-box">
         <h3>La posta</h3>
@@ -582,7 +564,7 @@
       </div>
     </div>
 
-    <div class="pyxis-label">Pixie · V6 · in attesa dell'alethiometro</div>
+    <div class="pyxis-label">Pixie · V6.2</div>
   </div>
 </div>
 
