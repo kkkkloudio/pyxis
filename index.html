@@ -18,7 +18,7 @@
     overflow:hidden;
   }
 
-  /* ===== VETRINA DESKTOP: il telefono di presentazione ===== */
+  /* ===== VETRINA DESKTOP ===== */
   .phone {
     position:relative;
     width:390px; height:844px;
@@ -91,6 +91,12 @@
     filter:drop-shadow(0 0 16px rgba(184,150,62,.14));
   }
   .quadrante { position:absolute; inset:0; width:100%; height:100%; }
+  /* l'alloggiamento dell'immagine vera (assets/quadrante.png): quando arriva copre l'SVG */
+  .quadrante-img {
+    position:absolute; inset:0; border-radius:50%;
+    background:url('assets/quadrante.png') center/cover no-repeat;
+    box-shadow:inset 0 0 40px rgba(0,0,0,.55);
+  }
   .simbolo {
     font-family:'Cinzel', serif; font-size:9px; letter-spacing:2px;
     fill:#d9b96a; text-anchor:middle; opacity:.9;
@@ -142,7 +148,7 @@
     z-index:10;
   }
 
-  /* ===== LEGENDA: pannello della notte ===== */
+  /* ===== LEGENDA ===== */
   .legenda {
     margin-top:26px; width:100%; max-width:320px;
     background:linear-gradient(170deg, rgba(20,17,12,.88), rgba(12,11,8,.92));
@@ -231,7 +237,7 @@
   .schermata { display:none; width:100%; }
   .schermata.attiva { display:flex; flex-direction:column; align-items:center; }
 
-  /* ===== ISCRIZIONE: la lettera di pergamena ===== */
+  /* ===== ISCRIZIONE ===== */
   .iscrizione-box {
     width:100%; max-width:320px;
     background:linear-gradient(160deg,#f3ead2,#e6d4ac);
@@ -280,7 +286,7 @@
     font-size:10px; color:#6a5a40; font-style:italic; text-align:center;
   }
 
-  /* ===== L'APERTURA: lo scrigno che si apre ===== */
+  /* ===== L'APERTURA: lo scrigno che si accende ===== */
   .apertura {
     position:absolute; inset:0; z-index:150; cursor:pointer;
     background:radial-gradient(100% 70% at 50% 30%, #101628, #07090f 70%);
@@ -305,30 +311,22 @@
     position:absolute; inset:0; border-radius:50%; padding:9px;
     background:linear-gradient(150deg,#d9b96a,#8a6a2e 55%,#5c4620);
     box-shadow:0 0 80px rgba(184,150,62,.22), 0 30px 60px rgba(0,0,0,.6);
-    animation: scrigno-arriva 1s ease both;
+    animation: scrigno-arriva 1s ease both, rosa-si-accende 1.1s ease 1.55s both;
   }
   .scrigno-fondo .quadrante {
     position:static; width:100%; height:100%; display:block; border-radius:50%;
-    animation: rosa-si-accende 1.1s ease 1.55s both;
+  }
+  /* l'alloggiamento dell'immagine vera (assets/scrigno.png): quando arriva copre l'SVG */
+  .scrigno-img {
+    position:absolute; inset:9px; border-radius:50%; z-index:2;
+    background:url('assets/scrigno.png') center/cover no-repeat;
+    box-shadow:inset 0 0 40px rgba(0,0,0,.55);
   }
   @keyframes scrigno-arriva { from { transform:scale(.6) rotate(-24deg); opacity:0; } to { transform:scale(1) rotate(0deg); opacity:1; } }
   @keyframes rosa-si-accende {
-    from { filter:drop-shadow(0 0 0 rgba(232,205,133,0)); opacity:.55; }
-    to   { filter:drop-shadow(0 0 22px rgba(232,205,133,.5)); opacity:1; }
+    from { filter:drop-shadow(0 0 0 rgba(232,205,133,0)); }
+    to   { filter:drop-shadow(0 0 22px rgba(232,205,133,.5)); }
   }
-  .scrigno-coperchio {
-    position:absolute; inset:-7px; border-radius:50%; z-index:3;
-    background:linear-gradient(155deg,#e8cd85,#a8843e 45%,#6a5224 80%);
-    box-shadow:inset 0 0 34px rgba(30,20,5,.55), inset 0 3px 8px rgba(255,240,200,.5);
-    transform-origin:50% -4%;
-    animation: coperchio-si-alza 1.25s cubic-bezier(.55,-.15,.35,1) 1.35s forwards;
-  }
-  .scrigno-coperchio::after {
-    content:''; position:absolute; inset:27%; border-radius:50%;
-    border:2px solid rgba(60,40,10,.4);
-    box-shadow:inset 0 0 20px rgba(60,40,10,.3);
-  }
-  @keyframes coperchio-si-alza { to { transform:rotateX(-108deg); } }
   .apertura-cera {
     position:absolute; left:50%; top:44%; z-index:5;
     width:104px; height:104px; margin:-52px 0 0 -52px;
@@ -358,7 +356,7 @@
   @keyframes titolo-appare { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
   @keyframes sipario-via { to { opacity:0; visibility:hidden; } }
 
-  /* ===== MODALI: lettere su pergamena ===== */
+  /* ===== MODALI ===== */
   .modale {
     position:absolute; inset:0; z-index:120;
     background:rgba(4,5,10,.7);
@@ -430,7 +428,7 @@
     100% { transform:translate(460px,130px) rotate(6deg); opacity:0; }
   }
 
-  /* il tocco del corvo (toast) */
+  /* il tocco del corvo */
   .toast-corvo {
     position:absolute; top:64px; left:50%; transform:translateX(-50%);
     z-index:130; max-width:300px; text-align:center;
@@ -447,7 +445,7 @@
     to   { opacity:1; transform:translate(-50%,0); }
   }
 
-  /* ===== SUL TELEFONO VERO: niente vetrina, schermo pieno ===== */
+  /* ===== SUL TELEFONO VERO ===== */
   @media (max-width:600px) {
     body { padding:0; }
     .phone { width:100%; height:100%; border-radius:0; background:transparent; box-shadow:none; }
@@ -466,11 +464,13 @@
 <div class="phone">
   <div class="screen">
 
-    <!-- ===== IL SIPARIO: LO SCRIGNO SI APRE ===== -->
+    <!-- ===== IL SIPARIO ===== -->
     <div class="apertura" id="apertura">
       <div class="scrigno">
-        <div class="scrigno-fondo"><svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" class="quadrante" aria-hidden="true"><defs><linearGradient id="ottone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8cd85"/><stop offset=".5" stop-color="#a8843e"/><stop offset="1" stop-color="#6a5224"/></linearGradient><radialGradient id="faccia"><stop offset="0" stop-color="#261d12"/><stop offset=".75" stop-color="#1c150c"/><stop offset="1" stop-color="#120d07"/></radialGradient><radialGradient id="alito"><stop offset="0" stop-color="#3a6a8a" stop-opacity=".22"/><stop offset="1" stop-color="#3a6a8a" stop-opacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="141" fill="none" stroke="url(#ottone)" stroke-width="9"/><circle cx="150" cy="150" r="135.5" fill="none" stroke="#5c4620" stroke-width="1"/><circle cx="150" cy="150" r="133" fill="none" stroke="#d9b96a" stroke-width="3" stroke-dasharray="1.2 22.1" opacity="0.5"/><circle cx="150" cy="150" r="126.5" fill="url(#faccia)" stroke="#6a5320" stroke-width="1.4"/><circle cx="150" cy="150" r="95" fill="url(#alito)"/><polygon points="150,58 154,146 150,242 146,146" fill="#191410" stroke="#8a6a3a" stroke-width="0.8"/><polygon points="58,150 146,154 242,150 146,146" fill="#191410" stroke="#8a6a3a" stroke-width="0.8"/><g transform="rotate(45 150 150)"><polygon points="150,94 152.5,146 150,206 147.5,146" fill="#151a26" stroke="#6a5a3a" stroke-width="0.6"/><polygon points="94,150 146,152.5 206,150 146,147.5" fill="#151a26" stroke="#6a5a3a" stroke-width="0.6"/></g><g transform="translate(192.9,46.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/></g><g transform="translate(253.5,107.1)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 A7 7 0 0 0 0 -5.5 Z" fill="#d9c58f"/></g><g transform="translate(253.5,192.9)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 Z" fill="#d9c58f"/></g><g transform="translate(192.9,253.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#d9c58f"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#151c30"/></g><g transform="translate(107.1,253.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#d9c58f"/></g><g transform="translate(46.5,192.9)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#d9c58f"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 A7 7 0 0 0 0 -5.5 Z" fill="#151c30"/></g><g transform="translate(46.5,107.1)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 Z" fill="#d9c58f"/></g><g transform="translate(107.1,46.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#d9c58f"/></g><text x="150" y="40" class="simbolo">TERRA</text><text x="259" y="153" class="simbolo">ARIA</text><text x="150" y="272" class="simbolo">FUOCO</text><text x="41" y="153" class="simbolo">ACQUA</text></svg></div>
-        <div class="scrigno-coperchio"></div>
+        <div class="scrigno-fondo">
+          <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" class="quadrante" aria-hidden="true"><defs><linearGradient id="ottone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8cd85"/><stop offset=".5" stop-color="#a8843e"/><stop offset="1" stop-color="#6a5224"/></linearGradient><radialGradient id="faccia"><stop offset="0" stop-color="#261d12"/><stop offset=".75" stop-color="#1c150c"/><stop offset="1" stop-color="#120d07"/></radialGradient><radialGradient id="alito"><stop offset="0" stop-color="#3a6a8a" stop-opacity=".22"/><stop offset="1" stop-color="#3a6a8a" stop-opacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="141" fill="none" stroke="url(#ottone)" stroke-width="9"/><circle cx="150" cy="150" r="135.5" fill="none" stroke="#5c4620" stroke-width="1"/><circle cx="150" cy="150" r="133" fill="none" stroke="#d9b96a" stroke-width="3" stroke-dasharray="1.2 22.1" opacity="0.5"/><circle cx="150" cy="150" r="126.5" fill="url(#faccia)" stroke="#6a5320" stroke-width="1.4"/><circle cx="150" cy="150" r="95" fill="url(#alito)"/><polygon points="150,58 154,146 150,242 146,146" fill="#191410" stroke="#8a6a3a" stroke-width="0.8"/><polygon points="58,150 146,154 242,150 146,146" fill="#191410" stroke="#8a6a3a" stroke-width="0.8"/><g transform="rotate(45 150 150)"><polygon points="150,94 152.5,146 150,206 147.5,146" fill="#151a26" stroke="#6a5a3a" stroke-width="0.6"/><polygon points="94,150 146,152.5 206,150 146,147.5" fill="#151a26" stroke="#6a5a3a" stroke-width="0.6"/></g><g transform="translate(192.9,46.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/></g><g transform="translate(253.5,107.1)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 A7 7 0 0 0 0 -5.5 Z" fill="#d9c58f"/></g><g transform="translate(253.5,192.9)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 Z" fill="#d9c58f"/></g><g transform="translate(192.9,253.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#d9c58f"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#151c30"/></g><g transform="translate(107.1,253.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#d9c58f"/></g><g transform="translate(46.5,192.9)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#d9c58f"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 A7 7 0 0 0 0 -5.5 Z" fill="#151c30"/></g><g transform="translate(46.5,107.1)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 Z" fill="#d9c58f"/></g><g transform="translate(107.1,46.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#d9c58f"/></g><text x="150" y="40" class="simbolo">TERRA</text><text x="259" y="153" class="simbolo">ARIA</text><text x="150" y="272" class="simbolo">FUOCO</text><text x="41" y="153" class="simbolo">ACQUA</text></svg>
+          <div class="scrigno-img"></div>
+        </div>
       </div>
       <img src="assets/wax.png" class="apertura-cera" alt="Sigillo di cera">
       <div class="apertura-scritte">
@@ -483,7 +483,7 @@
     <div class="vignette"></div>
 
     <div class="content">
-      <!-- ===== SCHERMATA 1: ISCRIZIONE ===== -->
+      <!-- ===== ISCRIZIONE ===== -->
       <div class="schermata attiva" id="schermata-iscrizione">
         <div class="titolo">PIXIE</div>
         <div class="sottotitolo">la bussola delle presenze</div>
@@ -509,13 +509,14 @@
         </div>
       </div>
 
-      <!-- ===== SCHERMATA 2: LA BUSSOLA ===== -->
+      <!-- ===== LA BUSSOLA ===== -->
       <div class="schermata" id="schermata-bussola">
         <div class="titolo">PIXIE</div>
         <div class="sottotitolo" id="sottotitolo-utente">la bussola delle presenze</div>
 
         <div class="bussola-wrap">
           <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" class="quadrante" aria-hidden="true"><defs><linearGradient id="ottone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8cd85"/><stop offset=".5" stop-color="#a8843e"/><stop offset="1" stop-color="#6a5224"/></linearGradient><radialGradient id="faccia"><stop offset="0" stop-color="#261d12"/><stop offset=".75" stop-color="#1c150c"/><stop offset="1" stop-color="#120d07"/></radialGradient><radialGradient id="alito"><stop offset="0" stop-color="#3a6a8a" stop-opacity=".22"/><stop offset="1" stop-color="#3a6a8a" stop-opacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="141" fill="none" stroke="url(#ottone)" stroke-width="9"/><circle cx="150" cy="150" r="135.5" fill="none" stroke="#5c4620" stroke-width="1"/><circle cx="150" cy="150" r="133" fill="none" stroke="#d9b96a" stroke-width="3" stroke-dasharray="1.2 22.1" opacity="0.5"/><circle cx="150" cy="150" r="126.5" fill="url(#faccia)" stroke="#6a5320" stroke-width="1.4"/><circle cx="150" cy="150" r="95" fill="url(#alito)"/><polygon points="150,58 154,146 150,242 146,146" fill="#191410" stroke="#8a6a3a" stroke-width="0.8"/><polygon points="58,150 146,154 242,150 146,146" fill="#191410" stroke="#8a6a3a" stroke-width="0.8"/><g transform="rotate(45 150 150)"><polygon points="150,94 152.5,146 150,206 147.5,146" fill="#151a26" stroke="#6a5a3a" stroke-width="0.6"/><polygon points="94,150 146,152.5 206,150 146,147.5" fill="#151a26" stroke="#6a5a3a" stroke-width="0.6"/></g><g transform="translate(192.9,46.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/></g><g transform="translate(253.5,107.1)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 A7 7 0 0 0 0 -5.5 Z" fill="#d9c58f"/></g><g transform="translate(253.5,192.9)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 Z" fill="#d9c58f"/></g><g transform="translate(192.9,253.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#d9c58f"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#151c30"/></g><g transform="translate(107.1,253.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#d9c58f"/></g><g transform="translate(46.5,192.9)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><circle r="5.5" fill="#d9c58f"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 A7 7 0 0 0 0 -5.5 Z" fill="#151c30"/></g><g transform="translate(46.5,107.1)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 Z" fill="#d9c58f"/></g><g transform="translate(107.1,46.5)"><circle r="5.5" fill="#151c30" stroke="#6a5a3a" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#d9c58f"/></g><text x="150" y="40" class="simbolo">TERRA</text><text x="259" y="153" class="simbolo">ARIA</text><text x="150" y="272" class="simbolo">FUOCO</text><text x="41" y="153" class="simbolo">ACQUA</text></svg>
+          <div class="quadrante-img"></div>
           <div class="fiammella f1"></div>
           <div class="fiammella f2"></div>
           <div class="fiammella f3"></div>
@@ -560,7 +561,7 @@
       </div>
     </div>
 
-    <!-- ===== MODALE: SCRITTURA DELLA LETTERA ===== -->
+    <!-- ===== MODALE: SCRITTURA ===== -->
     <div class="modale nascosto" id="modale-scrittura">
       <div class="modale-box">
         <h3>Una lettera al vicino</h3>
@@ -581,7 +582,7 @@
       </div>
     </div>
 
-    <div class="pyxis-label">Pixie · V5 · la notte</div>
+    <div class="pyxis-label">Pixie · V6 · in attesa dell'alethiometro</div>
   </div>
 </div>
 
