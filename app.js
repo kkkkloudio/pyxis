@@ -158,7 +158,7 @@ function aggiornaLancette(l, totale) {
     g.style.opacity = '1';
     itemG.style.display = '';
     itemG.querySelector('.nome').textContent = l.grande.nome;
-    itemG.querySelector('.dett').textContent = 'luogo di potere · ' + l.grande.provincia;
+    itemG.querySelector('.dett').textContent = l.grande.descrizione || ('luogo di potere · ' + l.grande.provincia);
     poiCorrente = { id: l.grande.id, nome: l.grande.nome, lat: l.grande.lat, lon: l.grande.lon };
     if (btnVisita) btnVisita.disabled = false;
   } else {

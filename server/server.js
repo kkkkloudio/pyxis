@@ -69,6 +69,7 @@ db.exec(`
 const colonnePoi = db.prepare('PRAGMA table_info(poi)').all().map(c => c.name);
 if (!colonnePoi.includes('lat')) db.exec('ALTER TABLE poi ADD COLUMN lat REAL');
 if (!colonnePoi.includes('lon')) db.exec('ALTER TABLE poi ADD COLUMN lon REAL');
+if (!colonnePoi.includes('evidenza')) db.exec('ALTER TABLE poi ADD COLUMN evidenza INTEGER NOT NULL DEFAULT 0');
 
 // POI reali del Veneto (luoghi di potere/naturali con leggenda) — si espandono provincia per provincia.
 // Coordinate approssimative dei LUOGHI (dati pubblici): da rifinire a mano quando serve precisione.
@@ -80,7 +81,7 @@ const poiSeed = [
   ['poi-pd-colli', 'Monte della Madonna', 'Padova', 'Il colle sacro dei Colli Euganei, panorama su tutta la pianura veneta', 45.3167, 11.6833, null],
   ['poi-ve-ponte', 'Ponte Scaligero', 'Verona', 'Ponte medievale sull\'Adige, si dice che a mezzanotte mostri la via giusta', 45.4392, 10.9917, null],
   ['poi-ro-gorino', 'Po di Gorino', 'Rovigo', 'La bocca del Grande Fiume nel Delta, dove il Po si perde nel mare Adriatico tra nebbie e voci', 44.9836, 12.3214, null],
-  ['poi-ro-rotonda', 'La Rotonda', 'Rovigo', 'Il tempio ottagonale della Beata Vergine del Soccorso, cuore sacro di Rovigo', 45.0692, 11.7910, null],
+  ['poi-ro-rotonda', 'La Rotonda', 'Rovigo', 'Il tempio ottagonale della Beata Vergine del Soccorso. Prima che sorgesse, le segnaresse — le streghe di Rovigo — si riunivano proprio qui per riti e incantesimi', 45.0692, 11.7910, null],
   ['poi-ro-panarella', 'Bosco Panarella', 'Rovigo', 'Ultima foresta planiziale del Polesine, resto del bosco antico che copriva la pianura', 45.0283, 11.8383, null],
 ];
 const insPoi = db.prepare('INSERT OR IGNORE INTO poi (id, nome, provincia, descrizione, lat, lon, creato_da, creato_il) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
@@ -89,6 +90,12 @@ for (const p of poiSeed) {
   insPoi.run(p[0], p[1], p[2], p[3], p[4], p[5], p[6], new Date().toISOString());
   updPoi.run(p[4], p[5], p[0]);
 }
+
+// Il luogo di potere che la bussola punta: la Rotonda di Rovigo,
+// dove prima del tempio si riunivano le segnaresse (le streghe di Rovigo).
+// Vale anche per i DB già esistenti: la migrazione gira a ogni avvio.
+const rotonda = poiSeed.find(p => p[0] === 'poi-ro-rotonda');
+db.prepare('UPDATE poi SET evidenza = 1, descrizione = ? WHERE id = ?').run(rotonda[3], rotonda[0]);
 
 // ============ HELPERS ============
 function json(res, code, data) {
@@ -228,10 +235,10 @@ const server = http.createServer(async (req, res) => {
       ORDER BY p.online_da ASC
     `).all(provincia, mioId || '');
 
-    // POI più vicino (primo POI della provincia — simulazione "più vicino").
-    // lat/lon servono al TELEFONO per il confronto del check-in: sono coordinate
-    // di luoghi pubblici, non la posizione dell'utente.
-    const poi = db.prepare('SELECT id, nome, descrizione, provincia, lat, lon FROM poi WHERE provincia = ? LIMIT 1').get(provincia);
+    // Il luogo di potere della provincia: quello messo in evidenza, altrimenti
+    // il primo in ordine stabile. lat/lon servono al TELEFONO per il confronto
+    // del check-in: sono coordinate di luoghi pubblici, non la posizione dell'utente.
+    const poi = db.prepare('SELECT id, nome, descrizione, provincia, lat, lon FROM poi WHERE provincia = ? ORDER BY evidenza DESC, id LIMIT 1').get(provincia);
 
     // Angoli stabili per demo: il POI punta verso nord (0°), le anime a est.
     // In futuro: calcolo reale della direzione relativa (senza mai salvare posizioni).
