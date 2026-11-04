@@ -5,7 +5,7 @@
 //        POST /api/lettera (il corvo), GET /api/lettere (la posta)
 //        POST /api/checkin (le stelle), GET /api/collezione
 //        GET /api/poi, GET /api/utenti (debug)
-// - V5: lancette flip — grande=luogo sacro (POI), media=prima anima, piccola=seconda anima
+// - V5: lancette flip — grande=luogo di potere (POI), media=prima anima, piccola=seconda anima
 // - V5: check-in — PIETRA ANGOLARE: mai trattenere, salvare o trasmettere la
 //        posizione dell'utente. Il confronto GPS avviene SOLO sul telefono:
 //        al server arriva unicamente { utente_id, poi_id }. Nessuna coordinata
@@ -70,10 +70,10 @@ const colonnePoi = db.prepare('PRAGMA table_info(poi)').all().map(c => c.name);
 if (!colonnePoi.includes('lat')) db.exec('ALTER TABLE poi ADD COLUMN lat REAL');
 if (!colonnePoi.includes('lon')) db.exec('ALTER TABLE poi ADD COLUMN lon REAL');
 
-// POI reali del Veneto (luoghi sacri/naturali con leggenda) — si espandono provincia per provincia.
+// POI reali del Veneto (luoghi di potere/naturali con leggenda) — si espandono provincia per provincia.
 // Coordinate approssimative dei LUOGHI (dati pubblici): da rifinire a mano quando serve precisione.
 const poiSeed = [
-  ['poi-vi-covoli', 'Covoli di Valstagna', 'Vicenza', 'Grotte con pitture rupestri del Paleolitico, antico luogo sacro della Valbrenta', 45.9100, 11.7520, null],
+  ['poi-vi-covoli', 'Covoli di Valstagna', 'Vicenza', 'Grotte con pitture rupestri del Paleolitico, antico luogo di potere della Valbrenta', 45.9100, 11.7520, null],
   ['poi-vr-lessinia', 'Menhir di Giazza', 'Verona', 'Menhir cimbro nel bosco della Lessinia, segna il sorgere del sole al solstizio', 45.5833, 11.0167, null],
   ['poi-tv-grappa', 'Cima del Grappa', 'Treviso', 'La montagna sacra, 1775 m, raduni al solstizio d\'estate', 45.9139, 11.7861, null],
   ['poi-bl-cansiglio', 'Radura del Cansiglio', 'Belluno', 'Foresta sacra dei Cimbri, radura centrale dell\'altopiano del Cansiglio', 46.0583, 12.4333, null],
@@ -214,7 +214,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ---- GET /api/lancette?provincia=X&id=TUO ----
-  // Restituisce le 3 lancette: GRANDE=luogo sacro (POI), MEDIA=prima anima, PICCOLA=seconda anima
+  // Restituisce le 3 lancette: GRANDE=luogo di potere (POI), MEDIA=prima anima, PICCOLA=seconda anima
   if (path === '/api/lancette' && req.method === 'GET') {
     const provincia = url.searchParams.get('provincia');
     const mioId = url.searchParams.get('id');

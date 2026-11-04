@@ -4,7 +4,7 @@
 
 Una web app minimale: **una sola bussola antica** con **tre lancette**.
 
-- **Lancetta grande** → il luogo sacro (POI) più vicino
+- **Lancetta grande** → il luogo di potere (POI) più vicino
 - **Lancetta media** → l'anima più vicina a te
 - **Lancetta piccola dorata** → la seconda anima più vicina
 
@@ -12,7 +12,7 @@ Niente mappe, niente distanze in km. Solo la direzione relativa.
 
 ## ✨ Il check-in — «Il luogo è raggiunto»
 
-Quando arrivi sul luogo sacro, premi il bottone: il telefono legge il GPS **una volta sola, nel browser**, calcola la distanza dal POI (raggio ~500 m) **sul dispositivo** e poi al server arriva **solo "visitato: true"**. La stella entra nella tua collezione.
+Quando arrivi sul luogo di potere, premi il bottone: il telefono legge il GPS **una volta sola, nel browser**, calcola la distanza dal POI (raggio ~500 m) **sul dispositivo** e poi al server arriva **solo "visitato: true"**. La stella entra nella tua collezione.
 
 Pietra angolare del progetto:
 

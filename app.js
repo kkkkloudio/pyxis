@@ -24,12 +24,12 @@ const API = (location.hostname === 'kkkkloudio.github.io' || location.hostname.e
   ? 'https://incidence-tutorial-anna-helen.trycloudflare.com'  // tunnel pubblico HTTPS (mini PC acceso)
   : '';                          // in locale (localhost) usa stesso origin
 
-const RAGGIO_M = 500; // quanto vicino devi essere al luogo sacro perché la stella si posi
+const RAGGIO_M = 500; // quanto vicino devi essere al luogo di potere perché la stella si posi
 
 let utente = JSON.parse(localStorage.getItem('pyxis-utente') || 'null');
 let evtSource = null;
 let destinatario = null;   // l'anima più vicina (lancetta media): { id, nome }
-let poiCorrente = null;     // il luogo sacro (lancetta grande): { id, nome, lat, lon }
+let poiCorrente = null;     // il luogo di potere (lancetta grande): { id, nome, lat, lon }
 
 document.addEventListener('DOMContentLoaded', function () {
   // ===== IL SIPARIO: lo scrigno si apre =====
@@ -148,17 +148,17 @@ function aggiornaLancette(l, totale) {
   const btnLettera = document.getElementById('btn-lettera');
   const btnVisita = document.getElementById('btn-visita');
 
-  // GRANDE: il luogo sacro (POI)
+  // GRANDE: il luogo di potere (POI)
   if (l.grande) {
     g.style.transform = 'rotate(' + l.grande.angolo + 'deg)';
     g.style.opacity = '1';
     itemG.style.display = '';
     itemG.querySelector('.nome').textContent = l.grande.nome;
-    itemG.querySelector('.dett').textContent = 'luogo sacro · ' + l.grande.provincia;
+    itemG.querySelector('.dett').textContent = 'luogo di potere · ' + l.grande.provincia;
     poiCorrente = { id: l.grande.id, nome: l.grande.nome, lat: l.grande.lat, lon: l.grande.lon };
     if (btnVisita) btnVisita.disabled = false;
   } else {
-    // Nessun luogo sacro puntato: niente stella da raccogliere
+    // Nessun luogo di potere puntato: niente stella da raccogliere
     itemG.style.display = 'none';
     g.style.opacity = '0.1';
     poiCorrente = null;
@@ -216,7 +216,7 @@ function distanzaMetri(lat1, lon1, lat2, lon2) {
 function checkIn() {
   if (!utente) return;
   if (!poiCorrente) {
-    alert('La bussola non punta ancora a nessun luogo sacro.');
+    alert('La bussola non punta ancora a nessun luogo di potere.');
     return;
   }
   if (poiCorrente.lat == null || poiCorrente.lon == null) {
@@ -242,7 +242,7 @@ function checkIn() {
     if (d > RAGGIO_M) {
       btn.disabled = false;
       btn.textContent = etichetta;
-      alert('Il luogo sacro non ti sente ancora: sei lontano. La distanza non si dice, ma la bussola sa.');
+      alert('Il luogo di potere non ti sente ancora: sei lontano. La distanza non si dice, ma la bussola sa.');
       return;
     }
 
@@ -289,7 +289,7 @@ async function apriCollezione() {
     const lista = document.getElementById('collezione-lista');
     lista.innerHTML = '';
     if (!data.stelle.length) {
-      lista.innerHTML = '<div class="stella-raccolta"><div class="nome">Nessuna stella, per ora.</div><div class="quando">Segui la lancetta grande e raggiungi il luogo sacro.</div></div>';
+      lista.innerHTML = '<div class="stella-raccolta"><div class="nome">Nessuna stella, per ora.</div><div class="quando">Segui la lancetta grande e raggiungi il luogo di potere.</div></div>';
     } else {
       data.stelle.forEach(S => {
         const el = document.createElement('div');
