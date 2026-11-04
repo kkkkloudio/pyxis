@@ -1,5 +1,8 @@
-// Pyxis — Frontend V4: nessuna categoria, il corvo per le lettere, apertura animata
-// Iscrizione reale via API + bussola real-time (SSE) + lettere al vicino
+// Pyxis — Frontend V5: lancette flip (grande=POI, media=prima anima, piccola=seconda)
+// + check-in "Il luogo è raggiunto" + collezione di stelle.
+// PIETRA ANGOLARE: mai trattenere, salvare o trasmettere la posizione dell'utente.
+// Il GPS si legge SOLO al click sul bottone: la distanza si calcola sul telefono
+// e al server partono unicamente { utente_id, poi_id }. Mai coordinate in rete.
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -21,9 +24,12 @@ const API = (location.hostname === 'kkkkloudio.github.io' || location.hostname.e
   ? 'https://incidence-tutorial-anna-helen.trycloudflare.com'  // tunnel pubblico HTTPS (mini PC acceso)
   : '';                          // in locale (localhost) usa stesso origin
 
+const RAGGIO_M = 500; // quanto vicino devi essere al luogo sacro perché la stella si posi
+
 let utente = JSON.parse(localStorage.getItem('pyxis-utente') || 'null');
 let evtSource = null;
-let destinatario = null; // l'anima più vicina: { id, nome }
+let destinatario = null;   // l'anima più vicina (lancetta media): { id, nome }
+let poiCorrente = null;     // il luogo sacro (lancetta grande): { id, nome, lat, lon }
 
 document.addEventListener('DOMContentLoaded', function () {
   // ===== IL SIPARIO: lo scrigno si apre =====
@@ -107,6 +113,11 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('btn-affida').addEventListener('click', inviaLettera);
   document.getElementById('btn-annulla-lettera').addEventListener('click', () => chiudiModale('modale-scrittura'));
   document.getElementById('btn-chiudi-posta').addEventListener('click', () => chiudiModale('modale-posta'));
+
+  // ===== il check-in e la collezione =====
+  document.getElementById('btn-visita').addEventListener('click', checkIn);
+  document.getElementById('btn-collezione').addEventListener('click', apriCollezione);
+  document.getElementById('btn-chiudi-collezione').addEventListener('click', () => chiudiModale('modale-collezione'));
 });
 
 function mostraBussola() {
@@ -135,44 +146,165 @@ function aggiornaLancette(l, totale) {
   const itemM = document.querySelector('.legenda-item[data-tipo="media"]');
   const itemP = document.querySelector('.legenda-item[data-tipo="piccola"]');
   const btnLettera = document.getElementById('btn-lettera');
+  const btnVisita = document.getElementById('btn-visita');
 
+  // GRANDE: il luogo sacro (POI)
   if (l.grande) {
     g.style.transform = 'rotate(' + l.grande.angolo + 'deg)';
     g.style.opacity = '1';
     itemG.style.display = '';
     itemG.querySelector('.nome').textContent = l.grande.nome;
-    itemG.querySelector('.dett').textContent = 'anima più vicina';
-    destinatario = { id: l.grande.id, nome: l.grande.nome };
-    btnLettera.disabled = false;
+    itemG.querySelector('.dett').textContent = 'luogo sacro · ' + l.grande.provincia;
+    poiCorrente = { id: l.grande.id, nome: l.grande.nome, lat: l.grande.lat, lon: l.grande.lon };
+    if (btnVisita) btnVisita.disabled = false;
   } else {
-    // Nessuna anima vicina: lancetta spenta, corvo senza meta
+    // Nessun luogo sacro puntato: niente stella da raccogliere
     itemG.style.display = 'none';
     g.style.opacity = '0.1';
-    destinatario = null;
-    btnLettera.disabled = true;
+    poiCorrente = null;
+    if (btnVisita) btnVisita.disabled = true;
   }
 
+  // MEDIA: l'anima più vicina (destinataria del corvo)
   if (l.media) {
     m.style.transform = 'rotate(' + l.media.angolo + 'deg)';
     m.style.opacity = '1';
     itemM.style.display = '';
     itemM.querySelector('.nome').textContent = l.media.nome;
-    itemM.querySelector('.dett').textContent = 'seconda anima';
+    itemM.querySelector('.dett').textContent = 'anima più vicina';
+    destinatario = { id: l.media.id, nome: l.media.nome };
+    btnLettera.disabled = false;
   } else {
+    // Nessuna anima vicina: lancetta spenta, corvo senza meta
     itemM.style.display = 'none';
     m.style.opacity = '0.1';
+    destinatario = null;
+    btnLettera.disabled = true;
   }
 
+  // PICCOLA: la seconda anima
   if (l.piccola) {
     p.style.transform = 'rotate(' + l.piccola.angolo + 'deg)';
     p.style.opacity = '1';
     itemP.style.display = '';
     itemP.querySelector('.nome').textContent = l.piccola.nome;
-    itemP.querySelector('.dett').textContent = 'luogo sacro · ' + l.piccola.provincia;
+    itemP.querySelector('.dett').textContent = 'seconda anima';
+  } else {
+    itemP.style.display = 'none';
+    p.style.opacity = '0.1';
   }
 
   const nota = document.querySelector('#schermata-bussola .nota');
-  if (nota) nota.textContent = totale + ' anime online a ' + utente.provincia + ' · niente GPS · solo la bussola sa';
+  if (nota) nota.textContent = totale + ' anime in ascolto · la posizione resta sul telefono · solo la bussola sa';
+}
+
+// ===== IL CHECK-IN: "Il luogo è raggiunto" =====
+// Il GPS si legge una volta sola, qui nel browser. La posizione NON viene
+// salvata, NON viene inviata: serve solo a confrontare la distanza dal POI
+// e muore in questa funzione. Al server partono solo { utente_id, poi_id }.
+function distanzaMetri(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const rad = x => x * Math.PI / 180;
+  const dLat = rad(lat2 - lat1);
+  const dLon = rad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(rad(lat1)) * Math.cos(rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function checkIn() {
+  if (!utente) return;
+  if (!poiCorrente) {
+    alert('La bussola non punta ancora a nessun luogo sacro.');
+    return;
+  }
+  if (poiCorrente.lat == null || poiCorrente.lon == null) {
+    alert('Questo luogo non ha ancora coordinate: la stella non può posarsi.');
+    return;
+  }
+  if (!navigator.geolocation) {
+    alert('Questo scrigno non ha un ago GPS.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-visita');
+  const etichetta = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '✨ la bussola ascolta…';
+
+  navigator.geolocation.getCurrentPosition(function (pos) {
+    // La posizione vive SOLO qui: confronto sul telefono, poi non serve più.
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    const d = distanzaMetri(lat, lon, poiCorrente.lat, poiCorrente.lon);
+
+    if (d > RAGGIO_M) {
+      btn.disabled = false;
+      btn.textContent = etichetta;
+      alert('Il luogo sacro non ti sente ancora: sei lontano. La distanza non si dice, ma la bussola sa.');
+      return;
+    }
+
+    fetch(API + '/api/checkin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ utente_id: utente.id, poi_id: poiCorrente.id })
+    })
+      .then(r => r.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.textContent = etichetta;
+        if (!data.ok) { alert(data.error || 'Il luogo non ha accolto la firma.'); return; }
+        if (data.gia_visitato) { alert('Avevi già lasciato la tua stella qui.'); return; }
+        mostraStella(data.nome, data.stelle);
+      })
+      .catch(e => {
+        btn.disabled = false;
+        btn.textContent = etichetta;
+        alert('Il server non risponde: ' + e.message);
+      });
+  }, function () {
+    btn.disabled = false;
+    btn.textContent = etichetta;
+    alert('Lo scrigno non ha il permesso di leggere l\'ago GPS. La posizione resta comunque solo tua.');
+  }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
+}
+
+function mostraStella(nomePoi, stelle) {
+  const toast = document.createElement('div');
+  toast.className = 'toast-corvo';
+  toast.textContent = '⭐ Una stella si è posata: ' + nomePoi + ' — ' + stelle + (stelle === 1 ? ' stella in collezione' : ' stelle in collezione');
+  document.querySelector('.screen').appendChild(toast);
+  setTimeout(() => toast.classList.add('spegni'), 6000);
+  setTimeout(() => toast.remove(), 6600);
+}
+
+// ===== LA COLLEZIONE =====
+async function apriCollezione() {
+  if (!utente) return;
+  try {
+    const resp = await fetch(API + '/api/collezione?id=' + encodeURIComponent(utente.id));
+    const data = await resp.json();
+    const lista = document.getElementById('collezione-lista');
+    lista.innerHTML = '';
+    if (!data.stelle.length) {
+      lista.innerHTML = '<div class="stella-raccolta"><div class="nome">Nessuna stella, per ora.</div><div class="quando">Segui la lancetta grande e raggiungi il luogo sacro.</div></div>';
+    } else {
+      data.stelle.forEach(S => {
+        const el = document.createElement('div');
+        el.className = 'stella-raccolta';
+        const quando = new Date(S.visitato_il).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+        el.innerHTML = '<div class="stella">⭐</div>' +
+                       '<div class="nome">' + escapeHtml(S.nome) + '</div>' +
+                       '<div class="quando">' + escapeHtml(S.provincia) + ' · ' + quando + '</div>';
+        lista.appendChild(el);
+      });
+    }
+    document.getElementById('modale-collezione').classList.remove('nascosto');
+  } catch (e) {
+    alert('La collezione non risponde (server non raggiungibile): ' + e.message);
+  }
 }
 
 // ===== IL CORVO =====
@@ -264,6 +396,18 @@ function avviaSSE() {
     const d = JSON.parse(e.data);
     console.log('Nuovo utente:', d);
     caricaLancette();
+  });
+
+  // una stella si è posata: qualcuno in provincia ha raggiunto un luogo
+  evtSource.addEventListener('poi-visitato', e => {
+    const d = JSON.parse(e.data);
+    if (d.da === utente.nome) return; // la mia stella l'ho già vista
+    const toast = document.createElement('div');
+    toast.className = 'toast-corvo';
+    toast.textContent = '⭐ ' + d.da + ' ha raccolto una stella: ' + d.poi;
+    document.querySelector('.screen').appendChild(toast);
+    setTimeout(() => toast.classList.add('spegni'), 5000);
+    setTimeout(() => toast.remove(), 5600);
   });
 
   // un corvo è planato: lettera in arrivo
