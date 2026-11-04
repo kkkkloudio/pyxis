@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.legenda-item').forEach(i => i.classList.remove('sel'));
       this.classList.add('sel');
       const tipo = this.dataset.tipo;
-      document.querySelectorAll('.lancetta').forEach(l => l.style.opacity = '0.15');
+    document.querySelectorAll('.lancetta').forEach(l => l.style.opacity = '1');
       const sel = document.querySelector('.lancetta.' + tipo);
       if (sel) sel.style.opacity = '1';
     });

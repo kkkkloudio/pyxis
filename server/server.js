@@ -233,8 +233,9 @@ const server = http.createServer(async (req, res) => {
     // di luoghi pubblici, non la posizione dell'utente.
     const poi = db.prepare('SELECT id, nome, descrizione, provincia, lat, lon FROM poi WHERE provincia = ? LIMIT 1').get(provincia);
 
-    // Assegna angoli casuali ma stabili per demo (in futuro: calcolo reale)
-    const angoli = [-50 + Math.random() * 20, 40 + Math.random() * 20, 155 + Math.random() * 20];
+    // Angoli stabili per demo: il POI punta verso nord (0°), le anime a est.
+    // In futuro: calcolo reale della direzione relativa (senza mai salvare posizioni).
+    const angoli = [0, 90, 200];
 
     return json(res, 200, {
       provincia,
