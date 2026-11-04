@@ -1,10 +1,16 @@
 // Pyxis — Backend reale (zero dipendenze, solo Node.js)
 // - Database: node:sqlite (integrato)
 // - Real-time: SSE (Server-Sent Events)
-// - API: POST /api/register, GET /api/lancette?provincia=X, GET /api/events?provincia=X
-//        POST /api/lettera (il corvo), GET /api/lettere?id=X (la posta)
-// - V4: nessuna categoria (tipo default "utente"), lettere tra vicini via corvo
-// - V4.1: seminati i POI di Rovigo — il Polesine entra nella bussola
+// - API: POST /api/register, GET /api/lancette, GET /api/events
+//        POST /api/lettera (il corvo), GET /api/lettere (la posta)
+//        POST /api/checkin (le stelle), GET /api/collezione
+//        GET /api/poi, GET /api/utenti (debug)
+// - V5: lancette flip — grande=luogo sacro (POI), media=prima anima, piccola=seconda anima
+// - V5: check-in — PIETRA ANGOLARE: mai trattenere, salvare o trasmettere la
+//        posizione dell'utente. Il confronto GPS avviene SOLO sul telefono:
+//        al server arriva unicamente { utente_id, poi_id }. Nessuna coordinata
+//        dell'utente esiste nel DB. Le colonne lat/lon della tabella poi sono
+//        coordinate di LUOGHI PUBBLICI, non di persone.
 
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
@@ -35,6 +41,8 @@ db.exec(`
     nome TEXT NOT NULL,
     provincia TEXT NOT NULL,
     descrizione TEXT,
+    lat REAL,
+    lon REAL,
     creato_da TEXT,
     creato_il TEXT NOT NULL
   );
@@ -47,23 +55,39 @@ db.exec(`
     creata_il TEXT NOT NULL,
     letta INTEGER NOT NULL DEFAULT 0
   );
+  CREATE TABLE IF NOT EXISTS visite (
+    utente_id TEXT NOT NULL,
+    poi_id TEXT NOT NULL,
+    visitato_il TEXT NOT NULL,
+    PRIMARY KEY (utente_id, poi_id),
+    FOREIGN KEY(utente_id) REFERENCES utenti(id),
+    FOREIGN KEY(poi_id) REFERENCES poi(id)
+  );
 `);
 
-// POI reali del Veneto (luoghi sacri/naturali con leggenda) — si espandono provincia per provincia
+// Migrazione: se un DB già esistente non ha lat/lon sui POI, aggiungile
+const colonnePoi = db.prepare('PRAGMA table_info(poi)').all().map(c => c.name);
+if (!colonnePoi.includes('lat')) db.exec('ALTER TABLE poi ADD COLUMN lat REAL');
+if (!colonnePoi.includes('lon')) db.exec('ALTER TABLE poi ADD COLUMN lon REAL');
+
+// POI reali del Veneto (luoghi sacri/naturali con leggenda) — si espandono provincia per provincia.
+// Coordinate approssimative dei LUOGHI (dati pubblici): da rifinire a mano quando serve precisione.
 const poiSeed = [
-  ['poi-vi-covoli', 'Covoli di Valstagna', 'Vicenza', 'Grotte con pitture rupestri del Paleolitico, antico luogo sacro della Valbrenta', null],
-  ['poi-vr-lessinia', 'Menhir di Giazza', 'Verona', 'Menhir cimbro nel bosco della Lessinia, segna il sorgere del sole al solstizio', null],
-  ['poi-tv-grappa', 'Cima del Grappa', 'Treviso', 'La montagna sacra, 1775 m, raduni al solstizio d\'estate', null],
-  ['poi-bl-cansiglio', 'Radura del Cansiglio', 'Belluno', 'Foresta sacra dei Cimbri, radura centrale dell\'altopiano del Cansiglio', null],
-  ['poi-pd-colli', 'Monte della Madonna', 'Padova', 'Il colle sacro dei Colli Euganei, panorama su tutta la pianura veneta', null],
-  ['poi-ve-ponte', 'Ponte Scaligero', 'Verona', 'Ponte medievale sull\'Adige, si dice che a mezzanotte mostri la via giusta', null],
-  ['poi-ro-gorino', 'Po di Gorino', 'Rovigo', 'La bocca del Grande Fiume nel Delta, dove il Po si perde nel mare Adriatico tra nebbie e voci', null],
-  ['poi-ro-rotonda', 'La Rotonda', 'Rovigo', 'Il tempio ottagonale della Beata Vergine del Soccorso, cuore sacro di Rovigo', null],
-  ['poi-ro-panarella', 'Bosco Panarella', 'Rovigo', 'Ultima foresta planiziale del Polesine, resto del bosco antico che copriva la pianura', null],
+  ['poi-vi-covoli', 'Covoli di Valstagna', 'Vicenza', 'Grotte con pitture rupestri del Paleolitico, antico luogo sacro della Valbrenta', 45.9100, 11.7520, null],
+  ['poi-vr-lessinia', 'Menhir di Giazza', 'Verona', 'Menhir cimbro nel bosco della Lessinia, segna il sorgere del sole al solstizio', 45.5833, 11.0167, null],
+  ['poi-tv-grappa', 'Cima del Grappa', 'Treviso', 'La montagna sacra, 1775 m, raduni al solstizio d\'estate', 45.9139, 11.7861, null],
+  ['poi-bl-cansiglio', 'Radura del Cansiglio', 'Belluno', 'Foresta sacra dei Cimbri, radura centrale dell\'altopiano del Cansiglio', 46.0583, 12.4333, null],
+  ['poi-pd-colli', 'Monte della Madonna', 'Padova', 'Il colle sacro dei Colli Euganei, panorama su tutta la pianura veneta', 45.3167, 11.6833, null],
+  ['poi-ve-ponte', 'Ponte Scaligero', 'Verona', 'Ponte medievale sull\'Adige, si dice che a mezzanotte mostri la via giusta', 45.4392, 10.9917, null],
+  ['poi-ro-gorino', 'Po di Gorino', 'Rovigo', 'La bocca del Grande Fiume nel Delta, dove il Po si perde nel mare Adriatico tra nebbie e voci', 44.9836, 12.3214, null],
+  ['poi-ro-rotonda', 'La Rotonda', 'Rovigo', 'Il tempio ottagonale della Beata Vergine del Soccorso, cuore sacro di Rovigo', 45.0692, 11.7910, null],
+  ['poi-ro-panarella', 'Bosco Panarella', 'Rovigo', 'Ultima foresta planiziale del Polesine, resto del bosco antico che copriva la pianura', 45.0283, 11.8383, null],
 ];
-const insPoi = db.prepare('INSERT OR IGNORE INTO poi (id, nome, provincia, descrizione, creato_da, creato_il) VALUES (?, ?, ?, ?, ?, ?)');
+const insPoi = db.prepare('INSERT OR IGNORE INTO poi (id, nome, provincia, descrizione, lat, lon, creato_da, creato_il) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+const updPoi = db.prepare('UPDATE poi SET lat = ?, lon = ? WHERE id = ? AND (lat IS NULL OR lon IS NULL)');
 for (const p of poiSeed) {
-  insPoi.run(p[0], p[1], p[2], p[3], p[4], new Date().toISOString());
+  insPoi.run(p[0], p[1], p[2], p[3], p[4], p[5], p[6], new Date().toISOString());
+  updPoi.run(p[4], p[5], p[0]);
 }
 
 // ============ HELPERS ============
@@ -112,8 +136,6 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { json(res, 204, {}); return; }
 
   // ---- POST /api/register ----
-  // V4: la "via" non si chiede più — se un vecchio client la manda, viene accettata;
-  // se non la manda, il tipo è semplicemente "utente".
   if (path === '/api/register' && req.method === 'POST') {
     try {
       const body = await readBody(req);
@@ -192,7 +214,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ---- GET /api/lancette?provincia=X&id=TUO ----
-  // Restituisce le 3 lancette: vicino, secondo, POI sacro
+  // Restituisce le 3 lancette: GRANDE=luogo sacro (POI), MEDIA=prima anima, PICCOLA=seconda anima
   if (path === '/api/lancette' && req.method === 'GET') {
     const provincia = url.searchParams.get('provincia');
     const mioId = url.searchParams.get('id');
@@ -206,8 +228,10 @@ const server = http.createServer(async (req, res) => {
       ORDER BY p.online_da ASC
     `).all(provincia, mioId || '');
 
-    // POI più vicino (primo POI della provincia — simulazione "più vicino")
-    const poi = db.prepare('SELECT id, nome, descrizione, provincia FROM poi WHERE provincia = ? LIMIT 1').get(provincia);
+    // POI più vicino (primo POI della provincia — simulazione "più vicino").
+    // lat/lon servono al TELEFONO per il confronto del check-in: sono coordinate
+    // di luoghi pubblici, non la posizione dell'utente.
+    const poi = db.prepare('SELECT id, nome, descrizione, provincia, lat, lon FROM poi WHERE provincia = ? LIMIT 1').get(provincia);
 
     // Assegna angoli casuali ma stabili per demo (in futuro: calcolo reale)
     const angoli = [-50 + Math.random() * 20, 40 + Math.random() * 20, 155 + Math.random() * 20];
@@ -215,12 +239,57 @@ const server = http.createServer(async (req, res) => {
     return json(res, 200, {
       provincia,
       lancette: {
-        grande: altri[0] ? { ...altri[0], angolo: Math.round(angoli[0]) } : null,
-        media: altri[1] ? { ...altri[1], angolo: Math.round(angoli[1]) } : null,
-        piccola: poi ? { ...poi, angolo: Math.round(angoli[2]), tipo: 'poi' } : null,
+        grande: poi ? { ...poi, angolo: Math.round(angoli[0]), tipo: 'poi' } : null,
+        media: altri[0] ? { ...altri[0], angolo: Math.round(angoli[1]) } : null,
+        piccola: altri[1] ? { ...altri[1], angolo: Math.round(angoli[2]) } : null,
       },
       totale_online: altri.length + 1
     });
+  }
+
+  // ---- POST /api/checkin ---- ("Il luogo è raggiunto")
+  // PIETRA ANGOLARE: questo endpoint accetta SOLO { utente_id, poi_id }.
+  // Nessuna coordinata dell'utente viene mai accettata, salvata o loggata:
+  // la verifica della vicinanza avviene interamente sul telefono del client.
+  if (path === '/api/checkin' && req.method === 'POST') {
+    try {
+      const body = await readBody(req);
+      const { utente_id, poi_id } = body;
+
+      if (!utente_id || !poi_id) return json(res, 400, { error: 'utente o luogo mancanti' });
+
+      const u = db.prepare('SELECT id, nome, provincia FROM utenti WHERE id = ?').get(utente_id);
+      if (!u) return json(res, 404, { error: 'Anima sconosciuta' });
+      const p = db.prepare('SELECT id, nome FROM poi WHERE id = ?').get(poi_id);
+      if (!p) return json(res, 404, { error: 'Luogo sconosciuto' });
+
+      const gia = db.prepare('SELECT 1 FROM visite WHERE utente_id = ? AND poi_id = ?').get(utente_id, poi_id);
+      if (gia) return json(res, 200, { ok: true, gia_visitato: true, nome: p.nome });
+
+      db.prepare('INSERT INTO visite (utente_id, poi_id, visitato_il) VALUES (?, ?, ?)')
+        .run(utente_id, poi_id, new Date().toISOString());
+
+      const stelle = db.prepare('SELECT COUNT(*) AS n FROM visite WHERE utente_id = ?').get(utente_id).n;
+
+      broadcast(u.provincia, 'poi-visitato', { da: u.nome, poi: p.nome });
+
+      return json(res, 201, { ok: true, gia_visitato: false, nome: p.nome, stelle });
+    } catch (e) {
+      return json(res, 500, { error: e.message });
+    }
+  }
+
+  // ---- GET /api/collezione?id=TUO ---- (le stelle raccolte)
+  if (path === '/api/collezione' && req.method === 'GET') {
+    const mioId = url.searchParams.get('id');
+    if (!mioId) return json(res, 400, { error: 'id mancante' });
+    const stelle = db.prepare(`
+      SELECT v.poi_id, p.nome, p.provincia, p.descrizione, v.visitato_il
+      FROM visite v JOIN poi p ON p.id = v.poi_id
+      WHERE v.utente_id = ?
+      ORDER BY v.visitato_il DESC
+    `).all(mioId);
+    return json(res, 200, { stelle, totale: stelle.length });
   }
 
   // ---- GET /api/poi?provincia=X ----
@@ -297,4 +366,5 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`🧭 Pyxis backend in ascolto su http://localhost:${PORT}`);
   console.log(`   Database: ${DB_PATH}`);
   console.log(`   Frontend servito da: ${__dirname}/..`);
+  console.log(`   Pietra angolare: nessuna posizione utente viene mai salvata o trasmessa.`);
 });
