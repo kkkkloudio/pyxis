@@ -1,4 +1,6 @@
-// Pyxis — Frontend V5: lancette flip (grande=POI, media=prima anima, piccola=seconda)
+// Pyxis — Frontend V6: la bussola viva (molle e attrito) — gli aghi cercano, sforano,
+// si assestano, e da fermi tremano come in ascolto.
+// (grande=POI, media=prima anima, piccola=seconda)
 // + check-in "Il luogo è raggiunto" + collezione di stelle.
 // PIETRA ANGOLARE: mai trattenere, salvare o trasmettere la posizione dell'utente.
 // Il GPS si legge SOLO al click sul bottone: la distanza si calcola sul telefono
@@ -125,6 +127,7 @@ function mostraBussola() {
   document.getElementById('schermata-bussola').classList.add('attiva');
   document.getElementById('sottotitolo-utente').textContent =
     utente.nome + ' · ' + utente.provincia;
+  avviaBussolaViva(); // gli aghi prendono vita appena lo scrigno si apre
 }
 
 async function caricaLancette() {
@@ -150,7 +153,7 @@ function aggiornaLancette(l, totale) {
 
   // GRANDE: il luogo di potere (POI)
   if (l.grande) {
-    g.style.transform = 'rotate(' + l.grande.angolo + 'deg)';
+    puntaLancetta('grande', l.grande.angolo); // la molla farà il resto: sforo e assesto
     g.style.opacity = '1';
     itemG.style.display = '';
     itemG.querySelector('.nome').textContent = l.grande.nome;
@@ -162,12 +165,13 @@ function aggiornaLancette(l, totale) {
     itemG.style.display = 'none';
     g.style.opacity = '0.1';
     poiCorrente = null;
+    spegniLancetta('grande'); // l'ago torna a cercare, e non trova
     if (btnVisita) btnVisita.disabled = true;
   }
 
   // MEDIA: l'anima più vicina (destinataria del corvo)
   if (l.media) {
-    m.style.transform = 'rotate(' + l.media.angolo + 'deg)';
+    puntaLancetta('media', l.media.angolo);
     m.style.opacity = '1';
     itemM.style.display = '';
     itemM.querySelector('.nome').textContent = l.media.nome;
@@ -179,12 +183,13 @@ function aggiornaLancette(l, totale) {
     itemM.style.display = 'none';
     m.style.opacity = '0.1';
     destinatario = null;
+    spegniLancetta('media');
     btnLettera.disabled = true;
   }
 
   // PICCOLA: la seconda anima
   if (l.piccola) {
-    p.style.transform = 'rotate(' + l.piccola.angolo + 'deg)';
+    puntaLancetta('piccola', l.piccola.angolo);
     p.style.opacity = '1';
     itemP.style.display = '';
     itemP.querySelector('.nome').textContent = l.piccola.nome;
@@ -192,10 +197,101 @@ function aggiornaLancette(l, totale) {
   } else {
     itemP.style.display = 'none';
     p.style.opacity = '0.1';
+    spegniLancetta('piccola');
   }
 
   const nota = document.querySelector('#schermata-bussola .nota');
   if (nota) nota.textContent = totale + ' anime in ascolto · la posizione resta sul telefono · solo la bussola sa';
+}
+
+// ===== LA BUSSOLA VIVA: molle e attrito =====
+// Un ago magnetico vero non sta mai fermo: cerca, sfora il bersaglio, torna,
+// si assesta, e da fermo trema appena, come in ascolto. Qui non c'è nessuna
+// posizione dell'utente: solo gli angoli che manda il server, vestiti di fisica.
+
+const VIVA = { avviata:false, ferma:false, tPrec:null, aghi:{} };
+
+function avviaBussolaViva() {
+  if (VIVA.avviata) return;
+  VIVA.avviata = true;
+  const partenza = { grande:-50, media:40, piccola:160 }; // gli angoli disegnati nel CSS
+  ['grande','media','piccola'].forEach(tipo => {
+    const el = document.querySelector('.lancetta.' + tipo);
+    if (!el) return;
+    VIVA.aghi[tipo] = {
+      el: el,
+      angolo: partenza[tipo],
+      vel: 0,
+      bersaglio: null,          // null: l'ago cerca e non trova
+      deriva: partenza[tipo],  // dove vaga chi non ha ancora un segnale
+      prossimoGiro: performance.now() + 3000 + Math.random() * 5000,
+      perdeIlFilo: 0,          // la piccola deriva di chi ri-ascolta
+      prossimoFiloperduto: 0,
+      fase: Math.random() * Math.PI * 2,  // il tremito è un respiro, mica un terremoto
+      freq: 0.4 + Math.random() * 0.5,
+      tremore: 0.5 + Math.random() * 0.6
+    };
+  });
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    VIVA.ferma = true; // chi ha chiesto calma al telefono, calma avrà
+    return;
+  }
+  requestAnimationFrame(loopBussolaViva);
+}
+
+function loopBussolaViva(t) {
+  const dt = Math.min(((t - (VIVA.tPrec ?? t)) / 1000) || 0.016, 0.05);
+  VIVA.tPrec = t;
+  for (const tipo in VIVA.aghi) stepAgo(VIVA.aghi[tipo], dt, t);
+  requestAnimationFrame(loopBussolaViva);
+}
+
+function stepAgo(A, dt, t) {
+  if (A.bersaglio == null) {
+    // nessun segnale: l'ago vaga piano, quasi addormentato
+    if (t >= A.prossimoGiro) {
+      A.deriva = Math.random() * 360 - 180;
+      A.prossimoGiro = t + 7000 + Math.random() * 10000;
+    }
+    molla(A, A.deriva, 1.3, 3.2, dt);
+  } else {
+    // ogni tanto l'ago perde il filo di qualche grado, poi lo ritrova
+    if (t >= A.prossimoFiloperduto) {
+      A.perdeIlFilo = (Math.random() < 0.5 ? -1 : 1) * (8 + Math.random() * 14);
+      A.prossimoFiloperduto = t + 12000 + Math.random() * 26000;
+    }
+    A.perdeIlFilo *= Math.exp(-dt / 2.6); // il filo si ritrova piano
+    molla(A, A.bersaglio + A.perdeIlFilo, 9, 2.2, dt);
+  }
+  // il tremito: un respiro di un grado, mai fermo del tutto
+  const tremito = Math.sin(t / 1000 * A.freq * Math.PI * 2 + A.fase) * A.tremore;
+  A.el.style.transform = 'rotate(' + (A.angolo + tremito).toFixed(2) + 'deg)';
+}
+
+function molla(A, bersaglio, k, c, dt) {
+  // la molla tira verso il bersaglio, l'attrito rallenta: insieme fanno lo sforo
+  const acc = k * (bersaglio - A.angolo) - c * A.vel;
+  A.vel += acc * dt;
+  if (A.vel > 720) A.vel = 720;      // nemmeno la magia supera i due giri al secondo
+  if (A.vel < -720) A.vel = -720;
+  A.angolo += A.vel * dt;
+}
+
+function puntaLancetta(tipo, angolo) {
+  const A = VIVA.aghi[tipo];
+  if (!A) return;
+  if (VIVA.ferma) { A.el.style.transform = 'rotate(' + angolo + 'deg)'; return; }
+  const primoSegnale = (A.bersaglio == null);
+  A.bersaglio = angolo;
+  A.prossimoFiloperduto = performance.now() + 6000 + Math.random() * 15000;
+  // al primo segnale l'ago parte con slancio: è la bussola che si sveglia
+  if (primoSegnale) A.vel += (angolo - A.angolo > 0 ? 1 : -1) * (160 + Math.random() * 120);
+}
+
+function spegniLancetta(tipo) {
+  const A = VIVA.aghi[tipo];
+  if (!A) return;
+  A.bersaglio = null; // niente segnale: si torna a cercare, e non trovare
 }
 
 // ===== IL CHECK-IN: "Il luogo è raggiunto" =====
