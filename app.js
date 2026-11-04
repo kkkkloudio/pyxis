@@ -1,4 +1,5 @@
-// Pyxis — Frontend V6: la bussola viva (molle e attrito) — gli aghi cercano, sforano,
+// Pyxis — Frontend V6.1: bussola viva ricalibrata — respiro lento, sforo unico, zero fretta.
+// (V6: molle e attrito) — gli aghi cercano, sforano,
 // si assestano, e da fermi tremano come in ascolto.
 // (grande=POI, media=prima anima, piccola=seconda)
 // + check-in "Il luogo è raggiunto" + collezione di stelle.
@@ -224,12 +225,12 @@ function avviaBussolaViva() {
       vel: 0,
       bersaglio: null,          // null: l'ago cerca e non trova
       deriva: partenza[tipo],  // dove vaga chi non ha ancora un segnale
-      prossimoGiro: performance.now() + 3000 + Math.random() * 5000,
+      prossimoGiro: performance.now() + 8000 + Math.random() * 8000,
       perdeIlFilo: 0,          // la piccola deriva di chi ri-ascolta
       prossimoFiloperduto: 0,
-      fase: Math.random() * Math.PI * 2,  // il tremito è un respiro, mica un terremoto
-      freq: 0.4 + Math.random() * 0.5,
-      tremore: 0.5 + Math.random() * 0.6
+      fase: Math.random() * Math.PI * 2,  // il tremito è un respiro lento, mica un fremito
+      freq: 0.08 + Math.random() * 0.12,
+      tremore: 0.25 + Math.random() * 0.25
     };
   });
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -251,17 +252,17 @@ function stepAgo(A, dt, t) {
     // nessun segnale: l'ago vaga piano, quasi addormentato
     if (t >= A.prossimoGiro) {
       A.deriva = Math.random() * 360 - 180;
-      A.prossimoGiro = t + 7000 + Math.random() * 10000;
+      A.prossimoGiro = t + 14000 + Math.random() * 12000;
     }
-    molla(A, A.deriva, 1.3, 3.2, dt);
+    molla(A, A.deriva, 1.0, 3.0, dt);
   } else {
     // ogni tanto l'ago perde il filo di qualche grado, poi lo ritrova
     if (t >= A.prossimoFiloperduto) {
-      A.perdeIlFilo = (Math.random() < 0.5 ? -1 : 1) * (8 + Math.random() * 14);
-      A.prossimoFiloperduto = t + 12000 + Math.random() * 26000;
+      A.perdeIlFilo = (Math.random() < 0.5 ? -1 : 1) * (5 + Math.random() * 7);
+      A.prossimoFiloperduto = t + 25000 + Math.random() * 35000;
     }
-    A.perdeIlFilo *= Math.exp(-dt / 2.6); // il filo si ritrova piano
-    molla(A, A.bersaglio + A.perdeIlFilo, 9, 2.2, dt);
+    A.perdeIlFilo *= Math.exp(-dt / 3.5); // il filo si ritrova piano
+    molla(A, A.bersaglio + A.perdeIlFilo, 7, 2.8, dt);
   }
   // il tremito: un respiro di un grado, mai fermo del tutto
   const tremito = Math.sin(t / 1000 * A.freq * Math.PI * 2 + A.fase) * A.tremore;
@@ -272,8 +273,8 @@ function molla(A, bersaglio, k, c, dt) {
   // la molla tira verso il bersaglio, l'attrito rallenta: insieme fanno lo sforo
   const acc = k * (bersaglio - A.angolo) - c * A.vel;
   A.vel += acc * dt;
-  if (A.vel > 720) A.vel = 720;      // nemmeno la magia supera i due giri al secondo
-  if (A.vel < -720) A.vel = -720;
+  if (A.vel > 420) A.vel = 420;      // la magia non ha mai fretta
+  if (A.vel < -420) A.vel = -420;
   A.angolo += A.vel * dt;
 }
 
@@ -281,11 +282,9 @@ function puntaLancetta(tipo, angolo) {
   const A = VIVA.aghi[tipo];
   if (!A) return;
   if (VIVA.ferma) { A.el.style.transform = 'rotate(' + angolo + 'deg)'; return; }
-  const primoSegnale = (A.bersaglio == null);
   A.bersaglio = angolo;
-  A.prossimoFiloperduto = performance.now() + 6000 + Math.random() * 15000;
-  // al primo segnale l'ago parte con slancio: è la bussola che si sveglia
-  if (primoSegnale) A.vel += (angolo - A.angolo > 0 ? 1 : -1) * (160 + Math.random() * 120);
+  A.prossimoFiloperduto = performance.now() + 12000 + Math.random() * 20000;
+  // niente strattoni d'arrivo: lo sweep elegante lo fa la molla da sola
 }
 
 function spegniLancetta(tipo) {
