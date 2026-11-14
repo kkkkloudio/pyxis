@@ -6,6 +6,7 @@
 //        POST /api/checkin (le stelle), GET /api/collezione
 //        GET /api/poi, GET /api/utenti (debug)
 // - V8.13: LA PIAZZA — le voci di tutte le anime: POST /api/voce, GET /api/voci
+// - V8.14: FEEDBACK — parola ai costruttori: POST /api/feedback (si legge dal DB)
 // - V5: lancette flip — grande=luogo di potere (POI), media=prima anima, piccola=seconda anima
 // - V5: check-in — PIETRA ANGOLARE: mai trattenere, salvare o trasmettere la
 //        posizione dell'utente. Il confronto GPS avviene SOLO sul telefono:
@@ -84,6 +85,14 @@ db.exec(`
   );
 
   CREATE TABLE IF NOT EXISTS voci (
+    id TEXT PRIMARY KEY,
+    utente_id TEXT NOT NULL,
+    nome TEXT NOT NULL,
+    testo TEXT NOT NULL,
+    creata_il TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS feedback (
     id TEXT PRIMARY KEY,
     utente_id TEXT NOT NULL,
     nome TEXT NOT NULL,
@@ -493,6 +502,27 @@ const server = http.createServer(async (req, res) => {
   if (path === '/api/voci' && req.method === 'GET') {
     const voci = db.prepare('SELECT nome, testo, creata_il FROM voci ORDER BY creata_il DESC LIMIT 30').all();
     return json(res, 200, { voci });
+  }
+
+  // ---- POST /api/feedback ---- (parola ai costruttori: Carlo e Hermes la leggono dal DB)
+  if (path === '/api/feedback' && req.method === 'POST') {
+    try {
+      const body = await readBody(req);
+      const { utente_id, testo } = body;
+      if (!utente_id) return json(res, 400, { error: 'Anima mancante' });
+      if (!testo || !testo.trim()) return json(res, 400, { error: 'Il messaggio è vuoto' });
+      if (testo.trim().length > 1000) return json(res, 400, { error: 'Il messaggio è troppo lungo (max 1000 caratteri)' });
+
+      const u = db.prepare('SELECT nome FROM utenti WHERE id = ?').get(utente_id);
+      if (!u) return json(res, 404, { error: 'Anima sconosciuta' });
+
+      const id = crypto.randomUUID();
+      db.prepare('INSERT INTO feedback (id, utente_id, nome, testo, creata_il) VALUES (?, ?, ?, ?, ?)')
+        .run(id, utente_id, u.nome, testo.trim(), new Date().toISOString());
+      return json(res, 201, { ok: true });
+    } catch (e) {
+      return json(res, 500, { error: e.message });
+    }
   }
 
   // ---- GET /api/lancette?provincia=X&id=TUO ----

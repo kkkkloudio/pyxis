@@ -16,6 +16,8 @@
 // e la distanza che manca — calcolata e mostrata SOLO sul telefono.
 // V8.13: LA PIAZZA — le voci di tutte le anime: un pensiero lasciato nel cerchio,
 // visibile a chiunque entri. Niente posizioni: solo nome, testo, tempo.
+// V8.14: FEEDBACK — parola ai costruttori: se qualcosa non torna, il corvo
+// lo porta a Carlo e Hermes (tabella feedback, la leggono dal DB).
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -132,6 +134,9 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('btn-piazza').addEventListener('click', apriPiazza);
   document.getElementById('btn-voce').addEventListener('click', inviaVoce);
   document.getElementById('btn-chiudi-piazza').addEventListener('click', () => chiudiModale('modale-piazza'));
+  document.getElementById('btn-feedback').addEventListener('click', apriFeedback);
+  document.getElementById('btn-feedback-invia').addEventListener('click', inviaFeedback);
+  document.getElementById('btn-chiudi-feedback').addEventListener('click', () => chiudiModale('modale-feedback'));
 });
 
 function mostraBussola() {
@@ -694,6 +699,46 @@ async function inviaVoce() {
     apriPiazza(); // la piazza si rinnova davanti agli occhi
   } catch (e) {
     alert('La piazza non risponde (server non raggiungibile): ' + e.message);
+  }
+}
+
+// ===== FEEDBACK (V8.14): parola ai costruttori =====
+function apriFeedback() {
+  document.getElementById('feedback-testo').value = '';
+  document.getElementById('modale-feedback').classList.remove('nascosto');
+}
+
+async function inviaFeedback() {
+  const area = document.getElementById('feedback-testo');
+  const testo = area.value.trim();
+  if (!testo) return;
+  try {
+    const resp = await fetch(API + '/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ utente_id: utente.id, testo })
+    });
+    if (!resp.ok) {
+      const d = await resp.json().catch(() => ({}));
+      alert(d.error || 'Il corvo non è riuscito a partire');
+      return;
+    }
+    area.value = '';
+    chiudiModale('modale-feedback');
+    // il corvo spicca il volo verso i costruttori
+    const corvo = document.createElement('div');
+    corvo.className = 'corvo-volo';
+    corvo.textContent = '🐦‍⬛';
+    document.querySelector('.screen').appendChild(corvo);
+    setTimeout(() => corvo.remove(), 1700);
+    const toast = document.createElement('div');
+    toast.className = 'toast-corvo';
+    toast.textContent = '🐦‍⬛ Il corvo ha preso il tuo messaggio. Grazie, anima.';
+    document.querySelector('.screen').appendChild(toast);
+    setTimeout(() => toast.classList.add('spegni'), 4500);
+    setTimeout(() => toast.remove(), 5100);
+  } catch (e) {
+    alert('Il corvo non trova la via (server non raggiungibile): ' + e.message);
   }
 }
 
