@@ -20,6 +20,11 @@
 //        legenda: tab chiusa male, telefono morto o riavvio del server non
 //        lasciano più fantasmi. Se nessuno è davvero online, media e piccola
 //        restano spente (il client le lascia vagare, come da canone VIVA).
+// - V8.9: la mappa si riempie — due luoghi per provincia (15 POI totali).
+//        Venezia finalmente in mappa (Bovolo + Poveglia). Coordinate stimate
+//        da rifinire a mano. NOTA: l'id 'poi-ve-ponte' (Ponte Scaligero) ha
+//        il prefisso VE ma il luogo è a VERONA — non rinominarlo: con
+//        INSERT OR IGNORE un id nuovo creerebbe una riga doppia nel DB.
 
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
@@ -92,6 +97,12 @@ const poiSeed = [
   ['poi-ro-gorino', 'Po di Gorino', 'Rovigo', 'La bocca del Grande Fiume nel Delta, dove il Po si perde nel mare Adriatico tra nebbie e voci', 44.9836, 12.3214, null],
   ['poi-ro-rotonda', 'La Rotonda', 'Rovigo', 'Il tempio ottagonale della Beata Vergine del Soccorso. Prima che sorgesse, le segnaresse — le streghe di Rovigo — si riunivano proprio qui per riti e incantesimi', 45.0692, 11.7910, null],
   ['poi-ro-panarella', 'Bosco Panarella', 'Rovigo', 'Ultima foresta planiziale del Polesine, resto del bosco antico che copriva la pianura', 45.0283, 11.8383, null],
+  ['poi-ve-bovolo', 'Scala del Bovolo', 'Venezia', 'La scala a chiocciola dei Contarini, una conchiglia di pietra in piena città: si sale girando su se stessi, come dentro una spirale alchemica', 45.4342, 12.3346, null],
+  ['poi-ve-poveglia', 'Isola di Poveglia', 'Venezia', 'L\'isola vietata della laguna: prima borgo di Popilia, poi lazzaretto della peste, infine ospedale abbandonato. Nessuno sbarca — le si gira intorno in barca, e si ascolta', 45.3830, 12.3280, null],
+  ['poi-vi-berico', 'Monte Berico', 'Vicenza', 'Il colle sacro sopra Vicenza: nel 1426 la Madonna apparve qui a una contadina. Chi sale vede tutta la città dall\'alto', 45.5199, 11.5489, null],
+  ['poi-tv-follina', 'Abbazia di Follina', 'Treviso', 'L\'abbazia cistercense nascosta in fondo alla valle: acqua che cade, silenzio dei monaci, tempo misurato a preghiere e non a ore', 45.9549, 12.1244, null],
+  ['poi-bl-santacroce', 'Lago di Santa Croce', 'Belluno', 'Il lago del drago: la leggenda popola le acque profonde di un mostro, e nelle notti di tempesta dalla superficie salgono campane', 46.0511, 12.3556, null],
+  ['poi-pd-ragione', 'Palazzo della Ragione', 'Padova', 'Il Salone con il cielo dipinto: stelle e pianeti affrescati secondo la scienza di Pietro d\'Abano, l\'astrologo di Padova processato dall\'Inquisizione', 45.4075, 11.8754, null],
 ];
 const insPoi = db.prepare('INSERT OR IGNORE INTO poi (id, nome, provincia, descrizione, lat, lon, creato_da, creato_il) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
 const updPoi = db.prepare('UPDATE poi SET lat = ?, lon = ? WHERE id = ? AND (lat IS NULL OR lon IS NULL)');
