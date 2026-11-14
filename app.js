@@ -18,6 +18,8 @@
 // visibile a chiunque entri. Niente posizioni: solo nome, testo, tempo.
 // V8.14: FEEDBACK — parola ai costruttori: se qualcosa non torna, il corvo
 // lo porta a Carlo e Hermes (tabella feedback, la leggono dal DB).
+// V8.15: LA GUIDA — i primi passi: si apre da sola alla prima visita, si
+// riapre col bottone ❔. Cinque passi e l'anima sa camminare.
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -137,6 +139,12 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('btn-feedback').addEventListener('click', apriFeedback);
   document.getElementById('btn-feedback-invia').addEventListener('click', inviaFeedback);
   document.getElementById('btn-chiudi-feedback').addEventListener('click', () => chiudiModale('modale-feedback'));
+  document.getElementById('btn-guida').addEventListener('click', apriGuida);
+  document.getElementById('btn-guida-avanti').addEventListener('click', avantiGuida);
+  document.getElementById('btn-chiudi-guida').addEventListener('click', () => {
+    localStorage.setItem('pyxis-guida', 'vista');
+    chiudiModale('modale-guida');
+  });
 });
 
 function mostraBussola() {
@@ -145,6 +153,7 @@ function mostraBussola() {
   document.getElementById('sottotitolo-utente').textContent =
     utente.nome + ' · ' + utente.provincia;
   avviaBussolaViva(); // gli aghi prendono vita appena lo scrigno si apre
+  if (!localStorage.getItem('pyxis-guida')) apriGuida(); // V8.15: la prima volta, l'anima viene accompagnata
 }
 
 async function caricaLancette() {
@@ -739,6 +748,46 @@ async function inviaFeedback() {
     setTimeout(() => toast.remove(), 5100);
   } catch (e) {
     alert('Il corvo non trova la via (server non raggiungibile): ' + e.message);
+  }
+}
+
+// ===== LA GUIDA (V8.15): i primi passi =====
+const GUIDA_STEP = [
+  { titolo: 'Benvenuta, anima', testo: 'Questa è Pyxis, la bussola delle presenze. Punta i luoghi di potere e le anime che viaggiano nel cerchio con te. Niente paura: qui si impara camminando.' },
+  { titolo: 'Le tre lancette', testo: 'La grande punta il Luogo di Potere (granato). La media, la prima anima vicina (smeraldo). La piccola, la seconda (zaffiro). Tocca un ago — o la sua riga nella pergamena — e ti dirà chi sta indicando.' },
+  { titolo: 'La rotta vera', testo: 'Sul telefono, sveglia l\'ago con 🧭: la bussola seguirà la direzione VERA del luogo. Girati finché il granato entra nella porta d\'ottone in alto al quadrante — stai guardando verso il luogo. Poi cammina: sotto la bussola appare quanto manca.' },
+  { titolo: 'La stella', testo: 'Entro 500 metri dal luogo, il bottone ✨ si accende: la stella si posa e va nella tua collezione. La tua posizione resta sul telefono — mai salvata, mai inviata: è la pietra angolare di questo mondo.' },
+  { titolo: 'Il corvo e la piazza', testo: 'Con 🐦‍⬛ scrivi una lettera all\'anima più vicina; nella piazza lasciano pensieri tutte le anime; con 🗝️ parli ai costruttori. Ora il sentiero è tuo. Buon viaggio, anima.' }
+];
+let guidaIndice = 0;
+
+function apriGuida() {
+  guidaIndice = 0;
+  disegnaGuida();
+  document.getElementById('modale-guida').classList.remove('nascosto');
+}
+
+function disegnaGuida() {
+  const s = GUIDA_STEP[guidaIndice];
+  document.getElementById('guida-titolo').textContent = (guidaIndice + 1) + ' · ' + s.titolo;
+  document.getElementById('guida-testo').textContent = s.testo;
+  document.getElementById('btn-guida-avanti').textContent = guidaIndice === GUIDA_STEP.length - 1 ? 'Entra nel cerchio' : 'Avanti';
+  const punti = document.getElementById('guida-punti');
+  punti.innerHTML = '';
+  GUIDA_STEP.forEach((_, i) => {
+    const p = document.createElement('span');
+    p.className = 'punto' + (i === guidaIndice ? ' acceso' : '');
+    punti.appendChild(p);
+  });
+}
+
+function avantiGuida() {
+  if (guidaIndice < GUIDA_STEP.length - 1) {
+    guidaIndice++;
+    disegnaGuida();
+  } else {
+    localStorage.setItem('pyxis-guida', 'vista');
+    chiudiModale('modale-guida');
   }
 }
 
