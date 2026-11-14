@@ -651,6 +651,7 @@
         <button class="btn-posta" id="btn-posta">la posta — le lettere ricevute</button>
         <button class="btn-posta" id="btn-collezione">la collezione — le stelle raccolte</button>
         <button class="btn-posta" id="btn-piazza">la piazza — le voci di tutte le anime</button>
+        <button class="btn-posta" id="btn-feedback">🗝️ parola ai costruttori</button>
         <button class="btn-posta" id="btn-uscita" onclick="localStorage.removeItem('pyxis-utente');location.reload()">lascia lo scrigno</button>
 
         <div class="nota">la posizione resta sul telefono · mai salvata · mai inviata · solo la bussola sa</div>
@@ -696,7 +697,17 @@
       </div>
     </div>
 
-    <div class="pyxis-label">Pyxis · V8.13</div>
+    <div class="modale nascosto" id="modale-feedback">
+      <div class="modale-box">
+        <h3>Parola ai costruttori</h3>
+        <div class="sub">cosa non torna, cosa sogni — il corvo lo porta a chi ha fatto la bussola</div>
+        <textarea id="feedback-testo" maxlength="1000" placeholder="Scrivi al di là del gioco…"></textarea>
+        <button class="btn-modale" id="btn-feedback-invia">🗝️ Affida al corvo</button>
+        <button class="btn-modale fantasma" id="btn-chiudi-feedback">Rimetti la penna</button>
+      </div>
+    </div>
+
+    <div class="pyxis-label">Pyxis · V8.14</div>
   </div>
 </div>
 
