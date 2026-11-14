@@ -650,6 +650,7 @@
         <button class="btn-corvo" id="btn-lettera" disabled>🐦‍⬛ Scrivi una lettera al vicino</button>
         <button class="btn-posta" id="btn-posta">la posta — le lettere ricevute</button>
         <button class="btn-posta" id="btn-collezione">la collezione — le stelle raccolte</button>
+        <button class="btn-posta" id="btn-piazza">la piazza — le voci di tutte le anime</button>
         <button class="btn-posta" id="btn-uscita" onclick="localStorage.removeItem('pyxis-utente');location.reload()">lascia lo scrigno</button>
 
         <div class="nota">la posizione resta sul telefono · mai salvata · mai inviata · solo la bussola sa</div>
@@ -684,7 +685,18 @@
       </div>
     </div>
 
-    <div class="pyxis-label">Pyxis · V8.12</div>
+    <div class="modale nascosto" id="modale-piazza">
+      <div class="modale-box">
+        <h3>La piazza</h3>
+        <div class="sub">le voci lasciate da tutte le anime</div>
+        <div id="piazza-lista"></div>
+        <textarea id="piazza-testo" maxlength="280" placeholder="Lascia un pensiero nel cerchio…"></textarea>
+        <button class="btn-modale" id="btn-voce">📣 Lascia la voce</button>
+        <button class="btn-modale fantasma" id="btn-chiudi-piazza">Chiudi</button>
+      </div>
+    </div>
+
+    <div class="pyxis-label">Pyxis · V8.13</div>
   </div>
 </div>
 

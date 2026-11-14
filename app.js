@@ -14,6 +14,8 @@
 // declinazione magnetica corretta (il nord dei sensori non è il nord vero),
 // GPS ad alta precisione, direzione di marcia se il magnetometro tace,
 // e la distanza che manca — calcolata e mostrata SOLO sul telefono.
+// V8.13: LA PIAZZA — le voci di tutte le anime: un pensiero lasciato nel cerchio,
+// visibile a chiunque entri. Niente posizioni: solo nome, testo, tempo.
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -127,6 +129,9 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('btn-visita').addEventListener('click', checkIn);
   document.getElementById('btn-collezione').addEventListener('click', apriCollezione);
   document.getElementById('btn-chiudi-collezione').addEventListener('click', () => chiudiModale('modale-collezione'));
+  document.getElementById('btn-piazza').addEventListener('click', apriPiazza);
+  document.getElementById('btn-voce').addEventListener('click', inviaVoce);
+  document.getElementById('btn-chiudi-piazza').addEventListener('click', () => chiudiModale('modale-piazza'));
 });
 
 function mostraBussola() {
@@ -640,6 +645,58 @@ async function apriPosta() {
   }
 }
 
+// ===== LA PIAZZA (V8.13): le voci di tutte le anime =====
+async function apriPiazza() {
+  if (!utente) return;
+  document.getElementById('modale-piazza').classList.remove('nascosto');
+  try {
+    const resp = await fetch(API + '/api/voci');
+    const data = await resp.json();
+    disegnaVoci(data.voci || []);
+  } catch (e) {
+    document.getElementById('piazza-lista').innerHTML =
+      '<div class="lettera-ricevuta"><div class="testo">La piazza è avvolta nella nebbia (server non raggiungibile).</div></div>';
+  }
+}
+
+function disegnaVoci(voci) {
+  const lista = document.getElementById('piazza-lista');
+  lista.innerHTML = '';
+  if (!voci.length) {
+    lista.innerHTML = '<div class="lettera-ricevuta"><div class="testo">Nessuna voce, per ora. La piazza attende la prima.</div></div>';
+    return;
+  }
+  for (const v of voci) {
+    const el = document.createElement('div');
+    el.className = 'lettera-ricevuta';
+    el.innerHTML = '<div class="da">📣 ' + escapeHtml(v.nome) + '</div>' +
+                   '<div class="testo">' + escapeHtml(v.testo) + '</div>';
+    lista.appendChild(el);
+  }
+}
+
+async function inviaVoce() {
+  const area = document.getElementById('piazza-testo');
+  const testo = area.value.trim();
+  if (!testo) return;
+  try {
+    const resp = await fetch(API + '/api/voce', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ utente_id: utente.id, testo })
+    });
+    if (!resp.ok) {
+      const d = await resp.json().catch(() => ({}));
+      alert(d.error || 'La voce si è persa nel vento');
+      return;
+    }
+    area.value = '';
+    apriPiazza(); // la piazza si rinnova davanti agli occhi
+  } catch (e) {
+    alert('La piazza non risponde (server non raggiungibile): ' + e.message);
+  }
+}
+
 function escapeHtml(s) {
   const d = document.createElement('div');
   d.textContent = s;
@@ -686,6 +743,12 @@ function avviaSSE() {
     document.querySelector('.screen').appendChild(toast);
     setTimeout(() => toast.classList.add('spegni'), 5000);
     setTimeout(() => toast.remove(), 5600);
+  });
+
+  // una voce nuova è arrivata in piazza (da qualunque provincia)
+  evtSource.addEventListener('voce', e => {
+    const modale = document.getElementById('modale-piazza');
+    if (modale && !modale.classList.contains('nascosto')) apriPiazza();
   });
 
   evtSource.onerror = () => {
