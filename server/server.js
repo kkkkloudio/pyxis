@@ -25,6 +25,8 @@
 //        da rifinire a mano. NOTA: l'id 'poi-ve-ponte' (Ponte Scaligero) ha
 //        il prefisso VE ma il luogo è a VERONA — non rinominarlo: con
 //        INSERT OR IGNORE un id nuovo creerebbe una riga doppia nel DB.
+// - V8.10: le porte d'Italia — RIF_PROVINCIA copre tutte le 107 province:
+//        le anime vicine puntano con la rotta vera da qualunque capoluogo.
 
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
@@ -120,15 +122,137 @@ db.prepare('UPDATE poi SET evidenza = 1, descrizione = ? WHERE id = ?').run(roto
 // ============ LA DIREZIONE VERA ============
 // Capoluoghi: punti di riferimento PUBBLICI per le rotte della bussola.
 // Precisione da cartografo pigro (~km): per un ago è più che sufficiente.
-// Si estende provincia per provincia, insieme al gioco.
+// Le 107 porte d'Italia (V8.10): tutte le province, tutte le rotte.
+// I luoghi di potere arrivano dopo, regione per regione: dove non sono ancora
+// mappati, l'ago grande vaga e le anime puntano comunque con la rotta vera.
 const RIF_PROVINCIA = {
-  'Rovigo':  [45.071, 11.7915],
-  'Padova':  [45.4064, 11.8762],
-  'Venezia': [45.4408, 12.3155],
-  'Verona':  [45.4386, 10.9916],
-  'Vicenza': [45.5455, 11.535],
+  // Valle d'Aosta
+  'Aosta': [45.737, 7.32],
+  // Piemonte
+  'Alessandria': [44.913, 8.621],
+  'Asti': [44.9, 8.207],
+  'Biella': [45.566, 8.054],
+  'Cuneo': [44.384, 7.541],
+  'Novara': [45.446, 8.621],
+  'Torino': [45.07, 7.686],
+  'Verbania': [45.921, 8.556],
+  'Vercelli': [45.325, 8.418],
+  // Lombardia
+  'Bergamo': [45.698, 9.677],
+  'Brescia': [45.541, 10.211],
+  'Como': [45.808, 9.085],
+  'Cremona': [45.133, 10.029],
+  'Lecco': [45.856, 9.393],
+  'Lodi': [45.31, 9.5],
+  'Mantova': [45.153, 10.774],
+  'Milano': [45.464, 9.19],
+  'Monza e della Brianza': [45.584, 9.274],
+  'Pavia': [45.185, 9.155],
+  'Sondrio': [46.139, 9.7],
+  'Varese': [45.82, 8.825],
+  // Trentino-Alto Adige
+  'Bolzano': [46.49, 11.34],
+  'Trento': [46.067, 11.117],
+  // Veneto
+  'Belluno': [46.1425, 12.2167],
+  'Padova': [45.4064, 11.8762],
+  'Rovigo': [45.071, 11.7915],
   'Treviso': [45.7108, 12.2383],
-  'Belluno': [46.1425, 12.2167]
+  'Venezia': [45.4408, 12.3155],
+  'Verona': [45.4386, 10.9916],
+  'Vicenza': [45.5455, 11.535],
+  // Friuli-Venezia Giulia
+  'Gorizia': [45.944, 13.624],
+  'Pordenone': [45.955, 12.69],
+  'Trieste': [45.649, 13.78],
+  'Udine': [46.063, 13.234],
+  // Liguria
+  'Genova': [44.406, 8.933],
+  'Imperia': [43.885, 8.033],
+  'La Spezia': [44.102, 9.84],
+  'Savona': [44.307, 8.479],
+  // Emilia-Romagna
+  'Bologna': [44.494, 11.343],
+  'Ferrara': [44.838, 11.62],
+  'Forlì-Cesena': [44.222, 12.041],
+  'Modena': [44.647, 10.925],
+  'Parma': [44.801, 10.328],
+  'Piacenza': [45.053, 9.695],
+  'Ravenna': [44.418, 12.203],
+  'Reggio Emilia': [44.698, 10.631],
+  'Rimini': [44.058, 12.569],
+  // Toscana
+  'Arezzo': [43.463, 11.878],
+  'Firenze': [43.769, 11.257],
+  'Grosseto': [42.76, 11.113],
+  'Livorno': [43.549, 10.309],
+  'Lucca': [43.843, 10.503],
+  'Massa-Carrara': [44.035, 10.14],
+  'Pisa': [43.717, 10.401],
+  'Pistoia': [43.932, 10.918],
+  'Prato': [43.878, 11.097],
+  'Siena': [43.319, 11.331],
+  // Umbria
+  'Perugia': [43.11, 12.389],
+  'Terni': [42.655, 12.644],
+  // Marche
+  'Ancona': [43.548, 13.459],
+  'Ascoli Piceno': [42.854, 13.572],
+  'Fermo': [43.164, 13.719],
+  'Macerata': [43.3, 13.554],
+  'Pesaro e Urbino': [43.911, 12.906],
+  // Lazio
+  'Frosinone': [41.643, 13.346],
+  'Latina': [41.462, 12.903],
+  'Rieti': [42.407, 12.858],
+  'Roma': [41.893, 12.483],
+  'Viterbo': [42.417, 12.104],
+  // Abruzzo
+  'L\'Aquila': [42.354, 13.38],
+  'Chieti': [42.355, 14.167],
+  'Pescara': [42.462, 14.214],
+  'Teramo': [42.649, 13.699],
+  // Molise
+  'Campobasso': [41.563, 14.657],
+  'Isernia': [41.594, 14.233],
+  // Campania
+  'Avellino': [40.914, 14.794],
+  'Benevento': [41.133, 14.784],
+  'Caserta': [41.081, 14.344],
+  'Napoli': [40.854, 14.268],
+  'Salerno': [40.68, 14.764],
+  // Puglia
+  'Bari': [41.126, 16.87],
+  'Barletta-Andria-Trani': [41.323, 16.287],
+  'Brindisi': [40.634, 17.942],
+  'Foggia': [41.462, 15.541],
+  'Lecce': [40.352, 18.171],
+  'Taranto': [40.464, 17.247],
+  // Basilicata
+  'Matera': [40.666, 16.604],
+  'Potenza': [40.642, 15.809],
+  // Calabria
+  'Catanzaro': [38.904, 16.6],
+  'Cosenza': [39.303, 16.253],
+  'Crotone': [39.085, 17.128],
+  'Reggio Calabria': [38.111, 15.651],
+  'Vibo Valentia': [38.673, 16.1],
+  // Sicilia
+  'Agrigento': [37.289, 13.578],
+  'Caltanissetta': [37.489, 14.062],
+  'Catania': [37.503, 15.088],
+  'Enna': [37.563, 14.282],
+  'Messina': [38.194, 15.554],
+  'Palermo': [38.116, 13.366],
+  'Ragusa': [36.927, 14.717],
+  'Siracusa': [37.065, 15.286],
+  'Trapani': [38.018, 12.512],
+  // Sardegna
+  'Cagliari': [39.224, 9.117],
+  'Nuoro': [40.32, 9.328],
+  'Oristano': [39.903, 8.588],
+  'Sassari': [40.726, 8.561],
+  'Sud Sardegna': [39.169, 8.522],
 };
 
 // Rotta vera da (lat1,lon1) verso (lat2,lon2), in gradi [0,360)

@@ -8,6 +8,8 @@
 // PIETRA ANGOLARE: mai trattenere, salvare o trasmettere la posizione dell'utente.
 // GPS e bussola interna si legano SOLO sul telefono: la rotta vera verso il luogo
 // si calcola qui e non parte mai. Al server arrivano solo { utente_id, poi_id }.
+// V8.10: le porte d'Italia — tutte le 107 province all'iscrizione (aggiunta
+// la Sud Sardegna, che mancava).
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -20,7 +22,7 @@ const PROVINCE = [
   "Napoli","Novara","Nuoro","Oristano","Padova","Palermo","Parma","Pavia","Perugia",
   "Pesaro e Urbino","Pescara","Piacenza","Pisa","Pistoia","Pordenone","Potenza","Prato",
   "Ragusa","Ravenna","Reggio Calabria","Reggio Emilia","Rieti","Rimini","Roma","Rovigo",
-  "Salerno","Sassari","Savona","Siena","Siracusa","Sondrio","Taranto","Teramo","Terni",
+  "Salerno","Sassari","Savona","Siena","Siracusa","Sondrio","Sud Sardegna","Taranto","Teramo","Terni",
   "Torino","Trapani","Trento","Treviso","Trieste","Udine","Varese","Venezia","Verbania",
   "Vercelli","Verona","Vibo Valentia","Vicenza","Viterbo"
 ];
