@@ -241,16 +241,24 @@
     background:#b8a878; opacity:.4;
   }
   .guida-punti .punto.acceso { background:#7a5a20; opacity:1; box-shadow:0 0 6px rgba(122,90,32,.5); }
+  /* V8.19 — la sveglia chiama davvero: oro pulsante finché l'ago sogna */
   .btn-sveglia {
-    display:none; margin-top:2px; cursor:pointer;
-    background:transparent; border:1px solid #6a5a3a; border-radius:16px;
-    padding:6px 14px;
-    font-family:'IM Fell English', serif; font-style:italic; font-size:12px;
-    color:#b8a878; transition:.15s;
+    display:none; margin-top:8px; cursor:pointer;
+    background:rgba(184,150,62,.10); border:1px solid #b8963e; border-radius:18px;
+    padding:10px 20px;
+    font-family:'IM Fell English', serif; font-style:italic; font-size:14px;
+    color:#e8cd85;
+    animation: chiama-sveglia 2.4s ease-in-out infinite;
+    transition:.15s;
   }
-  .btn-sveglia:hover { color:#e8cd85; border-color:#d9b96a; }
-  .btn-sveglia.viva { color:#9fe8c0; border-color:#2e9e6b; }
+  @keyframes chiama-sveglia {
+    0%,100% { box-shadow:0 0 0 rgba(184,150,62,0); border-color:#b8963e; }
+    50%     { box-shadow:0 0 18px rgba(184,150,62,.55); border-color:#e8cd85; }
+  }
+  .btn-sveglia:hover { background:rgba(184,150,62,.18); }
+  .btn-sveglia.viva { color:#9fe8c0; border-color:#2e9e6b; background:transparent; animation:none; }
   @media (pointer:coarse) { .btn-sveglia { display:inline-block; } }
+  @media (prefers-reduced-motion: reduce) { .btn-sveglia { animation:none; } }
 
   /* ===== LEGENDA: cartiglio di pergamena ===== */
   .legenda {
@@ -752,7 +760,7 @@
 
     <button class="btn-lingua" id="btn-lingua">🇮🇹 IT</button>
 
-    <div class="pyxis-label">Pyxis · V8.18</div>
+    <div class="pyxis-label">Pyxis · V8.19</div>
   </div>
 </div>
 
