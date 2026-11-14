@@ -212,6 +212,13 @@
     font-family:'IM Fell English', serif; font-style:italic; font-size:13px;
     color:#9a8c6a; transition:color .3s;
   }
+  /* V8.12 — la distanza del pellegrino: appare solo con la bussola sveglia */
+  .distanza-luogo {
+    margin-top:2px; min-height:16px; text-align:center;
+    font-family:'IM Fell English', serif; font-style:italic; font-size:12px;
+    color:#9fe8c0;
+  }
+  .distanza-luogo.vicino { color:#e8cd85; text-shadow:0 0 10px rgba(232,205,133,.45); }
   .btn-sveglia {
     display:none; margin-top:2px; cursor:pointer;
     background:transparent; border:1px solid #6a5a3a; border-radius:16px;
@@ -611,6 +618,7 @@
         </div>
 
         <div class="caption-bussola" id="caption-bussola">tocca un ago per sapere chi punta</div>
+        <div class="distanza-luogo" id="distanza-luogo"></div>
         <button class="btn-sveglia" id="btn-sveglia">🧭 Sveglia l'ago — la bussola vera</button>
 
         <div class="legenda">
@@ -676,7 +684,7 @@
       </div>
     </div>
 
-    <div class="pyxis-label">Pyxis · V8.11</div>
+    <div class="pyxis-label">Pyxis · V8.12</div>
   </div>
 </div>
 

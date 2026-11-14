@@ -10,6 +10,10 @@
 // si calcola qui e non parte mai. Al server arrivano solo { utente_id, poi_id }.
 // V8.10: le porte d'Italia — tutte le 107 province all'iscrizione (aggiunta
 // la Sud Sardegna, che mancava).
+// V8.12: la rotta del pellegrino — per chi cammina davvero verso il luogo:
+// declinazione magnetica corretta (il nord dei sensori non è il nord vero),
+// GPS ad alta precisione, direzione di marcia se il magnetometro tace,
+// e la distanza che manca — calcolata e mostrata SOLO sul telefono.
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -167,12 +171,17 @@ function aggiornaLancette(l, totale) {
     itemG.querySelector('.dett').textContent = l.grande.descrizione || ('luogo di potere · ' + l.grande.provincia);
     poiCorrente = { id: l.grande.id, nome: l.grande.nome, lat: l.grande.lat, lon: l.grande.lon };
     INFO_AGO.grande = { nome: l.grande.nome };
+    if (BVERA.pos && l.grande.lat != null && l.grande.lon != null) {
+      aggiornaDistanza(distanzaMetri(BVERA.pos.lat, BVERA.pos.lon, l.grande.lat, l.grande.lon));
+    }
     if (btnVisita) btnVisita.disabled = false;
   } else {
     // Nessun luogo di potere puntato: niente stella da raccogliere
     itemG.style.display = 'none';
     poiCorrente = null;
     spegniLancetta('grande'); // l'ago torna a cercare, e non trova
+    const dlLuogo = document.getElementById('distanza-luogo');
+    if (dlLuogo) dlLuogo.textContent = '';
     if (btnVisita) btnVisita.disabled = true;
   }
 
@@ -305,11 +314,13 @@ function loopBussolaViva(t) {
 
 function stepAgo(A, dt, t) {
   let bers = A.bersaglio;
-  const sveglia = BVERA.attiva && BVERA.heading != null && A.bersaglio != null;
+  // il nord che vale: l'ago magnetico corretto se c'è, altrimenti dove stai camminando
+  const nord = BVERA.heading != null ? BVERA.heading : BVERA.corso;
+  const sveglia = BVERA.attiva && nord != null && A.bersaglio != null;
   if (sveglia) {
     // BUSSOLA SVEGLIA: angolo nel mondo meno dove sei rivolto tu = dove sta l'ago
     // sul quadrante. Strada più corta: mai il giro completo quando passi da 359 a 0.
-    bers = A.bersaglio - BVERA.heading;
+    bers = A.bersaglio - nord;
     while (bers - A.angolo > 180) bers -= 360;
     while (bers - A.angolo < -180) bers += 360;
   }
@@ -364,7 +375,14 @@ function spegniLancetta(tipo) {
 // Il telefono ha una bussola magnetica e sa dove sei. ENTRAMBE le cose restano
 // sul telefono: qui si calcola l'angolo vero verso il luogo, e non parte mai
 // niente. Al server arrivano sempre e solo i luoghi pubblici.
-const BVERA = { attiva:false, heading:null, pos:null };
+// La declinazione magnetica in Italia è di ~4 gradi EST (WMM2025, 2026): l'ago
+// del telefono punta il nord magnetico, ma il nord VERO è 4 gradi più a ovest.
+// Senza correzione la rotta sbaglia di ~70 metri ogni chilometro camminato.
+// Stima nazionale: tra una provincia e l'altra varia meno di 1 grado (≈17 m/km),
+// ben dentro il raggio del check-in. Da rifinire coi test sul campo.
+const DECLINAZIONE = 4.0;
+
+const BVERA = { attiva:false, heading:null, pos:null, corso:null };
 
 function rottaVera(lat1, lon1, lat2, lon2) {
   const rad = x => x * Math.PI / 180;
@@ -374,14 +392,32 @@ function rottaVera(lat1, lon1, lat2, lon2) {
   return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
 }
 
-function leggiNord(e) {
-  // Safari/vecchi iPhone: webkitCompassHeading è già l'orientamento dal nord (senso orario)
-  if (typeof e.webkitCompassHeading === 'number' && !isNaN(e.webkitCompassHeading)) {
-    BVERA.heading = e.webkitCompassHeading;
+// V8.12: quanto manca al luogo — calcolato sul telefono, mostrato sul telefono.
+// Chi segue l'ago deve sapere se il passo giusto è "ancora un po'" o "sei arrivato".
+function aggiornaDistanza(d) {
+  const el = document.getElementById('distanza-luogo');
+  if (!el) return;
+  if (d <= RAGGIO_M) {
+    el.textContent = 'sei nel cerchio del luogo — la stella può posarsi';
+    el.classList.add('vicino');
     return;
   }
-  // Android assoluto: alpha conta in senso antiorario — si rigira
-  if (e.absolute && e.alpha != null) BVERA.heading = (360 - e.alpha) % 360;
+  el.classList.remove('vicino');
+  el.textContent = d >= 1000
+    ? '≈ ' + (d / 1000).toFixed(1).replace('.', ',') + ' km al luogo · segui il granato'
+    : '≈ ' + (Math.round(d / 10) * 10) + ' m al luogo · segui il granato';
+}
+
+function leggiNord(e) {
+  // Safari/vecchi iPhone: webkitCompassHeading è il nord MAGNETICO (senso orario).
+  // Nord vero = magnetico + declinazione: V8.12, o chi cammina sbaglia rotta.
+  if (typeof e.webkitCompassHeading === 'number' && !isNaN(e.webkitCompassHeading)) {
+    BVERA.heading = (e.webkitCompassHeading + DECLINAZIONE) % 360;
+    return;
+  }
+  // Android assoluto: alpha conta in senso antiorario — si rigira. Anche questi
+  // sensori in pratica si allineano al nord magnetico: stessa correzione.
+  if (e.absolute && e.alpha != null) BVERA.heading = (360 - e.alpha + DECLINAZIONE) % 360;
 }
 
 async function svegliaAgo() {
@@ -403,16 +439,24 @@ async function svegliaAgo() {
       navigator.geolocation.watchPosition(function (pos) {
         // La posizione vive SOLO qui: serve all'ago per la rotta vera, non parte mai.
         BVERA.pos = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        // Il passo del pellegrino: mentre CAMMINI, il GPS sa verso dove vai
+        // (course, già dal nord vero). Se il magnetometro tace o lo disturbano
+        // cover e metallo, la direzione di marcia fa da guida.
+        if (typeof pos.coords.heading === 'number' && !isNaN(pos.coords.heading) &&
+            (pos.coords.speed == null || pos.coords.speed > 0.7)) {
+          BVERA.corso = pos.coords.heading;
+        }
         if (poiCorrente && poiCorrente.lat != null && VIVA.aghi.grande) {
           puntaLancetta('grande', rottaVera(BVERA.pos.lat, BVERA.pos.lon, poiCorrente.lat, poiCorrente.lon));
+          aggiornaDistanza(distanzaMetri(BVERA.pos.lat, BVERA.pos.lon, poiCorrente.lat, poiCorrente.lon));
         }
       }, function () {
         // niente GPS: l'ago userà la rotta dal capoluogo, resta comunque una bussola
-      }, { enableHighAccuracy: false, timeout: 30000, maximumAge: 15000 });
+      }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 });
     }
     BVERA.attiva = true;
     btn.classList.add('viva');
-    btn.textContent = '🧭 l\'ago è sveglio — girati finché il granato entra nella porta';
+    btn.textContent = '🧭 l\'ago è sveglio — gira finché il granato entra nella porta, poi cammina';
     aggiornaCaption();
   } catch (e) {
     alert('Questo scrigno non ha l\'ago magnetico: ' + e.message);
@@ -463,7 +507,7 @@ function checkIn() {
     if (d > RAGGIO_M) {
       btn.disabled = false;
       btn.textContent = etichetta;
-      alert('Il luogo di potere non ti sente ancora: sei lontano. La distanza non si dice, ma la bussola sa.');
+      alert('Il luogo di potere non ti sente ancora: sei lontano. Segui il granato della lancetta grande.');
       return;
     }
 
@@ -489,7 +533,7 @@ function checkIn() {
     btn.disabled = false;
     btn.textContent = etichetta;
     alert('Lo scrigno non ha il permesso di leggere l\'ago GPS. La posizione resta comunque solo tua.');
-  }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 15000 });
 }
 
 function mostraStella(nomePoi, stelle) {
