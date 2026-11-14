@@ -219,6 +219,18 @@
     color:#9fe8c0;
   }
   .distanza-luogo.vicino { color:#e8cd85; text-shadow:0 0 10px rgba(232,205,133,.45); }
+
+  /* ===== V8.15 — LA GUIDA DEI PRIMI PASSI ===== */
+  .guida-testo {
+    font-family:'Cormorant Garamond', serif; font-size:15px; font-style:italic;
+    color:#221a10; line-height:1.5; margin-bottom:12px; min-height:120px;
+  }
+  .guida-punti { display:flex; justify-content:center; gap:8px; margin-bottom:12px; }
+  .guida-punti .punto {
+    width:7px; height:7px; border-radius:50%;
+    background:#b8a878; opacity:.4;
+  }
+  .guida-punti .punto.acceso { background:#7a5a20; opacity:1; box-shadow:0 0 6px rgba(122,90,32,.5); }
   .btn-sveglia {
     display:none; margin-top:2px; cursor:pointer;
     background:transparent; border:1px solid #6a5a3a; border-radius:16px;
@@ -652,6 +664,7 @@
         <button class="btn-posta" id="btn-collezione">la collezione — le stelle raccolte</button>
         <button class="btn-posta" id="btn-piazza">la piazza — le voci di tutte le anime</button>
         <button class="btn-posta" id="btn-feedback">🗝️ parola ai costruttori</button>
+        <button class="btn-posta" id="btn-guida">❔ i primi passi</button>
         <button class="btn-posta" id="btn-uscita" onclick="localStorage.removeItem('pyxis-utente');location.reload()">lascia lo scrigno</button>
 
         <div class="nota">la posizione resta sul telefono · mai salvata · mai inviata · solo la bussola sa</div>
@@ -707,7 +720,18 @@
       </div>
     </div>
 
-    <div class="pyxis-label">Pyxis · V8.14</div>
+    <div class="modale nascosto" id="modale-guida">
+      <div class="modale-box">
+        <h3 id="guida-titolo">I primi passi</h3>
+        <div class="sub">come si cammina in questo mondo</div>
+        <div id="guida-testo" class="guida-testo"></div>
+        <div id="guida-punti" class="guida-punti"></div>
+        <button class="btn-modale" id="btn-guida-avanti">Avanti</button>
+        <button class="btn-modale fantasma" id="btn-chiudi-guida">Salta la guida</button>
+      </div>
+    </div>
+
+    <div class="pyxis-label">Pyxis · V8.15</div>
   </div>
 </div>
 
