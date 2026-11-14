@@ -329,6 +329,15 @@
     font-family:'IM Fell English', serif; font-size:9px;
     color:rgba(184,150,62,.4); z-index:10;
   }
+  /* V8.17 — il selettore lingua: piccolo come la firma, in fondo a destra */
+  .btn-lingua {
+    position:absolute; bottom:8px; right:20px; z-index:11;
+    background:transparent; border:1px solid rgba(184,150,62,.25); border-radius:10px;
+    padding:3px 8px; cursor:pointer;
+    font-family:'IM Fell English', serif; font-size:9px;
+    color:rgba(184,150,62,.4); transition:.15s;
+  }
+  .btn-lingua:hover { color:rgba(184,150,62,.8); border-color:rgba(184,150,62,.5); }
 
   /* ===== SCHERMATE ===== */
   .schermata { display:none; width:100%; }
@@ -741,7 +750,9 @@
       </div>
     </div>
 
-    <div class="pyxis-label">Pyxis · V8.16</div>
+    <button class="btn-lingua" id="btn-lingua">🇮🇹 IT</button>
+
+    <div class="pyxis-label">Pyxis · V8.17</div>
   </div>
 </div>
 

@@ -20,6 +20,8 @@
 // lo porta a Carlo e Hermes (tabella feedback, la leggono dal DB).
 // V8.15: LA GUIDA — i primi passi: si apre da sola alla prima visita, si
 // riapre col bottone ❔. Cinque passi e l'anima sa camminare.
+// V8.17: LE LINGUE — 🇮🇹 IT / 🇬🇧 EN col bottone in fondo a destra: tutto il
+// giro di vista si traduce; gli avvisi (alert) restano in italiano per ora.
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -43,6 +45,206 @@ const API = (location.hostname === 'kkkkloudio.github.io' || location.hostname.e
 
 const RAGGIO_M = 500; // quanto vicino devi essere al luogo di potere perché la stella si posi
 
+// ===== LE LINGUE (V8.17): il cerchio si apre oltre i confini =====
+const LINGUA = { corrente: localStorage.getItem('pyxis-lingua') || 'it' };
+const TESTI = {
+  it: {
+    subBussola: "la bussola delle presenze",
+    entraScrigno: "Entra nello scrigno",
+    subDueCose: "due cose bastano, poi la bussola gira",
+    nomeArte: "Nome d'arte",
+    provincia: "Provincia",
+    scegli: "— scegli —",
+    apriBussola: "Apri la bussola",
+    privacyIscrizione: "nessuna via da scegliere · nessun nome vero · nessuna email · la posizione non lascia mai il telefono",
+    legendaTitolo: "Le tre lancette",
+    dettGrande: "luogo di potere più vicino",
+    dettMedia: "anima più vicina",
+    dettPiccola: "seconda anima",
+    visita: "✨ Il luogo è raggiunto",
+    lettera: "🐦‍⬛ Scrivi una lettera al vicino",
+    posta: "la posta — le lettere ricevute",
+    collezione: "la collezione — le stelle raccolte",
+    piazza: "la piazza — le voci di tutte le anime",
+    feedback: "🗝️ parola ai costruttori",
+    guida: "❔ i primi passi",
+    uscita: "lascia lo scrigno",
+    sveglia: "🧭 Sveglia l'ago — la bussola vera",
+    svegliaViva: "🧭 l'ago è sveglio — gira finché il granato entra nella porta, poi cammina",
+    captionTocca: "tocca un ago per sapere chi punta",
+    captionSveglia: "bussola sveglia: gli aghi puntano davvero — tocca un ago per sapere chi è",
+    dettoGrande: "il luogo di potere",
+    dettoMedia: "l'anima più vicina",
+    dettoPiccola: "la seconda anima",
+    portaCaption: " — girati finché l'ago entra nella porta",
+    cerchio: "sei nel cerchio del luogo — la stella può posarsi",
+    kmLuogo: " km al luogo · segui il granato",
+    mLuogo: " m al luogo · segui il granato",
+    notaAscolto: " anime in ascolto · la posizione resta sul telefono · solo la bussola sa",
+    guidaTitolo: "I primi passi",
+    guidaSub: "come si cammina in questo mondo",
+    avanti: "Avanti",
+    entraCerchio: "Entra nel cerchio",
+    saltaGuida: "Salta la guida",
+    affida: "🐦‍⬛ Affida al corvo",
+    affidaChiave: "🗝️ Affida al corvo",
+    rimettiPenna: "Rimetti la penna",
+    chiudi: "Chiudi",
+    lasciaVoce: "📣 Lascia la voce",
+    scritturaTitolo: "Una lettera al vicino",
+    scritturaSub: "il corvo la porterà a ",
+    postaTitolo: "La posta",
+    postaSub: "i corvi che sono giunti fin qui",
+    collezioneTitolo: "La collezione",
+    collezioneSub: "le stelle raccolte sui luoghi di potere",
+    piazzaTitolo: "La piazza",
+    piazzaSub: "le voci lasciate da tutte le anime",
+    feedbackTitolo: "Parola ai costruttori",
+    feedbackSub: "cosa non torna, cosa sogni — il corvo lo porta a chi ha fatto la bussola",
+    placeholderLettera: "Scrivi con l'inchiostro della notte…",
+    placeholderPiazza: "Lascia un pensiero nel cerchio…",
+    placeholderFeedback: "Scrivi al di là del gioco…"
+  },
+  en: {
+    subBussola: "the compass of presences",
+    entraScrigno: "Enter the casket",
+    subDueCose: "two things are enough, then the compass turns",
+    nomeArte: "Artist name",
+    provincia: "Province",
+    scegli: "— choose —",
+    apriBussola: "Open the compass",
+    privacyIscrizione: "no road to choose · no real name · no email · the position never leaves your phone",
+    legendaTitolo: "The three needles",
+    dettGrande: "nearest place of power",
+    dettMedia: "nearest soul",
+    dettPiccola: "second soul",
+    visita: "✨ The place is reached",
+    lettera: "🐦‍⬛ Write a letter to the neighbour",
+    posta: "the mail — letters received",
+    collezione: "the collection — stars gathered",
+    piazza: "the square — voices of all souls",
+    feedback: "🗝️ word to the makers",
+    guida: "❔ first steps",
+    uscita: "leave the casket",
+    sveglia: "🧭 Wake the needle — the true compass",
+    svegliaViva: "🧭 the needle is awake — turn until the garnet enters the door, then walk",
+    captionTocca: "tap a needle to know who it points at",
+    captionSveglia: "compass awake: the needles truly point — tap one to know who it is",
+    dettoGrande: "the place of power",
+    dettoMedia: "the nearest soul",
+    dettoPiccola: "the second soul",
+    portaCaption: " — turn until the needle enters the door",
+    cerchio: "you are inside the place's circle — the star can settle",
+    kmLuogo: " km to the place · follow the garnet",
+    mLuogo: " m to the place · follow the garnet",
+    notaAscolto: " souls listening · the position stays on the phone · only the compass knows",
+    guidaTitolo: "First steps",
+    guidaSub: "how to walk in this world",
+    avanti: "Next",
+    entraCerchio: "Enter the circle",
+    saltaGuida: "Skip the guide",
+    affida: "🐦‍⬛ Entrust to the raven",
+    affidaChiave: "🗝️ Entrust to the raven",
+    rimettiPenna: "Put the pen back",
+    chiudi: "Close",
+    lasciaVoce: "📣 Leave a voice",
+    scritturaTitolo: "A letter to the neighbour",
+    scritturaSub: "the raven will carry it to ",
+    postaTitolo: "The mail",
+    postaSub: "the ravens that have landed here",
+    collezioneTitolo: "The collection",
+    collezioneSub: "the stars gathered at places of power",
+    piazzaTitolo: "The square",
+    piazzaSub: "voices left by all souls",
+    feedbackTitolo: "Word to the makers",
+    feedbackSub: "what is off, what you dream — the raven carries it to those who made the compass",
+    placeholderLettera: "Write with the ink of the night…",
+    placeholderPiazza: "Leave a thought in the circle…",
+    placeholderFeedback: "Write from beyond the game…"
+  }
+};
+
+function t(k) { return (TESTI[LINGUA.corrente] || TESTI.it)[k] || TESTI.it[k]; }
+
+function applicaLingua() {
+  const set = (sel, k) => { const el = document.querySelector(sel); if (el) el.textContent = t(k); };
+  const setId = (id, k) => { const el = document.getElementById(id); if (el) el.textContent = t(k); };
+  const setPh = (id, k) => { const el = document.getElementById(id); if (el) el.placeholder = t(k); };
+  document.documentElement.lang = LINGUA.corrente;
+
+  // iscrizione
+  set('#schermata-iscrizione .sottotitolo', 'subBussola');
+  set('#schermata-iscrizione .iscrizione-box h3', 'entraScrigno');
+  set('#schermata-iscrizione .sub', 'subDueCose');
+  set('label[for="nome"]', 'nomeArte');
+  set('label[for="provincia"]', 'provincia');
+  const opt = document.querySelector('#provincia option[value=""]');
+  if (opt) opt.textContent = t('scegli');
+  setId('btn-inizia', 'apriBussola');
+  set('.privacy', 'privacyIscrizione');
+
+  // legenda
+  set('.legenda-titolo', 'legendaTitolo');
+  set('.legenda-item[data-tipo="grande"] .dett', 'dettGrande');
+  set('.legenda-item[data-tipo="media"] .dett', 'dettMedia');
+  set('.legenda-item[data-tipo="piccola"] .dett', 'dettPiccola');
+
+  // bottoni
+  const sveglia = document.getElementById('btn-sveglia');
+  if (sveglia && !BVERA.attiva) sveglia.textContent = t('sveglia');
+  setId('btn-visita', 'visita');
+  setId('btn-lettera', 'lettera');
+  setId('btn-posta', 'posta');
+  setId('btn-collezione', 'collezione');
+  setId('btn-piazza', 'piazza');
+  setId('btn-feedback', 'feedback');
+  setId('btn-guida', 'guida');
+  setId('btn-uscita', 'uscita');
+
+  // modali
+  const modale = (id, tk, sk) => {
+    const box = document.querySelector('#' + id + ' .modale-box');
+    if (!box) return;
+    const h3 = box.querySelector('h3'); if (h3 && tk) h3.textContent = t(tk);
+    const s = box.querySelector('.sub'); if (s && sk) s.textContent = t(sk);
+  };
+  modale('modale-scrittura', 'scritturaTitolo', null); // il sub contiene il nome: si traduce a parte
+  modale('modale-posta', 'postaTitolo', 'postaSub');
+  modale('modale-collezione', 'collezioneTitolo', 'collezioneSub');
+  modale('modale-piazza', 'piazzaTitolo', 'piazzaSub');
+  modale('modale-feedback', 'feedbackTitolo', 'feedbackSub');
+  modale('modale-guida', 'guidaTitolo', 'guidaSub');
+  const subScrittura = document.querySelector('#modale-scrittura .sub');
+  if (subScrittura && subScrittura.childNodes[0]) subScrittura.childNodes[0].textContent = t('scritturaSub');
+  setId('btn-affida', 'affida');
+  setId('btn-annulla-lettera', 'rimettiPenna');
+  setId('btn-chiudi-posta', 'chiudi');
+  setId('btn-chiudi-collezione', 'chiudi');
+  setId('btn-voce', 'lasciaVoce');
+  setId('btn-chiudi-piazza', 'chiudi');
+  setId('btn-feedback-invia', 'affidaChiave');
+  setId('btn-chiudi-feedback', 'rimettiPenna');
+  setId('btn-chiudi-guida', 'saltaGuida');
+  setPh('lettera-testo', 'placeholderLettera');
+  setPh('piazza-testo', 'placeholderPiazza');
+  setPh('feedback-testo', 'placeholderFeedback');
+
+  // il bottone lingua stesso
+  const bl = document.getElementById('btn-lingua');
+  if (bl) bl.textContent = LINGUA.corrente === 'en' ? '🇬🇧 EN' : '🇮🇹 IT';
+}
+
+function cambiaLingua() {
+  LINGUA.corrente = LINGUA.corrente === 'en' ? 'it' : 'en';
+  localStorage.setItem('pyxis-lingua', LINGUA.corrente);
+  applicaLingua();
+  aggiornaCaption();
+  if (BVERA.attiva) {
+    const btn = document.getElementById('btn-sveglia');
+    if (btn) btn.textContent = t('svegliaViva');
+  }
+}
+
 let utente = JSON.parse(localStorage.getItem('pyxis-utente') || 'null');
 let evtSource = null;
 let destinatario = null;   // l'anima più vicina (lancetta media): { id, nome }
@@ -65,6 +267,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setTimeout(chiudiApertura, 3300); // il sipario va via da solo
   }
 
+  applicaLingua(); // V8.17: la lingua scelta veste la pagina prima di tutto
   const select = document.getElementById('provincia');
   PROVINCE.forEach(p => {
     const o = document.createElement('option');
@@ -145,6 +348,7 @@ document.addEventListener('DOMContentLoaded', function () {
     localStorage.setItem('pyxis-guida', 'vista');
     chiudiModale('modale-guida');
   });
+  document.getElementById('btn-lingua').addEventListener('click', cambiaLingua);
 });
 
 function mostraBussola() {
@@ -237,7 +441,7 @@ function aggiornaLancette(l, totale) {
   aggiornaCaption();
 
   const nota = document.querySelector('#schermata-bussola .nota');
-  if (nota) nota.textContent = totale + ' anime in ascolto · la posizione resta sul telefono · solo la bussola sa';
+  if (nota) nota.textContent = totale + t('notaAscolto');
 }
 
 // ===== TOCCA L'AGO (V8.8): chi stai puntando? =====
@@ -272,9 +476,7 @@ function aggiornaCaption() {
   if (!cap) return;
   if (!agoSelezionato) {
     cap.style.color = '';
-    cap.textContent = BVERA.attiva
-      ? 'bussola sveglia: gli aghi puntano davvero — tocca un ago per sapere chi è'
-      : 'tocca un ago per sapere chi punta';
+    cap.textContent = BVERA.attiva ? t('captionSveglia') : t('captionTocca');
     return;
   }
   cap.style.color = COLORI_AGO[agoSelezionato];
@@ -283,8 +485,8 @@ function aggiornaCaption() {
     cap.textContent = '→ quest\'ago sta ancora cercando: non punta nessuno, per ora';
     return;
   }
-  let testo = '→ ' + info.nome + ' · ' + DETTI_AGO[agoSelezionato];
-  if (agoSelezionato === 'grande' && BVERA.attiva) testo += ' — girati finché l\'ago entra nella porta';
+  let testo = '→ ' + info.nome + ' · ' + t(DETTI_AGO[agoSelezionato]);
+  if (agoSelezionato === 'grande' && BVERA.attiva) testo += t('portaCaption');
   cap.textContent = testo;
 }
 
@@ -417,14 +619,14 @@ function aggiornaDistanza(d) {
   const el = document.getElementById('distanza-luogo');
   if (!el) return;
   if (d <= RAGGIO_M) {
-    el.textContent = 'sei nel cerchio del luogo — la stella può posarsi';
+    el.textContent = t('cerchio');
     el.classList.add('vicino');
     return;
   }
   el.classList.remove('vicino');
   el.textContent = d >= 1000
-    ? '≈ ' + (d / 1000).toFixed(1).replace('.', ',') + ' km al luogo · segui il granato'
-    : '≈ ' + (Math.round(d / 10) * 10) + ' m al luogo · segui il granato';
+    ? '≈ ' + (d / 1000).toFixed(1).replace('.', ',') + t('kmLuogo')
+    : '≈ ' + (Math.round(d / 10) * 10) + t('mLuogo');
 }
 
 function leggiNord(e) {
@@ -475,7 +677,7 @@ async function svegliaAgo() {
     }
     BVERA.attiva = true;
     btn.classList.add('viva');
-    btn.textContent = '🧭 l\'ago è sveglio — gira finché il granato entra nella porta, poi cammina';
+    btn.textContent = t('svegliaViva');
     aggiornaCaption();
   } catch (e) {
     alert('Questo scrigno non ha l\'ago magnetico: ' + e.message);
@@ -752,7 +954,7 @@ async function inviaFeedback() {
 }
 
 // ===== LA GUIDA (V8.15): i primi passi =====
-const GUIDA_STEP = [
+const GUIDA_STEP_IT = [
   { titolo: 'Benvenuta, anima', testo: 'Questa è Pyxis, la bussola delle presenze. Punta i luoghi di potere e le anime che viaggiano nel cerchio con te. Niente paura: qui si impara camminando.' },
   { titolo: 'Le tre lancette', testo: 'La grande punta il Luogo di Potere (granato). La media, la prima anima vicina (smeraldo). La piccola, la seconda (zaffiro). Tocca un ago — o la sua riga nella pergamena — e ti dirà chi sta indicando.' },
   { titolo: 'La rotta vera', testo: 'Sul telefono, sveglia l\'ago con 🧭: la bussola seguirà la direzione VERA del luogo. Girati finché il granato entra nella porta d\'ottone in alto al quadrante — stai guardando verso il luogo. Poi cammina: sotto la bussola appare quanto manca.' },
@@ -768,18 +970,28 @@ function apriGuida() {
 }
 
 function disegnaGuida() {
-  const s = GUIDA_STEP[guidaIndice];
+  const passi = GUIDA_STEP();
+  const s = passi[guidaIndice];
   document.getElementById('guida-titolo').textContent = (guidaIndice + 1) + ' · ' + s.titolo;
   document.getElementById('guida-testo').textContent = s.testo;
-  document.getElementById('btn-guida-avanti').textContent = guidaIndice === GUIDA_STEP.length - 1 ? 'Entra nel cerchio' : 'Avanti';
+  document.getElementById('btn-guida-avanti').textContent = guidaIndice === passi.length - 1 ? t('entraCerchio') : t('avanti');
   const punti = document.getElementById('guida-punti');
   punti.innerHTML = '';
-  GUIDA_STEP.forEach((_, i) => {
+  passi.forEach((_, i) => {
     const p = document.createElement('span');
     p.className = 'punto' + (i === guidaIndice ? ' acceso' : '');
     punti.appendChild(p);
   });
 }
+
+const GUIDA_STEP_EN = [
+  { titolo: 'Welcome, soul', testo: 'This is Pyxis, the compass of presences. It points to places of power and to the souls travelling the circle with you. No fear: here you learn by walking.' },
+  { titolo: 'The three needles', testo: 'The large one points to the Place of Power (garnet). The middle one, the nearest soul (emerald). The small one, the second (sapphire). Tap a needle — or its row on the parchment — and it will tell you who it is pointing at.' },
+  { titolo: 'The true bearing', testo: 'On your phone, wake the needle with 🧭: the compass will follow the REAL direction of the place. Turn until the garnet enters the brass door at the top of the dial — you are facing the place. Then walk: below the compass you will see how far is left.' },
+  { titolo: 'The star', testo: 'Within 500 metres of the place, the ✨ button lights up: the star settles and joins your collection. Your position stays on your phone — never saved, never sent: that is the cornerstone of this world.' },
+  { titolo: 'The raven and the square', testo: 'With 🐦‍⬛ you write a letter to the nearest soul; in the square all souls leave their thoughts; with 🗝️ you speak to the makers. Now the path is yours. Fair journey, soul.' }
+];
+function GUIDA_STEP() { return LINGUA.corrente === 'en' ? GUIDA_STEP_EN : GUIDA_STEP_IT; }
 
 function avantiGuida() {
   if (guidaIndice < GUIDA_STEP.length - 1) {
