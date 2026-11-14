@@ -11,6 +11,10 @@
 //        al server arriva unicamente { utente_id, poi_id }. Nessuna coordinata
 //        dell'utente esiste nel DB. Le colonne lat/lon della tabella poi sono
 //        coordinate di LUOGHI PUBBLICI, non di persone.
+// - V6: direzione vera — le lancette puntano la ROTTA tra luoghi pubblici
+//        (capoluoghi e POI), mai tra persone. Anime: le più vicine ovunque,
+//        misurate tra capoluoghi. Stessa provincia = nessuna rotta possibile:
+//        angolo d'albergo, dolce e fisso per coppia.
 
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
@@ -96,6 +100,46 @@ for (const p of poiSeed) {
 // Vale anche per i DB già esistenti: la migrazione gira a ogni avvio.
 const rotonda = poiSeed.find(p => p[0] === 'poi-ro-rotonda');
 db.prepare('UPDATE poi SET evidenza = 1, descrizione = ? WHERE id = ?').run(rotonda[3], rotonda[0]);
+
+// ============ LA DIREZIONE VERA ============
+// Capoluoghi: punti di riferimento PUBBLICI per le rotte della bussola.
+// Precisione da cartografo pigro (~km): per un ago è più che sufficiente.
+// Si estende provincia per provincia, insieme al gioco.
+const RIF_PROVINCIA = {
+  'Rovigo':  [45.071, 11.7915],
+  'Padova':  [45.4064, 11.8762],
+  'Venezia': [45.4408, 12.3155],
+  'Verona':  [45.4386, 10.9916],
+  'Vicenza': [45.5455, 11.535],
+  'Treviso': [45.7108, 12.2383],
+  'Belluno': [46.1425, 12.2167]
+};
+
+// Rotta vera da (lat1,lon1) verso (lat2,lon2), in gradi [0,360)
+function rotta(lat1, lon1, lat2, lon2) {
+  const rad = x => x * Math.PI / 180;
+  const y = Math.sin(rad(lon2 - lon1)) * Math.cos(rad(lat2));
+  const x = Math.cos(rad(lat1)) * Math.sin(rad(lat2)) -
+            Math.sin(rad(lat1)) * Math.cos(rad(lat2)) * Math.cos(rad(lon2 - lon1));
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+// Distanza tra due punti di riferimento (metri)
+function distanzaTraRif(a, b) {
+  if (!a || !b) return Infinity;
+  const rad = x => x * Math.PI / 180;
+  const R = 6371000;
+  const dLat = rad(b[0] - a[0]), dLon = rad(b[1] - a[1]);
+  const h = Math.sin(dLat/2) ** 2 + Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(dLon/2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+// Angolo d'albergo per chi è vicinissimo: piccolo scarto fisso per coppia (±25°),
+// deterministico — due anime vicine non si sovrappongono mai, e ogni giorno è uguale.
+function scartoStabile(idA, idB) {
+  const h = crypto.createHash('md5').update(String(idA) + ':' + String(idB)).digest('hex');
+  return (parseInt(h.slice(0, 2), 16) / 255) * 50 - 25;
+}
 
 // ============ HELPERS ============
 function json(res, code, data) {
@@ -240,16 +284,38 @@ const server = http.createServer(async (req, res) => {
     // del check-in: sono coordinate di luoghi pubblici, non la posizione dell'utente.
     const poi = db.prepare('SELECT id, nome, descrizione, provincia, lat, lon FROM poi WHERE provincia = ? ORDER BY evidenza DESC, id LIMIT 1').get(provincia);
 
-    // Angoli stabili per demo: il POI punta verso nord (0°), le anime a est.
-    // In futuro: calcolo reale della direzione relativa (senza mai salvare posizioni).
-    const angoli = [0, 90, 200];
+    // La rotta della lancetta grande: dal capoluogo della mia provincia
+    // verso il luogo di potere. Luoghi pubblici, zero posizioni di persone.
+    const mioRif = RIF_PROVINCIA[provincia] || null;
+    const angoloLuogo = (poi && mioRif && poi.lat != null && poi.lon != null)
+      ? rotta(mioRif[0], mioRif[1], poi.lat, poi.lon)
+      : 0; // geografia non ancora mappata: il luogo batte a nord
+
+    // Le anime: le più vicine ovunque (distanza tra capoluoghi, non tra persone).
+    // Stessa provincia = distanza zero = nessuna rotta possibile: angolo d'albergo.
+    const anime = db.prepare(`
+      SELECT u.id, u.nome, u.tipo, u.provincia, p.online_da FROM utenti u
+      JOIN presenze p ON u.id = p.utente_id
+      WHERE u.id != ?
+      ORDER BY p.online_da ASC
+    `).all(mioId || '');
+    const conDistanza = anime.map(a => ({
+      ...a,
+      _d: distanzaTraRif(mioRif, RIF_PROVINCIA[a.provincia] || null)
+    })).sort((a, b) => (a._d - b._d) || (a.online_da < b.online_da ? -1 : 1));
+
+    const angoloAnima = (a, base) => {
+      const suoRif = RIF_PROVINCIA[a.provincia] || null;
+      if (mioRif && suoRif && a._d > 3000) return rotta(mioRif[0], mioRif[1], suoRif[0], suoRif[1]);
+      return base + scartoStabile(mioId, a.id);
+    };
 
     return json(res, 200, {
       provincia,
       lancette: {
-        grande: poi ? { ...poi, angolo: Math.round(angoli[0]), tipo: 'poi' } : null,
-        media: altri[0] ? { ...altri[0], angolo: Math.round(angoli[1]) } : null,
-        piccola: altri[1] ? { ...altri[1], angolo: Math.round(angoli[2]) } : null,
+        grande: poi ? { ...poi, angolo: Math.round(angoloLuogo), tipo: 'poi' } : null,
+        media: conDistanza[0] ? { id: conDistanza[0].id, nome: conDistanza[0].nome, tipo: conDistanza[0].tipo, angolo: Math.round(angoloAnima(conDistanza[0], 90)) } : null,
+        piccola: conDistanza[1] ? { id: conDistanza[1].id, nome: conDistanza[1].nome, tipo: conDistanza[1].tipo, angolo: Math.round(angoloAnima(conDistanza[1], 200)) } : null,
       },
       totale_online: altri.length + 1
     });
