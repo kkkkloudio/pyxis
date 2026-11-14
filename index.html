@@ -125,16 +125,25 @@
   .fiammella.f3 { top:42%; right:2%; animation-delay:1.8s; }
   @keyframes tremolio { 0%,100% { opacity:.3; transform:scale(.9); } 50% { opacity:.85; transform:scale(1.05); } }
 
-  /* ===== LE LANCETTE — ETÀ DEL LEGNO: aghi di legno scuro, punta bruciata, perline d'argilla ===== */
+  /* ===== LE LANCETTE — ETÀ DEL LEGNO: aghi di legno scuro, punta bruciata, perlin d'argilla ===== */
   .lancetta {
     position:absolute; bottom:50%; left:50%; width:0; height:0;
     transform-origin:50% 100%;
     transition:opacity .3s; /* la trasformazione la muove la molla in app.js */
+    cursor:pointer;
   }
+  /* zona di tocco generosa: l'ago è sottile, il dito no */
+  .lancetta::after {
+    content:''; position:absolute; bottom:0; left:calc(var(--k) * -18px);
+    width:calc(var(--k) * 36px); height:calc(var(--k) * 82px);
+  }
+  .lancetta.grande::after { height:calc(var(--k) * 130px); }
+  .lancetta.media::after  { height:calc(var(--k) * 105px); }
   .lancetta.grande { transform:rotate(-50deg); z-index:6; }
   .lancetta.media  { transform:rotate(40deg);  z-index:5; }
   .lancetta.piccola{ transform:rotate(160deg); z-index:7; }
-  .ago { position:absolute; bottom:-1px; border-radius:2px; }
+  .ago { position:absolute; bottom:-1px; border-radius:2px; pointer-events:none; }
+  .gemma { pointer-events:none; }
   .ago-grande {
     left:calc(var(--k) * -4px); width:calc(var(--k) * 8px); height:calc(var(--k) * 118px);
     background:linear-gradient(to top,#4a3320 0%,#33220f 55%,#160c04 100%);
@@ -153,7 +162,7 @@
     clip-path:polygon(50% 0,90% 9%,78% 84%,50% 100%,22% 84%,10% 9%);
     filter:drop-shadow(0 0 2px rgba(0,0,0,.9));
   }
-  /* perline d'argilla in punta: granato (luogo di potere), smeraldo (anima vicina), zaffiro (seconda anima) */
+  /* perlin d'argilla in punta: granato (luogo di potere), smeraldo (anima vicina), zaffiro (seconda anima) */
   .gemma {
     position:absolute; border-radius:50%;
     border:1px solid #241a10;
@@ -187,6 +196,32 @@
     0%,100% { box-shadow:0 2px 8px rgba(0,0,0,.6); }
     50% { box-shadow:0 2px 8px rgba(0,0,0,.6), 0 0 14px rgba(232,205,133,.5); }
   }
+
+  /* ===== V8.8 — LA PORTA E LA BUSSOLA SVEGLIA ===== */
+  .porta {
+    position:absolute; top:calc(var(--k) * -16px); left:50%;
+    width:0; height:0; margin-left:calc(var(--k) * -8px);
+    border-left:calc(var(--k) * 8px) solid transparent;
+    border-right:calc(var(--k) * 8px) solid transparent;
+    border-top:calc(var(--k) * 13px) solid #e8cd85;
+    filter:drop-shadow(0 0 6px rgba(232,205,133,.6));
+    z-index:12; pointer-events:none;
+  }
+  .caption-bussola {
+    margin-top:12px; min-height:18px; text-align:center;
+    font-family:'IM Fell English', serif; font-style:italic; font-size:13px;
+    color:#9a8c6a; transition:color .3s;
+  }
+  .btn-sveglia {
+    display:none; margin-top:2px; cursor:pointer;
+    background:transparent; border:1px solid #6a5a3a; border-radius:16px;
+    padding:6px 14px;
+    font-family:'IM Fell English', serif; font-style:italic; font-size:12px;
+    color:#b8a878; transition:.15s;
+  }
+  .btn-sveglia:hover { color:#e8cd85; border-color:#d9b96a; }
+  .btn-sveglia.viva { color:#9fe8c0; border-color:#2e9e6b; }
+  @media (pointer:coarse) { .btn-sveglia { display:inline-block; } }
 
   /* ===== LEGENDA: cartiglio di pergamena ===== */
   .legenda {
@@ -518,7 +553,7 @@
     <div class="apertura" id="apertura">
       <div class="scrigno">
         <div class="scrigno-fondo">
-          <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" class="quadrante" aria-hidden="true"><defs><linearGradient id="betulla" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9d5ac"/><stop offset=".5" stop-color="#d9bf8c"/><stop offset="1" stop-color="#bfa170"/></linearGradient><radialGradient id="faccia"><stop offset="0" stop-color="#f0e0b8"/><stop offset=".75" stop-color="#e2cc9c"/><stop offset="1" stop-color="#cfae7a"/></radialGradient><radialGradient id="alito"><stop offset="0" stop-color="#3a6a8a" stop-opacity=".10"/><stop offset="1" stop-color="#3a6a8a" stop-opacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="141" fill="none" stroke="url(#betulla)" stroke-width="9"/><circle cx="150" cy="150" r="135.5" fill="none" stroke="#8a6a44" stroke-width="1"/><circle cx="150" cy="150" r="133" fill="none" stroke="#3a2a1a" stroke-width="3" stroke-dasharray="1.2 22.1" opacity="0.65"/><circle cx="150" cy="150" r="126.5" fill="url(#faccia)" stroke="#8a6a44" stroke-width="1.4"/><circle cx="150" cy="150" r="95" fill="url(#alito)"/><polygon points="150,58 154,146 150,242 146,146" fill="#241a10" stroke="#4a3620" stroke-width="0.8"/><polygon points="58,150 146,154 242,150 146,146" fill="#241a10" stroke="#4a3620" stroke-width="0.8"/><g transform="rotate(45 150 150)"><polygon points="150,94 152.5,146 150,206 147.5,146" fill="#3c2e1c" stroke="#4a3620" stroke-width="0.6"/><polygon points="94,150 146,152.5 206,150 146,147.5" fill="#3c2e1c" stroke="#4a3620" stroke-width="0.6"/></g><g transform="translate(192.9,46.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/></g><g transform="translate(253.5,107.1)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 A7 7 0 0 0 0 -5.5 Z" fill="#6a4a28"/></g><g transform="translate(253.5,192.9)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 Z" fill="#6a4a28"/></g><g transform="translate(192.9,253.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#3a2a1a"/></g><g transform="translate(107.1,253.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/></g><g transform="translate(46.5,192.9)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#3a2a1a"/></g><g transform="translate(46.5,107.1)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 Z" fill="#6a4a28"/></g><g transform="translate(107.1,46.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#6a4a28"/></g><text x="150" y="40" class="simbolo">TERRA</text><text x="259" y="153" class="simbolo">ARIA</text><text x="150" y="272" class="simbolo">FUOCO</text><text x="41" y="153" class="simbolo">ACQUA</text></svg>
+          <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" class="quadrante" aria-hidden="true"><defs><linearGradient id="betulla" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9d5ac"/><stop offset=".5" stop-color="#d9bf8c"/><stop offset="1" stop-color="#bfa170"/></linearGradient><radialGradient id="faccia"><stop offset="0" stop-color="#f0e0b8"/><stop offset=".75" stop-color="#e2cc9c"/><stop offset="1" stop-color="#cfae7a"/></radialGradient><radialGradient id="alito"><stop offset="0" stop-color="#3a6a8a" stop-opacity=".10"/><stop offset="1" stop-color="#3a6a8a" stop-opacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="141" fill="none" stroke="url(#betulla)" stroke-width="9"/><circle cx="150" cy="150" r="135.5" fill="none" stroke="#8a6a44" stroke-width="1"/><circle cx="150" cy="150" r="133" fill="none" stroke="#3a2a1a" stroke-width="3" stroke-dasharray="1.2 22.1" opacity="0.65"/><circle cx="150" cy="150" r="126.5" fill="url(#faccia)" stroke="#8a6a44" stroke-width="1.4"/><circle cx="150" cy="150" r="95" fill="url(#alito)"/><polygon points="150,58 154,146 150,242 146,146" fill="#241a10" stroke="#4a3620" stroke-width="0.8"/><polygon points="58,150 146,154 242,150 146,146" fill="#241a10" stroke="#4a3620" stroke-width="0.8"/><g transform="rotate(45 150 150)"><polygon points="150,94 152.5,146 150,206 147.5,146" fill="#3c2e1c" stroke="#4a3620" stroke-width="0.6"/><polygon points="94,150 146,152.5 206,150 146,147.5" fill="#3c2e1c" stroke="#4a3620" stroke-width="0.6"/></g><g transform="translate(192.9,46.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/></g><g transform="translate(253.5,107.1)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 A7 7 0 0 0 0 -5.5 Z" fill="#6a4a28"/></g><g transform="translate(253.5,192.9)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 Z" fill="#6a4a28"/></g><g transform="translate(192.9,253.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#3a2a1a"/></g><g transform="translate(107.1,253.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/></g><g transform="translate(46.5,192.9)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#3a2a1a"/></g><g transform="translate(46.5,107.1)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 Z" fill="#6a4a28"/></g><g transform="translate(107.1,46.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#6a4a28"/></g><text x="150" y="40" class="simbolo">N · TERRA</text><text x="259" y="153" class="simbolo">E · ARIA</text><text x="150" y="272" class="simbolo">S · FUOCO</text><text x="41" y="153" class="simbolo">O · ACQUA</text></svg>
           <div class="scrigno-img"></div>
         </div>
       </div>
@@ -563,7 +598,7 @@
         <div class="sottotitolo" id="sottotitolo-utente">la bussola delle presenze</div>
 
         <div class="bussola-wrap">
-          <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" class="quadrante" aria-hidden="true"><defs><linearGradient id="betulla" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9d5ac"/><stop offset=".5" stop-color="#d9bf8c"/><stop offset="1" stop-color="#bfa170"/></linearGradient><radialGradient id="faccia"><stop offset="0" stop-color="#f0e0b8"/><stop offset=".75" stop-color="#e2cc9c"/><stop offset="1" stop-color="#cfae7a"/></radialGradient><radialGradient id="alito"><stop offset="0" stop-color="#3a6a8a" stop-opacity=".10"/><stop offset="1" stop-color="#3a6a8a" stop-opacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="141" fill="none" stroke="url(#betulla)" stroke-width="9"/><circle cx="150" cy="150" r="135.5" fill="none" stroke="#8a6a44" stroke-width="1"/><circle cx="150" cy="150" r="133" fill="none" stroke="#3a2a1a" stroke-width="3" stroke-dasharray="1.2 22.1" opacity="0.65"/><circle cx="150" cy="150" r="126.5" fill="url(#faccia)" stroke="#8a6a44" stroke-width="1.4"/><circle cx="150" cy="150" r="95" fill="url(#alito)"/><polygon points="150,58 154,146 150,242 146,146" fill="#241a10" stroke="#4a3620" stroke-width="0.8"/><polygon points="58,150 146,154 242,150 146,146" fill="#241a10" stroke="#4a3620" stroke-width="0.8"/><g transform="rotate(45 150 150)"><polygon points="150,94 152.5,146 150,206 147.5,146" fill="#3c2e1c" stroke="#4a3620" stroke-width="0.6"/><polygon points="94,150 146,152.5 206,150 146,147.5" fill="#3c2e1c" stroke="#4a3620" stroke-width="0.6"/></g><g transform="translate(192.9,46.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/></g><g transform="translate(253.5,107.1)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 A7 7 0 0 0 0 -5.5 Z" fill="#6a4a28"/></g><g transform="translate(253.5,192.9)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 Z" fill="#6a4a28"/></g><g transform="translate(192.9,253.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#3a2a1a"/></g><g transform="translate(107.1,253.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/></g><g transform="translate(46.5,192.9)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#3a2a1a"/></g><g transform="translate(46.5,107.1)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 Z" fill="#6a4a28"/></g><g transform="translate(107.1,46.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#6a4a28"/></g><text x="150" y="40" class="simbolo">TERRA</text><text x="259" y="153" class="simbolo">ARIA</text><text x="150" y="272" class="simbolo">FUOCO</text><text x="41" y="153" class="simbolo">ACQUA</text></svg>
+          <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" class="quadrante" aria-hidden="true"><defs><linearGradient id="betulla" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9d5ac"/><stop offset=".5" stop-color="#d9bf8c"/><stop offset="1" stop-color="#bfa170"/></linearGradient><radialGradient id="faccia"><stop offset="0" stop-color="#f0e0b8"/><stop offset=".75" stop-color="#e2cc9c"/><stop offset="1" stop-color="#cfae7a"/></radialGradient><radialGradient id="alito"><stop offset="0" stop-color="#3a6a8a" stop-opacity=".10"/><stop offset="1" stop-color="#3a6a8a" stop-opacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="141" fill="none" stroke="url(#betulla)" stroke-width="9"/><circle cx="150" cy="150" r="135.5" fill="none" stroke="#8a6a44" stroke-width="1"/><circle cx="150" cy="150" r="133" fill="none" stroke="#3a2a1a" stroke-width="3" stroke-dasharray="1.2 22.1" opacity="0.65"/><circle cx="150" cy="150" r="126.5" fill="url(#faccia)" stroke="#8a6a44" stroke-width="1.4"/><circle cx="150" cy="150" r="95" fill="url(#alito)"/><polygon points="150,58 154,146 150,242 146,146" fill="#241a10" stroke="#4a3620" stroke-width="0.8"/><polygon points="58,150 146,154 242,150 146,146" fill="#241a10" stroke="#4a3620" stroke-width="0.8"/><g transform="rotate(45 150 150)"><polygon points="150,94 152.5,146 150,206 147.5,146" fill="#3c2e1c" stroke="#4a3620" stroke-width="0.6"/><polygon points="94,150 146,152.5 206,150 146,147.5" fill="#3c2e1c" stroke="#4a3620" stroke-width="0.6"/></g><g transform="translate(192.9,46.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/></g><g transform="translate(253.5,107.1)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 A7 7 0 0 0 0 -5.5 Z" fill="#6a4a28"/></g><g transform="translate(253.5,192.9)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 Z" fill="#6a4a28"/></g><g transform="translate(192.9,253.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#3a2a1a"/></g><g transform="translate(107.1,253.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/></g><g transform="translate(46.5,192.9)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#3a2a1a"/></g><g transform="translate(46.5,107.1)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 Z" fill="#6a4a28"/></g><g transform="translate(107.1,46.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#6a4a28"/></g><text x="150" y="40" class="simbolo">N · TERRA</text><text x="259" y="153" class="simbolo">E · ARIA</text><text x="150" y="272" class="simbolo">S · FUOCO</text><text x="41" y="153" class="simbolo">O · ACQUA</text></svg>
           <div class="quadrante-img"></div>
           <div class="fiammella f1"></div>
           <div class="fiammella f2"></div>
@@ -572,7 +607,11 @@
           <div class="lancetta media" data-tipo="media"><div class="ago ago-media"></div><div class="gemma gemma-media"></div></div>
           <div class="lancetta grande" data-tipo="grande"><div class="ago ago-grande"></div><div class="gemma gemma-grande"></div></div>
           <div class="perno"></div>
+          <div class="porta"></div>
         </div>
+
+        <div class="caption-bussola" id="caption-bussola">tocca un ago per sapere chi punta</div>
+        <button class="btn-sveglia" id="btn-sveglia">🧭 Sveglia l'ago — la bussola vera</button>
 
         <div class="legenda">
           <div class="legenda-titolo">Le tre lancette</div>
@@ -637,7 +676,7 @@
       </div>
     </div>
 
-    <div class="pyxis-label">Pyxis · V8.6</div>
+    <div class="pyxis-label">Pyxis · V8.8</div>
   </div>
 </div>
 

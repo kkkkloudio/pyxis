@@ -1,11 +1,13 @@
-// Pyxis — Frontend V6.1: bussola viva ricalibrata — respiro lento, sforo unico, zero fretta.
-// (V6: molle e attrito) — gli aghi cercano, sforano,
-// si assestano, e da fermi tremano come in ascolto.
+// Pyxis — Frontend V8.8: la bussola sveglia — l'ago che indica davvero.
+// (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
-// + check-in "Il luogo è raggiunto" + collezione di stelle.
+// V8.8: sul telefono con i sensori, l'ago grande punta il luogo NEL MONDO REALE:
+// tieni lo schermo davanti e girati — quando l'ago entra nella PORTA (il triangolo
+// d'ottone in alto) stai guardando nella direzione del luogo da visitare.
+// Tocca un ago (o la sua riga in legenda) e lui si presenta; gli altri si abbassano.
 // PIETRA ANGOLARE: mai trattenere, salvare o trasmettere la posizione dell'utente.
-// Il GPS si legge SOLO al click sul bottone: la distanza si calcola sul telefono
-// e al server partono unicamente { utente_id, poi_id }. Mai coordinate in rete.
+// GPS e bussola interna si legano SOLO sul telefono: la rotta vera verso il luogo
+// si calcola qui e non parte mai. Al server arrivano solo { utente_id, poi_id }.
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -98,17 +100,15 @@ document.addEventListener('DOMContentLoaded', function () {
     caricaLancette();
   }
 
-  // ===== selezione lancette in legenda =====
-  document.querySelectorAll('.legenda-item').forEach(item => {
-    item.addEventListener('click', function () {
-      document.querySelectorAll('.legenda-item').forEach(i => i.classList.remove('sel'));
-      this.classList.add('sel');
-      const tipo = this.dataset.tipo;
-    document.querySelectorAll('.lancetta').forEach(l => l.style.opacity = '1');
-      const sel = document.querySelector('.lancetta.' + tipo);
-      if (sel) sel.style.opacity = '1';
-    });
+  // ===== V8.8 — tocca l'ago per sapere chi punta =====
+  document.querySelectorAll('.lancetta').forEach(l => {
+    l.addEventListener('click', () => selezionaAgo(l.dataset.tipo));
   });
+  document.querySelectorAll('.legenda-item').forEach(item => {
+    item.addEventListener('click', () => selezionaAgo(item.dataset.tipo));
+  });
+  const btnSveglia = document.getElementById('btn-sveglia');
+  if (btnSveglia) btnSveglia.addEventListener('click', svegliaAgo);
 
   // ===== il corvo =====
   document.getElementById('btn-lettera').addEventListener('click', apriScrittura);
@@ -143,28 +143,32 @@ async function caricaLancette() {
 }
 
 function aggiornaLancette(l, totale) {
-  const g = document.querySelector('.lancetta.grande');
-  const m = document.querySelector('.lancetta.media');
-  const p = document.querySelector('.lancetta.piccola');
   const itemG = document.querySelector('.legenda-item[data-tipo="grande"]');
   const itemM = document.querySelector('.legenda-item[data-tipo="media"]');
   const itemP = document.querySelector('.legenda-item[data-tipo="piccola"]');
   const btnLettera = document.getElementById('btn-lettera');
   const btnVisita = document.getElementById('btn-visita');
 
+  INFO_AGO.grande = null; INFO_AGO.media = null; INFO_AGO.piccola = null;
+
   // GRANDE: il luogo di potere (POI)
   if (l.grande) {
-    puntaLancetta('grande', l.grande.angolo); // la molla farà il resto: sforo e assesto
-    g.style.opacity = '1';
+    // Bussola sveglia e posizione nota (SOLO sul telefono): la rotta è VERA,
+    // da te al luogo. Altrimenti resta la rotta dal capoluogo, l'approssimazione del server.
+    let angolo = l.grande.angolo;
+    if (BVERA.pos && l.grande.lat != null && l.grande.lon != null) {
+      angolo = rottaVera(BVERA.pos.lat, BVERA.pos.lon, l.grande.lat, l.grande.lon);
+    }
+    puntaLancetta('grande', angolo); // la molla farà il resto: sforo e assesto
     itemG.style.display = '';
     itemG.querySelector('.nome').textContent = l.grande.nome;
     itemG.querySelector('.dett').textContent = l.grande.descrizione || ('luogo di potere · ' + l.grande.provincia);
     poiCorrente = { id: l.grande.id, nome: l.grande.nome, lat: l.grande.lat, lon: l.grande.lon };
+    INFO_AGO.grande = { nome: l.grande.nome };
     if (btnVisita) btnVisita.disabled = false;
   } else {
     // Nessun luogo di potere puntato: niente stella da raccogliere
     itemG.style.display = 'none';
-    g.style.opacity = '0.1';
     poiCorrente = null;
     spegniLancetta('grande'); // l'ago torna a cercare, e non trova
     if (btnVisita) btnVisita.disabled = true;
@@ -173,16 +177,15 @@ function aggiornaLancette(l, totale) {
   // MEDIA: l'anima più vicina (destinataria del corvo)
   if (l.media) {
     puntaLancetta('media', l.media.angolo);
-    m.style.opacity = '1';
     itemM.style.display = '';
     itemM.querySelector('.nome').textContent = l.media.nome;
     itemM.querySelector('.dett').textContent = 'anima più vicina';
     destinatario = { id: l.media.id, nome: l.media.nome };
+    INFO_AGO.media = { nome: l.media.nome };
     btnLettera.disabled = false;
   } else {
     // Nessuna anima vicina: lancetta spenta, corvo senza meta
     itemM.style.display = 'none';
-    m.style.opacity = '0.1';
     destinatario = null;
     spegniLancetta('media');
     btnLettera.disabled = true;
@@ -191,18 +194,68 @@ function aggiornaLancette(l, totale) {
   // PICCOLA: la seconda anima
   if (l.piccola) {
     puntaLancetta('piccola', l.piccola.angolo);
-    p.style.opacity = '1';
     itemP.style.display = '';
     itemP.querySelector('.nome').textContent = l.piccola.nome;
     itemP.querySelector('.dett').textContent = 'seconda anima';
+    INFO_AGO.piccola = { nome: l.piccola.nome };
   } else {
     itemP.style.display = 'none';
-    p.style.opacity = '0.1';
     spegniLancetta('piccola');
   }
 
+  aggiornaVisibilitaAghi();
+  aggiornaCaption();
+
   const nota = document.querySelector('#schermata-bussola .nota');
   if (nota) nota.textContent = totale + ' anime in ascolto · la posizione resta sul telefono · solo la bussola sa';
+}
+
+// ===== TOCCA L'AGO (V8.8): chi stai puntando? =====
+// Tocchi un ago (o la sua riga in legenda): lui si presenta nella didascalia,
+// gli altri due si abbassano. Lo tocchi ancora e tutto torna com'era.
+const INFO_AGO = { grande:null, media:null, piccola:null };
+let agoSelezionato = null;
+const COLORI_AGO = { grande:'#d98a6a', media:'#7cc9a2', piccola:'#8ab0e0' };
+const DETTI_AGO  = { grande:'il luogo di potere', media:'l\'anima più vicina', piccola:'la seconda anima' };
+
+function selezionaAgo(tipo) {
+  if (!tipo) return;
+  agoSelezionato = (agoSelezionato === tipo) ? null : tipo;
+  document.querySelectorAll('.legenda-item').forEach(i =>
+    i.classList.toggle('sel', i.dataset.tipo === agoSelezionato));
+  aggiornaVisibilitaAghi();
+  aggiornaCaption();
+}
+
+function aggiornaVisibilitaAghi() {
+  ['grande','media','piccola'].forEach(tipo => {
+    const el = document.querySelector('.lancetta.' + tipo);
+    if (!el) return;
+    const presente = VIVA.aghi[tipo] && VIVA.aghi[tipo].bersaglio != null;
+    if (agoSelezionato) el.style.opacity = (tipo === agoSelezionato) ? '1' : '0.12';
+    else el.style.opacity = presente ? '1' : '0.1';
+  });
+}
+
+function aggiornaCaption() {
+  const cap = document.getElementById('caption-bussola');
+  if (!cap) return;
+  if (!agoSelezionato) {
+    cap.style.color = '';
+    cap.textContent = BVERA.attiva
+      ? 'bussola sveglia: gli aghi puntano davvero — tocca un ago per sapere chi è'
+      : 'tocca un ago per sapere chi punta';
+    return;
+  }
+  cap.style.color = COLORI_AGO[agoSelezionato];
+  const info = INFO_AGO[agoSelezionato];
+  if (!info) {
+    cap.textContent = '→ quest\'ago sta ancora cercando: non punta nessuno, per ora';
+    return;
+  }
+  let testo = '→ ' + info.nome + ' · ' + DETTI_AGO[agoSelezionato];
+  if (agoSelezionato === 'grande' && BVERA.attiva) testo += ' — girati finché l\'ago entra nella porta';
+  cap.textContent = testo;
 }
 
 // ===== LA BUSSOLA VIVA: molle e attrito =====
@@ -221,6 +274,7 @@ function avviaBussolaViva() {
     if (!el) return;
     VIVA.aghi[tipo] = {
       el: el,
+      tipo: tipo,
       angolo: partenza[tipo],
       vel: 0,
       bersaglio: null,          // null: l'ago cerca e non trova
@@ -248,7 +302,16 @@ function loopBussolaViva(t) {
 }
 
 function stepAgo(A, dt, t) {
-  if (A.bersaglio == null) {
+  let bers = A.bersaglio;
+  const sveglia = BVERA.attiva && BVERA.heading != null && A.bersaglio != null;
+  if (sveglia) {
+    // BUSSOLA SVEGLIA: angolo nel mondo meno dove sei rivolto tu = dove sta l'ago
+    // sul quadrante. Strada più corta: mai il giro completo quando passi da 359 a 0.
+    bers = A.bersaglio - BVERA.heading;
+    while (bers - A.angolo > 180) bers -= 360;
+    while (bers - A.angolo < -180) bers += 360;
+  }
+  if (bers == null) {
     // nessun segnale: l'ago vaga piano, quasi addormentato
     if (t >= A.prossimoGiro) {
       A.deriva = Math.random() * 360 - 180;
@@ -262,7 +325,9 @@ function stepAgo(A, dt, t) {
       A.prossimoFiloperduto = t + 25000 + Math.random() * 35000;
     }
     A.perdeIlFilo *= Math.exp(-dt / 3.5); // il filo si ritrova piano
-    molla(A, A.bersaglio + A.perdeIlFilo, 7, 2.8, dt);
+    // l'ago del luogo, quando la bussola è sveglia, NON perde mai il filo: deve essere vero
+    const filo = (sveglia && A.tipo === 'grande') ? 0 : A.perdeIlFilo;
+    molla(A, bers + filo, 7, 2.8, dt);
   }
   // il tremito: un respiro di un grado, mai fermo del tutto
   const tremito = Math.sin(t / 1000 * A.freq * Math.PI * 2 + A.fase) * A.tremore;
@@ -291,6 +356,65 @@ function spegniLancetta(tipo) {
   const A = VIVA.aghi[tipo];
   if (!A) return;
   A.bersaglio = null; // niente segnale: si torna a cercare, e non trovare
+}
+
+// ===== LA BUSSOLA SVEGLIA (V8.8): l'ago che indica davvero =====
+// Il telefono ha una bussola magnetica e sa dove sei. ENTRAMBE le cose restano
+// sul telefono: qui si calcola l'angolo vero verso il luogo, e non parte mai
+// niente. Al server arrivano sempre e solo i luoghi pubblici.
+const BVERA = { attiva:false, heading:null, pos:null };
+
+function rottaVera(lat1, lon1, lat2, lon2) {
+  const rad = x => x * Math.PI / 180;
+  const y = Math.sin(rad(lon2 - lon1)) * Math.cos(rad(lat2));
+  const x = Math.cos(rad(lat1)) * Math.sin(rad(lat2)) -
+            Math.sin(rad(lat1)) * Math.cos(rad(lat2)) * Math.cos(rad(lon2 - lon1));
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+function leggiNord(e) {
+  // Safari/vecchi iPhone: webkitCompassHeading è già l'orientamento dal nord (senso orario)
+  if (typeof e.webkitCompassHeading === 'number' && !isNaN(e.webkitCompassHeading)) {
+    BVERA.heading = e.webkitCompassHeading;
+    return;
+  }
+  // Android assoluto: alpha conta in senso antiorario — si rigira
+  if (e.absolute && e.alpha != null) BVERA.heading = (360 - e.alpha) % 360;
+}
+
+async function svegliaAgo() {
+  const btn = document.getElementById('btn-sveglia');
+  if (!btn || BVERA.attiva) return;
+  try {
+    // iOS chiede il permesso dei sensori da un tocco esplicito
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const perm = await DeviceOrientationEvent.requestPermission();
+      if (perm !== 'granted') {
+        alert('Senza il permesso dei sensori l\'ago resta addormentato: la bussola si vedrà, ma punterà solo nel gioco.');
+        return;
+      }
+    }
+    window.addEventListener('deviceorientationabsolute', leggiNord, true);
+    window.addEventListener('deviceorientation', leggiNord, true);
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(function (pos) {
+        // La posizione vive SOLO qui: serve all'ago per la rotta vera, non parte mai.
+        BVERA.pos = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        if (poiCorrente && poiCorrente.lat != null && VIVA.aghi.grande) {
+          puntaLancetta('grande', rottaVera(BVERA.pos.lat, BVERA.pos.lon, poiCorrente.lat, poiCorrente.lon));
+        }
+      }, function () {
+        // niente GPS: l'ago userà la rotta dal capoluogo, resta comunque una bussola
+      }, { enableHighAccuracy: false, timeout: 30000, maximumAge: 15000 });
+    }
+    BVERA.attiva = true;
+    btn.classList.add('viva');
+    btn.textContent = '🧭 l\'ago è sveglio — girati finché il granato entra nella porta';
+    aggiornaCaption();
+  } catch (e) {
+    alert('Questo scrigno non ha l\'ago magnetico: ' + e.message);
+  }
 }
 
 // ===== IL CHECK-IN: "Il luogo è raggiunto" =====
