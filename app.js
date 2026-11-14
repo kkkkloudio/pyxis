@@ -22,6 +22,9 @@
 // riapre col bottone ❔. Cinque passi e l'anima sa camminare.
 // V8.17: LE LINGUE — 🇮🇹 IT / 🇬🇧 EN col bottone in fondo a destra: tutto il
 // giro di vista si traduce; gli avvisi (alert) restano in italiano per ora.
+// V8.19: LA BUSSOLA SI PRESENTA — l'ago che sogna lo dice ad alta voce (caption)
+// e il bottone sveglia chiama davvero: chi entra deve capire COSA manca per
+// puntare davvero. E la guida torna ad avanzare un passo alla volta.
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -73,6 +76,7 @@ const TESTI = {
     svegliaViva: "🧭 l'ago è sveglio — gira finché il granato entra nella porta, poi cammina",
     captionTocca: "tocca un ago per sapere chi punta",
     captionSveglia: "bussola sveglia: gli aghi puntano davvero — tocca un ago per sapere chi è",
+    captionSogna: "l'ago sta sognando il luogo — sveglialo con 🧭 qui sotto, e punterà davvero",
     dettoGrande: "il luogo di potere",
     dettoMedia: "l'anima più vicina",
     dettoPiccola: "la seconda anima",
@@ -130,6 +134,7 @@ const TESTI = {
     svegliaViva: "🧭 the needle is awake — turn until the garnet enters the door, then walk",
     captionTocca: "tap a needle to know who it points at",
     captionSveglia: "compass awake: the needles truly point — tap one to know who it is",
+    captionSogna: "the needle is dreaming of the place — wake it with 🧭 below, and it will truly point",
     dettoGrande: "the place of power",
     dettoMedia: "the nearest soul",
     dettoPiccola: "the second soul",
@@ -475,6 +480,12 @@ function aggiornaCaption() {
   const cap = document.getElementById('caption-bussola');
   if (!cap) return;
   if (!agoSelezionato) {
+    // V8.19: sul telefono l'ago che sogna lo DICE — il bottone sveglia non si può mancare
+    if (!BVERA.attiva && window.matchMedia && window.matchMedia('(pointer:coarse)').matches) {
+      cap.style.color = '#e8cd85';
+      cap.textContent = t('captionSogna');
+      return;
+    }
     cap.style.color = '';
     cap.textContent = BVERA.attiva ? t('captionSveglia') : t('captionTocca');
     return;
@@ -994,7 +1005,9 @@ const GUIDA_STEP_EN = [
 function GUIDA_STEP() { return LINGUA.corrente === 'en' ? GUIDA_STEP_EN : GUIDA_STEP_IT; }
 
 function avantiGuida() {
-  if (guidaIndice < GUIDA_STEP.length - 1) {
+  // V8.19: bug della guida — GUIDA_STEP è una funzione da V8.17: .length era 0
+  // e la guida si chiudeva al primo "Avanti", senza mai mostrare i passi 2-5.
+  if (guidaIndice < GUIDA_STEP().length - 1) {
     guidaIndice++;
     disegnaGuida();
   } else {
