@@ -90,11 +90,21 @@
      restano in proporzione qualunque sia la sua taglia */
   .bussola-wrap {
     position:relative;
-    --k:1.05; /* vetrina desktop */
+    --k:1.12; /* vetrina desktop — V8.16: la bussola comanda */
     width:calc(300px * var(--k));
     height:calc(300px * var(--k));
-    filter:drop-shadow(0 0 16px rgba(184,150,62,.14));
+    animation: alito-bussola 5s ease-in-out infinite;
   }
+  /* V8.16 — l'alito d'oro: la bussola respira luce, il resto fa cornice */
+  .bussola-wrap::before {
+    content:''; position:absolute; inset:-12%; border-radius:50%; z-index:-1;
+    background:radial-gradient(circle, rgba(184,150,62,.16), transparent 66%);
+  }
+  @keyframes alito-bussola {
+    0%,100% { filter:drop-shadow(0 0 20px rgba(184,150,62,.18)) drop-shadow(0 0 46px rgba(184,150,62,.08)); }
+    50%     { filter:drop-shadow(0 0 30px rgba(184,150,62,.30)) drop-shadow(0 0 64px rgba(184,150,62,.13)); }
+  }
+  @media (prefers-reduced-motion: reduce) { .bussola-wrap { animation:none; } }
   .quadrante { position:absolute; inset:0; width:100%; height:100%; }
   .quadrante-img {
     position:absolute; inset:0; border-radius:50%;
@@ -551,17 +561,17 @@
     .phone { width:100%; height:100%; border-radius:0; background:transparent; box-shadow:none; }
     .phone::before { display:none; }
     .screen { inset:0; border-radius:0; }
-    .bussola-wrap { --k:1.14; } /* la bussola si prende lo spazio che le spetta */
-    .titolo { font-size:20px; letter-spacing:6px; }
-    .content { padding:40px 16px 16px; }
+    .bussola-wrap { --k:1.30; } /* V8.16: la bussola è la protagonista, il resto fa cornice */
+    .titolo { font-size:18px; letter-spacing:5px; }
+    .content { padding:36px 14px 16px; }
     .scrigno { width:240px; height:240px; margin:-120px 0 0 -120px; }
     .apertura-scritte { top:calc(44% + 148px); }
   }
   /* telefoni più generosi: la bussola respira ancora di più */
-  @media (max-width:600px) and (min-width:420px) { .bussola-wrap { --k:1.25; } }
+  @media (max-width:600px) and (min-width:420px) { .bussola-wrap { --k:1.42; } }
   /* telefonini più piccoli: la bussola si stringe senza perdere la sua parte */
-  @media (max-width:600px) and (max-width:380px) and (min-width:341px) { .bussola-wrap { --k:1.04; } }
-  @media (max-width:340px) { .bussola-wrap { --k:0.9; } }
+  @media (max-width:600px) and (max-width:380px) and (min-width:341px) { .bussola-wrap { --k:1.16; } }
+  @media (max-width:340px) { .bussola-wrap { --k:0.98; } }
 </style>
 </head>
 <body>
@@ -731,7 +741,7 @@
       </div>
     </div>
 
-    <div class="pyxis-label">Pyxis · V8.15</div>
+    <div class="pyxis-label">Pyxis · V8.16</div>
   </div>
 </div>
 
