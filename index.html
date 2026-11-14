@@ -85,9 +85,14 @@
   }
 
   /* ===== IL QUADRANTE ===== */
+  /* V8.5 — la bussola è la protagonista: il disegno resta pensato a 300px e tutto
+     ciò che vive dentro il quadrante scala con --k, così aghi, gemme e perno
+     restano in proporzione qualunque sia la sua taglia */
   .bussola-wrap {
     position:relative;
-    width:300px; height:300px;
+    --k:1.05; /* vetrina desktop */
+    width:calc(300px * var(--k));
+    height:calc(300px * var(--k));
     filter:drop-shadow(0 0 16px rgba(184,150,62,.14));
   }
   .quadrante { position:absolute; inset:0; width:100%; height:100%; }
@@ -110,7 +115,7 @@
     fill:#d9b96a; text-anchor:middle; opacity:.9;
   }
   .fiammella {
-    position:absolute; width:5px; height:9px; pointer-events:none; opacity:.75;
+    position:absolute; width:calc(var(--k) * 5px); height:calc(var(--k) * 9px); pointer-events:none; opacity:.75;
     background:radial-gradient(circle at 50% 70%, #ffd98a, #d9b96a 60%, transparent 75%);
     border-radius:50% 50% 45% 45% / 70% 70% 30% 30%;
     animation: tremolio 2.4s ease-in-out infinite;
@@ -131,19 +136,19 @@
   .lancetta.piccola{ transform:rotate(160deg); z-index:7; }
   .ago { position:absolute; bottom:-1px; border-radius:2px; }
   .ago-grande {
-    left:-4px; width:8px; height:118px;
+    left:calc(var(--k) * -4px); width:calc(var(--k) * 8px); height:calc(var(--k) * 118px);
     background:linear-gradient(to top,#100b06 0%,#2c2014 55%,#4a3a22 100%);
     clip-path:polygon(50% 0,92% 8%,80% 82%,50% 100%,20% 82%,8% 8%);
     filter:drop-shadow(0 0 2px rgba(0,0,0,.95));
   }
   .ago-media {
-    left:-3px; width:6px; height:94px; opacity:.92;
+    left:calc(var(--k) * -3px); width:calc(var(--k) * 6px); height:calc(var(--k) * 94px); opacity:.92;
     background:linear-gradient(to top,#0e0a06 0%,#241a10 55%,#3c2f1c 100%);
     clip-path:polygon(50% 0,90% 9%,78% 84%,50% 100%,22% 84%,10% 9%);
     filter:drop-shadow(0 0 2px rgba(0,0,0,.9));
   }
   .ago-piccola {
-    left:-3px; width:6px; height:72px;
+    left:calc(var(--k) * -3px); width:calc(var(--k) * 6px); height:calc(var(--k) * 72px);
     background:linear-gradient(to top,#0e0a06 0%,#241a10 55%,#3c2f1c 100%);
     clip-path:polygon(50% 0,90% 9%,78% 84%,50% 100%,22% 84%,10% 9%);
     filter:drop-shadow(0 0 2px rgba(0,0,0,.9));
@@ -155,23 +160,23 @@
     z-index:2;
   }
   .gemma-grande {
-    left:-6px; bottom:112px; width:13px; height:13px;
+    left:calc(var(--k) * -6px); bottom:calc(var(--k) * 112px); width:calc(var(--k) * 13px); height:calc(var(--k) * 13px);
     background:radial-gradient(circle at 35% 30%, #ff9a8a, #c22f45 55%, #6e1024 100%);
     box-shadow:0 0 9px rgba(226,60,84,.8), inset 0 -1px 2px rgba(0,0,0,.4);
   }
   .gemma-media {
-    left:-5px; bottom:88px; width:11px; height:11px;
+    left:calc(var(--k) * -5px); bottom:calc(var(--k) * 88px); width:calc(var(--k) * 11px); height:calc(var(--k) * 11px);
     background:radial-gradient(circle at 35% 30%, #9fe8c0, #2e9e6b 55%, #12432a 100%);
     box-shadow:0 0 8px rgba(46,158,107,.75), inset 0 -1px 2px rgba(0,0,0,.4);
   }
   .gemma-piccola {
-    left:-5px; bottom:66px; width:11px; height:11px;
+    left:calc(var(--k) * -5px); bottom:calc(var(--k) * 66px); width:calc(var(--k) * 11px); height:calc(var(--k) * 11px);
     background:radial-gradient(circle at 35% 30%, #a8cdf2, #3f7fd9 55%, #16305e 100%);
     box-shadow:0 0 8px rgba(63,127,217,.75), inset 0 -1px 2px rgba(0,0,0,.4);
   }
   .perno {
     position:absolute; top:50%; left:50%;
-    width:22px; height:22px; margin:-11px 0 0 -11px;
+    width:calc(var(--k) * 22px); height:calc(var(--k) * 22px); margin:calc(var(--k) * -11px) 0 0 calc(var(--k) * -11px);
     background:radial-gradient(circle at 35% 30%, #fff2c8, #b8963e);
     border:2px solid #2a1c08; border-radius:50%;
     box-shadow:0 2px 8px rgba(0,0,0,.6);
@@ -492,12 +497,17 @@
     .phone { width:100%; height:100%; border-radius:0; background:transparent; box-shadow:none; }
     .phone::before { display:none; }
     .screen { inset:0; border-radius:0; }
-    .bussola-wrap { width:min(280px,76vw); height:min(280px,76vw); }
+    .bussola-wrap { --k:1.14; } /* la bussola si prende lo spazio che le spetta */
     .titolo { font-size:20px; letter-spacing:6px; }
     .content { padding:40px 16px 16px; }
     .scrigno { width:240px; height:240px; margin:-120px 0 0 -120px; }
     .apertura-scritte { top:calc(44% + 148px); }
   }
+  /* telefoni più generosi: la bussola respira ancora di più */
+  @media (max-width:600px) and (min-width:420px) { .bussola-wrap { --k:1.25; } }
+  /* telefonini più piccoli: la bussola si stringe senza perdere la sua parte */
+  @media (max-width:600px) and (max-width:380px) and (min-width:341px) { .bussola-wrap { --k:1.04; } }
+  @media (max-width:340px) { .bussola-wrap { --k:0.9; } }
 </style>
 </head>
 <body>
@@ -627,7 +637,7 @@
       </div>
     </div>
 
-    <div class="pyxis-label">Pyxis · V8.4</div>
+    <div class="pyxis-label">Pyxis · V8.5</div>
   </div>
 </div>
 
