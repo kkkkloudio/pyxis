@@ -24,7 +24,7 @@ const PROVINCE = [
 ];
 
 const API = (location.hostname === 'kkkkloudio.github.io' || location.hostname.endsWith('github.io'))
-  ? 'https://pyxis.tail971635.ts.net'  // backend via Tailscale serve sul mini PC (hostname pyxis)
+  ? 'https://pyxis-1.tail971635.ts.net'  // backend via Tailscale serve sul mini PC (hostname definitivo: pyxis-1)
   : '';                          // in locale (localhost) usa stesso origin
 
 const RAGGIO_M = 500; // quanto vicino devi essere al luogo di potere perché la stella si posi
