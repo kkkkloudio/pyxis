@@ -15,6 +15,11 @@
 //        (capoluoghi e POI), mai tra persone. Anime: le più vicine ovunque,
 //        misurate tra capoluoghi. Stessa provincia = nessuna rotta possibile:
 //        angolo d'albergo, dolce e fisso per coppia.
+// - V8.7: presenze vere (Opzione A) — una presenza conta solo se il suo
+//        cuore batte da meno di 5 minuti. Nessuna anima "appesa" resta nella
+//        legenda: tab chiusa male, telefono morto o riavvio del server non
+//        lasciano più fantasmi. Se nessuno è davvero online, media e piccola
+//        restano spente (il client le lascia vagare, come da canone VIVA).
 
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
@@ -161,6 +166,27 @@ function readBody(req) {
   });
 }
 
+// ============ PRESENZE VERE (V8.7 — Opzione A) ============
+// Una presenza conta solo se il suo cuore batte da meno di 5 minuti.
+// online_da è una stringa ISO UTC prodotta da new Date().toISOString()
+// (es. 2026-11-14T15:57:19.945Z): la soglia va confrontata per ORDINE
+// LESSICOGRAFICO (stesso formato → ordinamento corretto), NON con
+// datetime('now') di SQLite, che genererebbe un formato diverso.
+const TTL_PRESENZE_MS = 5 * 60 * 1000;
+
+function sogliaPresenze() {
+  return new Date(Date.now() - TTL_PRESENZE_MS).toISOString();
+}
+
+// Butta via le anime appese: tab chiusa male, telefono morto, riavvio del server.
+function spazzaPresenze() {
+  db.prepare('DELETE FROM presenze WHERE online_da < ?').run(sogliaPresenze());
+}
+
+// Spazzata all'avvio (ripulisce i fantasmi del passato) e poi ogni minuto.
+spazzaPresenze();
+setInterval(spazzaPresenze, 60 * 1000);
+
 // ============ SSE (real-time) ============
 const clients = new Set(); // { res, provincia }
 
@@ -271,13 +297,16 @@ const server = http.createServer(async (req, res) => {
     const mioId = url.searchParams.get('id');
     if (!provincia) return json(res, 400, { error: 'provincia mancante' });
 
+    // Solo presenze vive: battito negli ultimi 5 minuti (Opzione A — nessun dato inventato)
+    const viva = sogliaPresenze();
+
     // Altri utenti online nella stessa provincia (escluso me)
     const altri = db.prepare(`
       SELECT u.id, u.nome, u.tipo FROM utenti u
       JOIN presenze p ON u.id = p.utente_id
-      WHERE u.provincia = ? AND u.id != ?
+      WHERE u.provincia = ? AND u.id != ? AND p.online_da >= ?
       ORDER BY p.online_da ASC
-    `).all(provincia, mioId || '');
+    `).all(provincia, mioId || '', viva);
 
     // Il luogo di potere della provincia: quello messo in evidenza, altrimenti
     // il primo in ordine stabile. lat/lon servono al TELEFONO per il confronto
@@ -296,9 +325,9 @@ const server = http.createServer(async (req, res) => {
     const anime = db.prepare(`
       SELECT u.id, u.nome, u.tipo, u.provincia, p.online_da FROM utenti u
       JOIN presenze p ON u.id = p.utente_id
-      WHERE u.id != ?
+      WHERE u.id != ? AND p.online_da >= ?
       ORDER BY p.online_da ASC
-    `).all(mioId || '');
+    `).all(mioId || '', viva);
     const conDistanza = anime.map(a => ({
       ...a,
       _d: distanzaTraRif(mioRif, RIF_PROVINCIA[a.provincia] || null)
@@ -393,9 +422,14 @@ const server = http.createServer(async (req, res) => {
     const client = { res, provincia };
     clients.add(client);
 
-    // Heartbeat ogni 25s
+    // Heartbeat ogni 25s: tiene vivo lo stream E batte il cuore della presenza
+    // (senza questo rintocco, una sessione lunga morirebbe di TTL a 5 minuti)
     const hb = setInterval(() => {
-      try { res.write(`: ping\n\n`); } catch (e) { clearInterval(hb); clients.delete(client); }
+      try {
+        res.write(`: ping\n\n`);
+        if (mioId) db.prepare('INSERT OR REPLACE INTO presenze (utente_id, provincia, online_da) VALUES (?, ?, ?)')
+          .run(mioId, provincia, new Date().toISOString());
+      } catch (e) { clearInterval(hb); clients.delete(client); }
     }, 25000);
 
     // Registra presenza se id dato
@@ -430,7 +464,7 @@ const server = http.createServer(async (req, res) => {
   fs.readFile(filePath, (err, data) => {
     if (err) { res.writeHead(404, {'Access-Control-Allow-Origin':'*'}); return res.end('Not found'); }
     const ext = pathMod.extname(filePath);
-    const mime = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.json':'application/json', '.png':'image/png', '.jpg':'image/jpeg', '.css':'text/css', '.svg':'image/svg+xml' }[ext] || 'application/octet-stream';
+    const mime = { '.html':'text/html; charset=utf-8', '.js':'text/javascript', '.json':'application/json', '.png':'image/png', '.jpg':'image/jpeg', '.css':'text/css', '.svg':'image/svg+xml' }[ext] || 'application/octet-stream';
     res.writeHead(200, { 'Content-Type': mime, 'Access-Control-Allow-Origin': '*' });
     res.end(data);
   });
