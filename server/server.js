@@ -5,6 +5,7 @@
 //        POST /api/lettera (il corvo), GET /api/lettere (la posta)
 //        POST /api/checkin (le stelle), GET /api/collezione
 //        GET /api/poi, GET /api/utenti (debug)
+// - V8.13: LA PIAZZA — le voci di tutte le anime: POST /api/voce, GET /api/voci
 // - V5: lancette flip — grande=luogo di potere (POI), media=prima anima, piccola=seconda anima
 // - V5: check-in — PIETRA ANGOLARE: mai trattenere, salvare o trasmettere la
 //        posizione dell'utente. Il confronto GPS avviene SOLO sul telefono:
@@ -80,6 +81,14 @@ db.exec(`
     PRIMARY KEY (utente_id, poi_id),
     FOREIGN KEY(utente_id) REFERENCES utenti(id),
     FOREIGN KEY(poi_id) REFERENCES poi(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS voci (
+    id TEXT PRIMARY KEY,
+    utente_id TEXT NOT NULL,
+    nome TEXT NOT NULL,
+    testo TEXT NOT NULL,
+    creata_il TEXT NOT NULL
   );
 `);
 
@@ -351,6 +360,14 @@ function broadcast(provincia, event, data) {
   }
 }
 
+// V8.13 — LA PIAZZA: il cerchio delle voci è di TUTTE le province, non di una sola
+function broadcastTutti(event, data) {
+  const msg = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  for (const c of clients) {
+    try { c.res.write(msg); } catch (e) { clients.delete(c); }
+  }
+}
+
 // ============ API ============
 const server = http.createServer(async (req, res) => {
   // CORS su TUTTE le risposte (anche errori e SSE) — prima di tutto
@@ -440,6 +457,42 @@ const server = http.createServer(async (req, res) => {
     const inArrivo = db.prepare('SELECT id, mittente_nome, testo, creata_il, letta FROM lettere WHERE destinatario_id = ? ORDER BY creata_il DESC').all(mioId);
     db.prepare('UPDATE lettere SET letta = 1 WHERE destinatario_id = ?').run(mioId);
     return json(res, 200, { lettere: inArrivo });
+  }
+
+  // ---- POST /api/voce ---- (LA PIAZZA: un pensiero lasciato nel cerchio, per tutte le anime)
+  if (path === '/api/voce' && req.method === 'POST') {
+    try {
+      const body = await readBody(req);
+      const { utente_id, testo } = body;
+      if (!utente_id) return json(res, 400, { error: 'Anima mancante' });
+      if (!testo || !testo.trim()) return json(res, 400, { error: 'La voce è vuota' });
+      if (testo.trim().length > 280) return json(res, 400, { error: 'La voce è troppo lunga (max 280 caratteri)' });
+
+      const u = db.prepare('SELECT nome FROM utenti WHERE id = ?').get(utente_id);
+      if (!u) return json(res, 404, { error: 'Anima sconosciuta' });
+
+      // la piazza respira: un pensiero al minuto per anima, niente tempeste
+      const ultima = db.prepare('SELECT creata_il FROM voci WHERE utente_id = ? ORDER BY creata_il DESC LIMIT 1').get(utente_id);
+      if (ultima && (Date.now() - new Date(ultima.creata_il).getTime()) < 60000) {
+        return json(res, 429, { error: 'La piazza respira: un pensiero ogni minuto' });
+      }
+
+      const id = crypto.randomUUID();
+      const now = new Date().toISOString();
+      db.prepare('INSERT INTO voci (id, utente_id, nome, testo, creata_il) VALUES (?, ?, ?, ?, ?)')
+        .run(id, utente_id, u.nome, testo.trim(), now);
+
+      broadcastTutti('voce', { da: u.nome, testo: testo.trim() });
+      return json(res, 201, { ok: true });
+    } catch (e) {
+      return json(res, 500, { error: e.message });
+    }
+  }
+
+  // ---- GET /api/voci ---- (LA PIAZZA: le ultime 30 voci, di tutte le province)
+  if (path === '/api/voci' && req.method === 'GET') {
+    const voci = db.prepare('SELECT nome, testo, creata_il FROM voci ORDER BY creata_il DESC LIMIT 30').all();
+    return json(res, 200, { voci });
   }
 
   // ---- GET /api/lancette?provincia=X&id=TUO ----
