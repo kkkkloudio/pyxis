@@ -135,7 +135,7 @@
   .fiammella.f3 { top:42%; right:2%; animation-delay:1.8s; }
   @keyframes tremolio { 0%,100% { opacity:.3; transform:scale(.9); } 50% { opacity:.85; transform:scale(1.05); } }
 
-  /* ===== LE LANCETTE — ETÀ DEL LEGNO: aghi di legno scuro, punta bruciata, perlin d'argilla ===== */
+  /* ===== LE LANCETTE — V8.18: ogni ago veste il colore della sua casella (granato/smeraldo/zaffiro) ===== */
   .lancetta {
     position:absolute; bottom:50%; left:50%; width:0; height:0;
     transform-origin:50% 100%;
@@ -156,21 +156,21 @@
   .gemma { pointer-events:none; }
   .ago-grande {
     left:calc(var(--k) * -4px); width:calc(var(--k) * 8px); height:calc(var(--k) * 118px);
-    background:linear-gradient(to top,#4a3320 0%,#33220f 55%,#160c04 100%);
+    background:linear-gradient(to top,#6e1024 0%,#c22f45 70%,#ff9a8a 100%);
     clip-path:polygon(50% 0,92% 8%,80% 82%,50% 100%,20% 82%,8% 8%);
-    filter:drop-shadow(0 0 2px rgba(0,0,0,.95));
+    filter:drop-shadow(0 0 2px rgba(0,0,0,.95)) drop-shadow(0 0 4px rgba(194,47,69,.4));
   }
   .ago-media {
     left:calc(var(--k) * -3px); width:calc(var(--k) * 6px); height:calc(var(--k) * 94px); opacity:.92;
-    background:linear-gradient(to top,#3c2817 0%,#2a1c0e 55%,#150c04 100%);
+    background:linear-gradient(to top,#12432a 0%,#2e9e6b 70%,#9fe8c0 100%);
     clip-path:polygon(50% 0,90% 9%,78% 84%,50% 100%,22% 84%,10% 9%);
-    filter:drop-shadow(0 0 2px rgba(0,0,0,.9));
+    filter:drop-shadow(0 0 2px rgba(0,0,0,.9)) drop-shadow(0 0 4px rgba(46,158,107,.35));
   }
   .ago-piccola {
     left:calc(var(--k) * -3px); width:calc(var(--k) * 6px); height:calc(var(--k) * 72px);
-    background:linear-gradient(to top,#3c2817 0%,#2a1c0e 55%,#150c04 100%);
+    background:linear-gradient(to top,#16305e 0%,#3f7fd9 70%,#a8cdf2 100%);
     clip-path:polygon(50% 0,90% 9%,78% 84%,50% 100%,22% 84%,10% 9%);
-    filter:drop-shadow(0 0 2px rgba(0,0,0,.9));
+    filter:drop-shadow(0 0 2px rgba(0,0,0,.9)) drop-shadow(0 0 4px rgba(63,127,217,.35));
   }
   /* perlin d'argilla in punta: granato (luogo di potere), smeraldo (anima vicina), zaffiro (seconda anima) */
   .gemma {
@@ -752,7 +752,7 @@
 
     <button class="btn-lingua" id="btn-lingua">🇮🇹 IT</button>
 
-    <div class="pyxis-label">Pyxis · V8.17</div>
+    <div class="pyxis-label">Pyxis · V8.18</div>
   </div>
 </div>
 
