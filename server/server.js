@@ -27,6 +27,8 @@
 //        INSERT OR IGNORE un id nuovo creerebbe una riga doppia nel DB.
 // - V8.10: le porte d'Italia — RIF_PROVINCIA copre tutte le 107 province:
 //        le anime vicine puntano con la rotta vera da qualunque capoluogo.
+// - V8.11: le stanze del Nord, prima ondata — 14 nuovi POI (Trentino,
+//        Friuli-Venezia Giulia, Valle d'Aosta): 29 luoghi in tutto.
 
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
@@ -87,7 +89,8 @@ if (!colonnePoi.includes('lat')) db.exec('ALTER TABLE poi ADD COLUMN lat REAL');
 if (!colonnePoi.includes('lon')) db.exec('ALTER TABLE poi ADD COLUMN lon REAL');
 if (!colonnePoi.includes('evidenza')) db.exec('ALTER TABLE poi ADD COLUMN evidenza INTEGER NOT NULL DEFAULT 0');
 
-// POI reali del Veneto (luoghi di potere/naturali con leggenda) — si espandono provincia per provincia.
+// POI reali d'Italia (luoghi di potere/naturali con leggenda) — Veneto completo,
+// + prima ondata del Nord (Trentino, Friuli, Valle d'Aosta). Si espande regione per regione.
 // Coordinate approssimative dei LUOGHI (dati pubblici): da rifinire a mano quando serve precisione.
 const poiSeed = [
   ['poi-vi-covoli', 'Covoli di Valstagna', 'Vicenza', 'Grotte con pitture rupestri del Paleolitico, antico luogo di potere della Valbrenta', 45.9100, 11.7520, null],
@@ -105,6 +108,20 @@ const poiSeed = [
   ['poi-tv-follina', 'Abbazia di Follina', 'Treviso', 'L\'abbazia cistercense nascosta in fondo alla valle: acqua che cade, silenzio dei monaci, tempo misurato a preghiere e non a ore', 45.9549, 12.1244, null],
   ['poi-bl-santacroce', 'Lago di Santa Croce', 'Belluno', 'Il lago del drago: la leggenda popola le acque profonde di un mostro, e nelle notti di tempesta dalla superficie salgono campane', 46.0511, 12.3556, null],
   ['poi-pd-ragione', 'Palazzo della Ragione', 'Padova', 'Il Salone con il cielo dipinto: stelle e pianeti affrescati secondo la scienza di Pietro d\'Abano, l\'astrologo di Padova processato dall\'Inquisizione', 45.4075, 11.8754, null],
+  ['poi-tn-tovel', 'Lago di Tovel', 'Trento', 'Il lago rosso: fino al 1964 le sue acque si tingevano di sangue ogni estate. La leggenda dice principessa, il lago non ha mai smentito', 46.346, 10.965, null],
+  ['poi-tn-pergine', 'Castello di Pergine', 'Trento', 'Il castello della Dama Bianca: la signora senza pace vaga ancora tra le mura, e le persiane si aprono da sole', 46.067, 11.149, null],
+  ['poi-bz-laurino', 'Catinaccio del Re Laurino', 'Bolzano', 'Il giardino di rose del re dei nani: pietra di giorno, ma al tramonto le pareti bruciano di rosa — l\'enrosadira, la vendetta di Laurino', 46.480, 11.683, null],
+  ['poi-bz-carezza', 'Lago di Carezza', 'Bolzano', 'Il lago dell\'arcobaleno: i colori restano imprigionati nell\'acqua dal giorno in cui un mago intrecciò l\'iride per una fanciulla', 46.408, 11.689, null],
+  ['poi-ao-cromlech', 'Cromlech di Aosta', 'Aosta', 'Il santuario megalitico ai piedi delle montagne: pietre e steli allineate al cielo, seimila anni di riti che nessuno ricorda', 45.731, 7.328, null],
+  ['poi-ao-sanbernardo', 'Colle del Piccolo San Bernardo', 'Aosta', 'Il colle del tempio di Giove: la strada romana sale tra i cippi, e la pietra dei morti conta i passi dei pellegrini', 45.866, 6.950, null],
+  ['poi-ud-lussari', 'Monte Lussari', 'Udine', 'La montagna dell\'angelo: un pastore trovò qui la statua della Madonna, e da allora tre popoli salgono insieme allo stesso santuario', 46.462, 13.575, null],
+  ['poi-ud-aquileia', 'Basilica di Aquileia', 'Udine', 'La capitale sepolta: il grande porto romano è affondato nei campi, e sotto la basilica il tempo si è fermato ai mosaici', 45.771, 13.368, null],
+  ['poi-pn-polcenigo', 'Castello di Polcenigo', 'Pordenone', 'Il castello dei fantasmi: tra le mura vive una presenza che non ha mai trovato pace, e la gente del posto evita la collina di notte', 46.013, 12.532, null],
+  ['poi-pn-maniago', 'Castello di Maniago', 'Pordenone', 'Il castello che guarda tutta la valle: qui si forgiano le lame da secoli, e la montagna tiene il conto dei martelli', 46.167, 12.583, null],
+  ['poi-go-doberdo', 'Lago di Doberdò', 'Gorizia', 'Il lago che appare e scompare: il carsico lo svuota e lo riempie a suo piacere, e nessuno sa dov\'è l\'acqua quando non c\'è', 45.777, 13.573, null],
+  ['poi-go-barbana', 'Isola di Barbana', 'Gorizia', 'L\'isola del voto: un santuario in mezzo alla laguna di Grado, otto secoli di promesse mantenute e di barche all\'alba', 45.674, 13.423, null],
+  ['poi-ts-grotta', 'Grotta Gigante', 'Trieste', 'La caverna che misura il cielo: dentro, pendoli appesi al buio studiano la gravità in una cattedrale di pietra', 45.706, 13.861, null],
+  ['poi-ts-miramare', 'Castello di Miramare', 'Trieste', 'Il castello della maledizione: Massimiliano lo lasciò per il Messico e non tornò. Chi ci ha dormito dopo non è mai finito bene', 45.704, 13.711, null],
 ];
 const insPoi = db.prepare('INSERT OR IGNORE INTO poi (id, nome, provincia, descrizione, lat, lon, creato_da, creato_il) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
 const updPoi = db.prepare('UPDATE poi SET lat = ?, lon = ? WHERE id = ? AND (lat IS NULL OR lon IS NULL)');
