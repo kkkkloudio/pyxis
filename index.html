@@ -572,6 +572,22 @@
     to   { opacity:1; transform:translate(-50%,0); }
   }
 
+  /* ===== V8.21 — IL CUSTODE DEL LUOGO ===== */
+  .custode-fuoco {
+    text-align:center; font-size:30px; margin-bottom:6px;
+    filter:drop-shadow(0 0 14px rgba(232,205,133,.5));
+    animation: alito-custode 3.2s ease-in-out infinite;
+  }
+  @keyframes alito-custode { 0%,100% { opacity:.7; } 50% { opacity:1; } }
+  @media (prefers-reduced-motion: reduce) { .custode-fuoco { animation:none; } }
+  .custode-racconto {
+    font-family:'IM Fell English', serif; font-style:italic;
+    font-size:15px; color:#221a10; line-height:1.55;
+    overflow-y:auto; margin-bottom:14px; min-height:110px;
+  }
+  #modale-custode .modale-box { animation: srotola .8s ease both; }
+  #modale-custode .modale-box h3 { color:#5c1414; }
+
   /* ===== SUL TELEFONO VERO ===== */
   @media (max-width:600px) {
     body { padding:0; }
@@ -758,9 +774,19 @@
       </div>
     </div>
 
+    <div class="modale nascosto" id="modale-custode">
+      <div class="modale-box">
+        <div class="custode-fuoco">🕯️</div>
+        <h3 id="custode-nome">…</h3>
+        <div class="sub" id="custode-luogo">il custode del luogo</div>
+        <div class="custode-racconto" id="custode-racconto"></div>
+        <button class="btn-modale" id="btn-custode-via">Ricevi la parola</button>
+      </div>
+    </div>
+
     <button class="btn-lingua" id="btn-lingua">🇮🇹 IT</button>
 
-    <div class="pyxis-label">Pyxis · V8.20</div>
+    <div class="pyxis-label">Pyxis · V8.21</div>
   </div>
 </div>
 
