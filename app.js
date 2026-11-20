@@ -354,6 +354,8 @@ document.addEventListener('DOMContentLoaded', function () {
     chiudiModale('modale-guida');
   });
   document.getElementById('btn-lingua').addEventListener('click', cambiaLingua);
+  // V8.21 — il custode congeda l'anima quando la parola è ricevuta
+  document.getElementById('btn-custode-via').addEventListener('click', () => chiudiModale('modale-custode'));
 });
 
 function mostraBussola() {
@@ -754,7 +756,7 @@ function checkIn() {
         btn.textContent = etichetta;
         if (!data.ok) { alert(data.error || 'Il luogo non ha accolto la firma.'); return; }
         if (data.gia_visitato) { alert('Avevi già lasciato la tua stella qui.'); return; }
-        mostraStella(data.nome, data.stelle);
+        mostraStella(data.nome, data.stelle, data.custode);
       })
       .catch(e => {
         btn.disabled = false;
@@ -768,13 +770,32 @@ function checkIn() {
   }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 15000 });
 }
 
-function mostraStella(nomePoi, stelle) {
+function mostraStella(nomePoi, stelle, custode) {
   const toast = document.createElement('div');
   toast.className = 'toast-corvo';
   toast.textContent = '⭐ Una stella si è posata: ' + nomePoi + ' — ' + stelle + (stelle === 1 ? ' stella in collezione' : ' stelle in collezione');
   document.querySelector('.screen').appendChild(toast);
   setTimeout(() => toast.classList.add('spegni'), 6000);
   setTimeout(() => toast.remove(), 6600);
+  // V8.21 — IL CUSTODE: se il luogo è profondo, lo spirito del posto
+  // aspetta che la stella sia posata, poi si presenta. Nessuna fretta: prima la
+  // stella, poi la voce. Chi torna (gia_visitato) non lo risente, giusto così.
+  if (custode && custode.nome) {
+    setTimeout(() => mostraCustode(custode, nomePoi), 1200);
+  }
+}
+
+// ===== V8.21 — IL CUSTODE DEL LUOGO =====
+// Nei luoghi profondi (livello 2 nel DB), al check-in ti accoglie lo spirito
+// del posto: narra la leggenda in prima persona. Testo statico che arriva col
+// check-in dal server: nessuna posizione, nessun dato nuovo, solo la voce
+// antica che ti sei guadagnato posando la stella.
+function mostraCustode(custode, nomePoi) {
+  document.getElementById('custode-nome').textContent = custode.nome;
+  document.getElementById('custode-luogo').textContent = 'il custode di ' + nomePoi;
+  document.getElementById('custode-racconto').textContent = custode.racconto || '';
+  const m = document.getElementById('modale-custode');
+  if (m) m.classList.remove('nascosto');
 }
 
 // ===== LA COLLEZIONE =====
