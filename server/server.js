@@ -31,6 +31,8 @@
 //        le anime vicine puntano con la rotta vera da qualunque capoluogo.
 // - V8.11: le stanze del Nord, prima ondata — 14 nuovi POI (Trentino,
 //        Friuli-Venezia Giulia, Valle d'Aosta): 29 luoghi in tutto.
+// - V8.20: le stanze della Lombardia — 24 nuovi POI (12 province, 2 ciascuna):
+//        53 luoghi in tutto. Seed idempotente: INSERT OR IGNORE.
 
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
@@ -108,7 +110,8 @@ if (!colonnePoi.includes('lon')) db.exec('ALTER TABLE poi ADD COLUMN lon REAL');
 if (!colonnePoi.includes('evidenza')) db.exec('ALTER TABLE poi ADD COLUMN evidenza INTEGER NOT NULL DEFAULT 0');
 
 // POI reali d'Italia (luoghi di potere/naturali con leggenda) — Veneto completo,
-// + prima ondata del Nord (Trentino, Friuli, Valle d'Aosta). Si espande regione per regione.
+// + prima ondata del Nord (Trentino, Friuli, Valle d'Aosta), + Lombardia completa (V8.20).
+// Si espande regione per regione.
 // Coordinate approssimative dei LUOGHI (dati pubblici): da rifinire a mano quando serve precisione.
 const poiSeed = [
   ['poi-vi-covoli', 'Covoli di Valstagna', 'Vicenza', 'Grotte con pitture rupestri del Paleolitico, antico luogo di potere della Valbrenta', 45.9100, 11.7520, null],
@@ -140,6 +143,34 @@ const poiSeed = [
   ['poi-go-barbana', 'Isola di Barbana', 'Gorizia', 'L\'isola del voto: un santuario in mezzo alla laguna di Grado, otto secoli di promesse mantenute e di barche all\'alba', 45.674, 13.423, null],
   ['poi-ts-grotta', 'Grotta Gigante', 'Trieste', 'La caverna che misura il cielo: dentro, pendoli appesi al buio studiano la gravità in una cattedrale di pietra', 45.706, 13.861, null],
   ['poi-ts-miramare', 'Castello di Miramare', 'Trieste', 'Il castello della maledizione: Massimiliano lo lasciò per il Messico e non tornò. Chi ci ha dormito dopo non è mai finito bene', 45.704, 13.711, null],
+
+  // V8.20 — le stanze della Lombardia (20/11/2026): 2 POI per provincia, 12 province.
+  // Leggende verificate una per una via ricerca; coordinate = stime da cartografo pigro
+  // (più incerte: Isolino Virginia, Bagni di Masino, Castel Masegra, Cornabusa).
+  ['poi-mi-ossa', 'San Bernardino alle Ossa', 'Milano', 'La cappelletta ossario di Milano: pareti e volte ricamate di ossa e teschi. La leggenda li vuole caduti contro l\'eresia ariana, e il re del Portogallo amò tanto questo luogo da replicarlo a Évora', 45.4663, 9.1886, null],
+  ['poi-mi-ambrogio', 'Colonna del Diavolo', 'Milano', 'Davanti alla basilica di Sant\'Ambrogio: la leggenda vuole che qui il diavolo lottò col santo e conficcò le corna nella pietra. I segni si vedono ancora', 45.4617, 9.1870, null],
+  ['poi-mb-duomo', 'Duomo di Monza', 'Monza e della Brianza', 'Nell\'altare della Cappella di Teodolinda riposa la Corona Ferrea: sei piastre d\'oro e, secondo il mito, un ferro che sarebbe un chiodo della Vera Croce. È la corona con cui si incoronavano re e imperatori', 45.5845, 9.2755, null],
+  ['poi-mb-castello', 'Castello di Monza', 'Monza e della Brianza', 'Il castello degli ultimi re d\'Italia: qui, la notte del 29 luglio 1900, il re Umberto I fu ucciso. Le mura ricordano ancora', 45.594, 9.271, null],
+  ['poi-bg-cornabusa', 'Santuario della Cornabusa', 'Bergamo', 'Una chiesa ipogea ricavata in una grotta della Valle Imagna, con una sorgente che stilla dalla roccia: unico nel suo genere in Lombardia, fede e mistero sotto la pietra', 45.875, 9.560, null],
+  ['poi-bg-serio', 'Cascate del Serio', 'Bergamo', 'I tre salti d\'acqua tra i più alti d\'Italia, 315 metri che cadono in un fiato: la leggenda racconta di una spada perduta e del lago del Barbellino che ancora la custodisce', 45.985, 9.874, null],
+  ['poi-bs-naquane', 'Rupi di Naquane', 'Brescia', 'Le rose camune e gli oranti del Parco delle incisioni: a Capo di Ponte migliaia di anni di preghiere incise nella pietra, allineate ai tramonti e agli equinozi', 46.027, 10.345, null],
+  ['poi-bs-ceriola', 'Santuario della Ceriola', 'Brescia', 'Sulla cima di Monte Isola, il santuario guarda tutto il lago d\'Iseo: un\'isola di pescatori che porta in vetta una corona', 45.723, 10.066, null],
+  ['poi-co-comacina', 'Isola Comacina', 'Como', 'L\'isola maledetta del Lario: bruciata e distrutta nel 1169, da otto secoli nessuno ci abita più. Si guarda in silenzio dalla riva di Ossuccio', 45.889, 9.138, null],
+  ['poi-co-faro', 'Faro Voltiano', 'Como', 'La torre di Brunate dedicata ad Alessandro Volta: di notte la sua luce tricolore attraversa il buio del lago per chilometri e chilometri', 45.826, 9.197, null],
+  ['poi-cr-torrazzo', 'Torrazzo di Cremona', 'Cremona', 'La torre che misura il cielo: il suo orologio astronomico del 1583 disegna un quadrante di otto metri con lune, stelle e zodiaco', 45.133, 10.026, null],
+  ['poi-cr-soncino', 'Rocca di Soncino', 'Cremona', 'La rocca viscontea con il fossato pieno d\'acqua: un fortilizio che ha visto passare eserciti e ora custodisce solo il vento sul borgo', 45.273, 9.862, null],
+  ['poi-lc-grigna', 'Grigna Settentrionale', 'Lecco', 'La Regina del Lario: la leggenda racconta di una guerriera bellissima e temibile, e la montagna non l\'ha mai smentita', 45.895, 9.390, null],
+  ['poi-lc-pescarenico', 'Borgo di Pescarenico', 'Lecco', 'Il borgo dei pescatori sulla sponda dell\'Adda: la terra di Renzo e Lucia, dove i Promessi Sposi attraversano il fiume della storia', 45.845, 9.372, null],
+  ['poi-lo-incoronata', 'Tempio dell\'Incoronata', 'Lodi', 'Il capolavoro del Rinascimento lombardo, voluto dalla città intera nel 1488: un tempio civico coi voti dei lodigiani alle pareti', 45.314, 9.503, null],
+  ['poi-lo-basilica', 'Basilica di Lodi Vecchio', 'Lodi', 'Sulla vecchia Laus Pompeia: tra le famiglie del luogo si tramanda un tunnel segreto che scendeva verso la nuova città. Storia o leggenda: il sottosuolo non dice', 45.298, 9.459, null],
+  ['poi-mn-te', 'Palazzo Te', 'Mantova', 'La casa dei giganti di Giulio Romano: chi entra nella sala in cui tutto rovina addosso capisce perché «non si pensi alcuno di vedere mai opera di pennello più orribile e spaventosa»', 45.155, 10.798, null],
+  ['poi-mn-sabbioneta', 'Sabbioneta', 'Mantova', 'La Città Ideale di Vespasiano Gonzaga: un sogno di pietra disegnato come una stella, patrimonio dell\'umanità', 45.093, 10.484, null],
+  ['poi-pv-certosa', 'Certosa di Pavia', 'Pavia', 'Il monastero che i duchi vollero come portale del cielo: cinque secoli di silenzio, marmo e preghiera', 45.215, 9.140, null],
+  ['poi-pv-ponte', 'Ponte Coperto', 'Pavia', 'Cinque arcate sul Ticino: si narra che qui San Bernardo vide il cielo aperto, e il suo compagno lo vide chiuso dal coppo del ponte', 45.1848, 9.1535, null],
+  ['poi-so-masegra', 'Castel Masegra', 'Sondrio', 'L\'unico dei tre castelli di Sondrio scampato allo smantellamento del 1639: domina ancora l\'imbocco della Valmalenco', 46.169, 9.788, null],
+  ['poi-so-masino', 'Bagni di Masino', 'Sondrio', 'Le antiche terme nella foresta della Val Masino: acque che rompono il gelo della montagna da secoli, tra pareti e cascate', 46.250, 9.640, null],
+  ['poi-va-sacromonte', 'Sacro Monte di Varese', 'Varese', 'Quattordici cappelle dei misteri del Rosario salgono al santuario, dal 1604: un cammino disegnato che è patrimonio UNESCO', 45.824, 8.844, null],
+  ['poi-va-isolino', 'Isolino Virginia', 'Varese', 'L\'isoletta del lago di Varese dove vive un villaggio di palafitte: la preistoria riemerge dall\'acqua a pochi metri dalla riva', 45.766, 8.806, null],
 ];
 const insPoi = db.prepare('INSERT OR IGNORE INTO poi (id, nome, provincia, descrizione, lat, lon, creato_da, creato_il) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
 const updPoi = db.prepare('UPDATE poi SET lat = ?, lon = ? WHERE id = ? AND (lat IS NULL OR lon IS NULL)');
