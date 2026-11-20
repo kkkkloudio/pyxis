@@ -1,42 +1,42 @@
-// Pyxis â Frontend V8.8: la bussola sveglia â l'ago che indica davvero.
-// (V6: molle e attrito) â gli aghi cercano, sforano, si assestano, tremano.
+// Pyxis — Frontend V8.8: la bussola sveglia — l'ago che indica davvero.
+// (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l'ago grande punta il luogo NEL MONDO REALE:
-// tieni lo schermo davanti e girati â quando l'ago entra nella PORTA (il triangolo
+// tieni lo schermo davanti e girati — quando l'ago entra nella PORTA (il triangolo
 // d'ottone in alto) stai guardando nella direzione del luogo da visitare.
 // Tocca un ago (o la sua riga in legenda) e lui si presenta; gli altri si abbassano.
 // PIETRA ANGOLARE: mai trattenere, salvare o trasmettere la posizione dell'utente.
 // GPS e bussola interna si legano SOLO sul telefono: la rotta vera verso il luogo
 // si calcola qui e non parte mai. Al server arrivano solo { utente_id, poi_id }.
-// V8.10: le porte d'Italia â tutte le 107 province all'iscrizione (aggiunta
+// V8.10: le porte d'Italia — tutte le 107 province all'iscrizione (aggiunta
 // la Sud Sardegna, che mancava).
-// V8.12: la rotta del pellegrino â per chi cammina davvero verso il luogo:
-// declinazione magnetica corretta (il nord dei sensori non Ã¨ il nord vero),
+// V8.12: la rotta del pellegrino — per chi cammina davvero verso il luogo:
+// declinazione magnetica corretta (il nord dei sensori non è il nord vero),
 // GPS ad alta precisione, direzione di marcia se il magnetometro tace,
-// e la distanza che manca â calcolata e mostrata SOLO sul telefono.
-// V8.13: LA PIAZZA â le voci di tutte le anime: un pensiero lasciato nel cerchio,
+// e la distanza che manca — calcolata e mostrata SOLO sul telefono.
+// V8.13: LA PIAZZA — le voci di tutte le anime: un pensiero lasciato nel cerchio,
 // visibile a chiunque entri. Niente posizioni: solo nome, testo, tempo.
-// V8.14: FEEDBACK â parola ai costruttori: se qualcosa non torna, il corvo
+// V8.14: FEEDBACK — parola ai costruttori: se qualcosa non torna, il corvo
 // lo porta a Carlo e Hermes (tabella feedback, la leggono dal DB).
-// V8.15: LA GUIDA â i primi passi: si apre da sola alla prima visita, si
-// riapre col bottone â. Cinque passi e l'anima sa camminare.
-// V8.17: LE LINGUE â ð®ð¹ IT / ð¬ð§ EN col bottone in fondo a destra: tutto il
+// V8.15: LA GUIDA — i primi passi: si apre da sola alla prima visita, si
+// riapre col bottone ❔. Cinque passi e l'anima sa camminare.
+// V8.17: LE LINGUE — 🇮🇹 IT / 🇬🇧 EN col bottone in fondo a destra: tutto il
 // giro di vista si traduce; gli avvisi (alert) restano in italiano per ora.
-// V8.19: LA BUSSOLA SI PRESENTA â l'ago che sogna lo dice ad alta voce (caption)
+// V8.19: LA BUSSOLA SI PRESENTA — l'ago che sogna lo dice ad alta voce (caption)
 // e il bottone sveglia chiama davvero: chi entra deve capire COSA manca per
 // puntare davvero. E la guida torna ad avanzare un passo alla volta.
-// V8.21 â IL CUSTODE DEL LUOGO: i luoghi profondi accolgono con la voce del
+// V8.21 — IL CUSTODE DEL LUOGO: i luoghi profondi accolgono con la voce del
 // loro spirito, che narra la leggenda in prima persona. Secondo giro della
-// stessa sera: il custode Ã¨ RICONTATTABILE. Parla a ogni check-in (anche a
-// chi Ã¨ giÃ  passato), con un racconto diverso ogni volta, e dalla modale si
-// puÃ² chiedere ancora alla fiammella quante volte si vuole.
+// stessa sera: il custode è RICONTATTABILE. Parla a ogni check-in (anche a
+// chi è già passato), con un racconto diverso ogni volta, e dalla modale si
+// può chiedere ancora alla fiammella quante volte si vuole.
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
   "Bari","Barletta-Andria-Trani","Belluno","Benevento","Bergamo","Biella","Bologna","Bolzano",
   "Brescia","Brindisi","Cagliari","Caltanissetta","Campobasso","Caserta","Catania","Catanzaro",
   "Chieti","Como","Cosenza","Cremona","Crotone","Cuneo","Enna","Fermo","Ferrara","Firenze",
-  "Foggia","ForlÃ¬-Cesena","Frosinone","Genova","Gorizia","Grosseto","Imperia","Isernia",
+  "Foggia","Forlì-Cesena","Frosinone","Genova","Gorizia","Grosseto","Imperia","Isernia",
   "L'Aquila","La Spezia","Latina","Lecce","Lecco","Livorno","Lodi","Lucca","Macerata",
   "Mantova","Massa-Carrara","Matera","Messina","Milano","Modena","Monza e della Brianza",
   "Napoli","Novara","Nuoro","Oristano","Padova","Palermo","Parma","Pavia","Perugia",
@@ -51,7 +51,7 @@ const API = (location.hostname === 'kkkkloudio.github.io' || location.hostname.e
   ? 'https://pyxis-1.tail971635.ts.net'  // backend via Tailscale serve sul mini PC (hostname definitivo: pyxis-1)
   : '';                          // in locale (localhost) usa stesso origin
 
-const RAGGIO_M = 500; // quanto vicino devi essere al luogo di potere perchÃ© la stella si posi
+const RAGGIO_M = 500; // quanto vicino devi essere al luogo di potere perché la stella si posi
 
 // ===== LE LINGUE (V8.17): il cerchio si apre oltre i confini =====
 const LINGUA = { corrente: localStorage.getItem('pyxis-lingua') || 'it' };
@@ -62,46 +62,46 @@ const TESTI = {
     subDueCose: "due cose bastano, poi la bussola gira",
     nomeArte: "Nome d'arte",
     provincia: "Provincia",
-    scegli: "â scegli â",
+    scegli: "— scegli —",
     apriBussola: "Apri la bussola",
-    privacyIscrizione: "nessuna via da scegliere Â· nessun nome vero Â· nessuna email Â· la posizione non lascia mai il telefono",
+    privacyIscrizione: "nessuna via da scegliere · nessun nome vero · nessuna email · la posizione non lascia mai il telefono",
     legendaTitolo: "Le tre lancette",
-    dettGrande: "luogo di potere piÃ¹ vicino",
-    dettMedia: "anima piÃ¹ vicina",
+    dettGrande: "luogo di potere più vicino",
+    dettMedia: "anima più vicina",
     dettPiccola: "seconda anima",
-    visita: "â¨ Il luogo Ã¨ raggiunto",
-    lettera: "ð¦ââ¬ Scrivi una lettera al vicino",
-    posta: "la posta â le lettere ricevute",
-    collezione: "la collezione â le stelle raccolte",
-    piazza: "la piazza â le voci di tutte le anime",
-    feedback: "ðï¸ parola ai costruttori",
-    guida: "â i primi passi",
+    visita: "✨ Il luogo è raggiunto",
+    lettera: "🐦‍⬛ Scrivi una lettera al vicino",
+    posta: "la posta — le lettere ricevute",
+    collezione: "la collezione — le stelle raccolte",
+    piazza: "la piazza — le voci di tutte le anime",
+    feedback: "🗝️ parola ai costruttori",
+    guida: "❔ i primi passi",
     uscita: "lascia lo scrigno",
-    sveglia: "ð§­ Sveglia l'ago â la bussola vera",
-    svegliaViva: "ð§­ l'ago Ã¨ sveglio â gira finchÃ© il granato entra nella porta, poi cammina",
+    sveglia: "🧭 Sveglia l'ago — la bussola vera",
+    svegliaViva: "🧭 l'ago è sveglio — gira finché il granato entra nella porta, poi cammina",
     captionTocca: "tocca un ago per sapere chi punta",
-    captionSveglia: "bussola sveglia: gli aghi puntano davvero â tocca un ago per sapere chi Ã¨",
-    captionSogna: "l'ago sta sognando il luogo â sveglialo con ð§­ qui sotto, e punterÃ  davvero",
+    captionSveglia: "bussola sveglia: gli aghi puntano davvero — tocca un ago per sapere chi è",
+    captionSogna: "l'ago sta sognando il luogo — sveglialo con 🧭 qui sotto, e punterà davvero",
     dettoGrande: "il luogo di potere",
-    dettoMedia: "l'anima piÃ¹ vicina",
+    dettoMedia: "l'anima più vicina",
     dettoPiccola: "la seconda anima",
-    portaCaption: " â girati finchÃ© l'ago entra nella porta",
-    cerchio: "sei nel cerchio del luogo â la stella puÃ² posarsi",
-    kmLuogo: " km al luogo Â· segui il granato",
-    mLuogo: " m al luogo Â· segui il granato",
-    notaAscolto: " anime in ascolto Â· la posizione resta sul telefono Â· solo la bussola sa",
+    portaCaption: " — girati finché l'ago entra nella porta",
+    cerchio: "sei nel cerchio del luogo — la stella può posarsi",
+    kmLuogo: " km al luogo · segui il granato",
+    mLuogo: " m al luogo · segui il granato",
+    notaAscolto: " anime in ascolto · la posizione resta sul telefono · solo la bussola sa",
     guidaTitolo: "I primi passi",
     guidaSub: "come si cammina in questo mondo",
     avanti: "Avanti",
     entraCerchio: "Entra nel cerchio",
     saltaGuida: "Salta la guida",
-    affida: "ð¦ââ¬ Affida al corvo",
-    affidaChiave: "ðï¸ Affida al corvo",
+    affida: "🐦‍⬛ Affida al corvo",
+    affidaChiave: "🗝️ Affida al corvo",
     rimettiPenna: "Rimetti la penna",
     chiudi: "Chiudi",
-    lasciaVoce: "ð£ Lascia la voce",
+    lasciaVoce: "📣 Lascia la voce",
     scritturaTitolo: "Una lettera al vicino",
-    scritturaSub: "il corvo la porterÃ  a ",
+    scritturaSub: "il corvo la porterà a ",
     postaTitolo: "La posta",
     postaSub: "i corvi che sono giunti fin qui",
     collezioneTitolo: "La collezione",
@@ -109,10 +109,10 @@ const TESTI = {
     piazzaTitolo: "La piazza",
     piazzaSub: "le voci lasciate da tutte le anime",
     feedbackTitolo: "Parola ai costruttori",
-    feedbackSub: "cosa non torna, cosa sogni â il corvo lo porta a chi ha fatto la bussola",
-    placeholderLettera: "Scrivi con l'inchiostro della notteâ¦",
-    placeholderPiazza: "Lascia un pensiero nel cerchioâ¦",
-    placeholderFeedback: "Scrivi al di lÃ  del giocoâ¦"
+    feedbackSub: "cosa non torna, cosa sogni — il corvo lo porta a chi ha fatto la bussola",
+    placeholderLettera: "Scrivi con l'inchiostro della notte…",
+    placeholderPiazza: "Lascia un pensiero nel cerchio…",
+    placeholderFeedback: "Scrivi al di là del gioco…"
   },
   en: {
     subBussola: "the compass of presences",
@@ -120,44 +120,44 @@ const TESTI = {
     subDueCose: "two things are enough, then the compass turns",
     nomeArte: "Artist name",
     provincia: "Province",
-    scegli: "â choose â",
+    scegli: "— choose —",
     apriBussola: "Open the compass",
-    privacyIscrizione: "no road to choose Â· no real name Â· no email Â· the position never leaves your phone",
+    privacyIscrizione: "no road to choose · no real name · no email · the position never leaves your phone",
     legendaTitolo: "The three needles",
     dettGrande: "nearest place of power",
     dettMedia: "nearest soul",
     dettPiccola: "second soul",
-    visita: "â¨ The place is reached",
-    lettera: "ð¦ââ¬ Write a letter to the neighbour",
-    posta: "the mail â letters received",
-    collezione: "the collection â stars gathered",
-    piazza: "the square â voices of all souls",
-    feedback: "ðï¸ word to the makers",
-    guida: "â first steps",
+    visita: "✨ The place is reached",
+    lettera: "🐦‍⬛ Write a letter to the neighbour",
+    posta: "the mail — letters received",
+    collezione: "the collection — stars gathered",
+    piazza: "the square — voices of all souls",
+    feedback: "🗝️ word to the makers",
+    guida: "❔ first steps",
     uscita: "leave the casket",
-    sveglia: "ð§­ Wake the needle â the true compass",
-    svegliaViva: "ð§­ the needle is awake â turn until the garnet enters the door, then walk",
+    sveglia: "🧭 Wake the needle — the true compass",
+    svegliaViva: "🧭 the needle is awake — turn until the garnet enters the door, then walk",
     captionTocca: "tap a needle to know who it points at",
-    captionSveglia: "compass awake: the needles truly point â tap one to know who it is",
-    captionSogna: "the needle is dreaming of the place â wake it with ð§­ below, and it will truly point",
+    captionSveglia: "compass awake: the needles truly point — tap one to know who it is",
+    captionSogna: "the needle is dreaming of the place — wake it with 🧭 below, and it will truly point",
     dettoGrande: "the place of power",
     dettoMedia: "the nearest soul",
     dettoPiccola: "the second soul",
-    portaCaption: " â turn until the needle enters the door",
-    cerchio: "you are inside the place's circle â the star can settle",
-    kmLuogo: " km to the place Â· follow the garnet",
-    mLuogo: " m to the place Â· follow the garnet",
-    notaAscolto: " souls listening Â· the position stays on the phone Â· only the compass knows",
+    portaCaption: " — turn until the needle enters the door",
+    cerchio: "you are inside the place's circle — the star can settle",
+    kmLuogo: " km to the place · follow the garnet",
+    mLuogo: " m to the place · follow the garnet",
+    notaAscolto: " souls listening · the position stays on the phone · only the compass knows",
     guidaTitolo: "First steps",
     guidaSub: "how to walk in this world",
     avanti: "Next",
     entraCerchio: "Enter the circle",
     saltaGuida: "Skip the guide",
-    affida: "ð¦ââ¬ Entrust to the raven",
-    affidaChiave: "ðï¸ Entrust to the raven",
+    affida: "🐦‍⬛ Entrust to the raven",
+    affidaChiave: "🗝️ Entrust to the raven",
     rimettiPenna: "Put the pen back",
     chiudi: "Close",
-    lasciaVoce: "ð£ Leave a voice",
+    lasciaVoce: "📣 Leave a voice",
     scritturaTitolo: "A letter to the neighbour",
     scritturaSub: "the raven will carry it to ",
     postaTitolo: "The mail",
@@ -167,10 +167,10 @@ const TESTI = {
     piazzaTitolo: "The square",
     piazzaSub: "voices left by all souls",
     feedbackTitolo: "Word to the makers",
-    feedbackSub: "what is off, what you dream â the raven carries it to those who made the compass",
-    placeholderLettera: "Write with the ink of the nightâ¦",
-    placeholderPiazza: "Leave a thought in the circleâ¦",
-    placeholderFeedback: "Write from beyond the gameâ¦"
+    feedbackSub: "what is off, what you dream — the raven carries it to those who made the compass",
+    placeholderLettera: "Write with the ink of the night…",
+    placeholderPiazza: "Leave a thought in the circle…",
+    placeholderFeedback: "Write from beyond the game…"
   }
 };
 
@@ -241,7 +241,7 @@ function applicaLingua() {
 
   // il bottone lingua stesso
   const bl = document.getElementById('btn-lingua');
-  if (bl) bl.textContent = LINGUA.corrente === 'en' ? 'ð¬ð§ EN' : 'ð®ð¹ IT';
+  if (bl) bl.textContent = LINGUA.corrente === 'en' ? '🇬🇧 EN' : '🇮🇹 IT';
 }
 
 function cambiaLingua() {
@@ -257,7 +257,7 @@ function cambiaLingua() {
 
 let utente = JSON.parse(localStorage.getItem('pyxis-utente') || 'null');
 let evtSource = null;
-let destinatario = null;   // l'anima piÃ¹ vicina (lancetta media): { id, nome }
+let destinatario = null;   // l'anima più vicina (lancetta media): { id, nome }
 let poiCorrente = null;     // il luogo di potere (lancetta grande): { id, nome, lat, lon }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
     caricaLancette();
   }
 
-  // ===== V8.8 â tocca l'ago per sapere chi punta =====
+  // ===== V8.8 — tocca l'ago per sapere chi punta =====
   document.querySelectorAll('.lancetta').forEach(l => {
     l.addEventListener('click', () => selezionaAgo(l.dataset.tipo));
   });
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
     chiudiModale('modale-guida');
   });
   document.getElementById('btn-lingua').addEventListener('click', cambiaLingua);
-  // V8.21 â il custode congeda l'anima quando la parola Ã¨ ricevuta
+  // V8.21 — il custode congeda l'anima quando la parola è ricevuta
   document.getElementById('btn-custode-via').addEventListener('click', () => chiudiModale('modale-custode'));
 });
 
@@ -367,7 +367,7 @@ function mostraBussola() {
   document.getElementById('schermata-iscrizione').classList.remove('attiva');
   document.getElementById('schermata-bussola').classList.add('attiva');
   document.getElementById('sottotitolo-utente').textContent =
-    utente.nome + ' Â· ' + utente.provincia;
+    utente.nome + ' · ' + utente.provincia;
   avviaBussolaViva(); // gli aghi prendono vita appena lo scrigno si apre
   if (!localStorage.getItem('pyxis-guida')) apriGuida(); // V8.15: la prima volta, l'anima viene accompagnata
 }
@@ -394,16 +394,16 @@ function aggiornaLancette(l, totale) {
 
   // GRANDE: il luogo di potere (POI)
   if (l.grande) {
-    // Bussola sveglia e posizione nota (SOLO sul telefono): la rotta Ã¨ VERA,
+    // Bussola sveglia e posizione nota (SOLO sul telefono): la rotta è VERA,
     // da te al luogo. Altrimenti resta la rotta dal capoluogo, l'approssimazione del server.
     let angolo = l.grande.angolo;
     if (BVERA.pos && l.grande.lat != null && l.grande.lon != null) {
       angolo = rottaVera(BVERA.pos.lat, BVERA.pos.lon, l.grande.lat, l.grande.lon);
     }
-    puntaLancetta('grande', angolo); // la molla farÃ  il resto: sforo e assesto
+    puntaLancetta('grande', angolo); // la molla farà il resto: sforo e assesto
     itemG.style.display = '';
     itemG.querySelector('.nome').textContent = l.grande.nome;
-    itemG.querySelector('.dett').textContent = l.grande.descrizione || ('luogo di potere Â· ' + l.grande.provincia);
+    itemG.querySelector('.dett').textContent = l.grande.descrizione || ('luogo di potere · ' + l.grande.provincia);
     poiCorrente = { id: l.grande.id, nome: l.grande.nome, lat: l.grande.lat, lon: l.grande.lon };
     INFO_AGO.grande = { nome: l.grande.nome };
     if (BVERA.pos && l.grande.lat != null && l.grande.lon != null) {
@@ -420,12 +420,12 @@ function aggiornaLancette(l, totale) {
     if (btnVisita) btnVisita.disabled = true;
   }
 
-  // MEDIA: l'anima piÃ¹ vicina (destinataria del corvo)
+  // MEDIA: l'anima più vicina (destinataria del corvo)
   if (l.media) {
     puntaLancetta('media', l.media.angolo);
     itemM.style.display = '';
     itemM.querySelector('.nome').textContent = l.media.nome;
-    itemM.querySelector('.dett').textContent = 'anima piÃ¹ vicina';
+    itemM.querySelector('.dett').textContent = 'anima più vicina';
     destinatario = { id: l.media.id, nome: l.media.nome };
     INFO_AGO.media = { nome: l.media.nome };
     btnLettera.disabled = false;
@@ -462,7 +462,7 @@ function aggiornaLancette(l, totale) {
 const INFO_AGO = { grande:null, media:null, piccola:null };
 let agoSelezionato = null;
 const COLORI_AGO = { grande:'#d98a6a', media:'#7cc9a2', piccola:'#8ab0e0' };
-const DETTI_AGO  = { grande:'il luogo di potere', media:'l\'anima piÃ¹ vicina', piccola:'la seconda anima' };
+const DETTI_AGO  = { grande:'il luogo di potere', media:'l'anima più vicina', piccola:'la seconda anima' };
 
 function selezionaAgo(tipo) {
   if (!tipo) return;
@@ -487,7 +487,7 @@ function aggiornaCaption() {
   const cap = document.getElementById('caption-bussola');
   if (!cap) return;
   if (!agoSelezionato) {
-    // V8.19: sul telefono l'ago che sogna lo DICE â il bottone sveglia non si puÃ² mancare
+    // V8.19: sul telefono l'ago che sogna lo DICE — il bottone sveglia non si può mancare
     if (!BVERA.attiva && window.matchMedia && window.matchMedia('(pointer:coarse)').matches) {
       cap.style.color = '#e8cd85';
       cap.textContent = t('captionSogna');
@@ -500,17 +500,17 @@ function aggiornaCaption() {
   cap.style.color = COLORI_AGO[agoSelezionato];
   const info = INFO_AGO[agoSelezionato];
   if (!info) {
-    cap.textContent = 'â quest\'ago sta ancora cercando: non punta nessuno, per ora';
+    cap.textContent = '→ quest'ago sta ancora cercando: non punta nessuno, per ora';
     return;
   }
-  let testo = 'â ' + info.nome + ' Â· ' + t(DETTI_AGO[agoSelezionato]);
+  let testo = '→ ' + info.nome + ' · ' + t(DETTI_AGO[agoSelezionato]);
   if (agoSelezionato === 'grande' && BVERA.attiva) testo += t('portaCaption');
   cap.textContent = testo;
 }
 
 // ===== LA BUSSOLA VIVA: molle e attrito =====
 // Un ago magnetico vero non sta mai fermo: cerca, sfora il bersaglio, torna,
-// si assesta, e da fermo trema appena, come in ascolto. Qui non c'Ã¨ nessuna
+// si assesta, e da fermo trema appena, come in ascolto. Qui non c'è nessuna
 // posizione dell'utente: solo gli angoli che manda il server, vestiti di fisica.
 
 const VIVA = { avviata:false, ferma:false, tPrec:null, aghi:{} };
@@ -532,13 +532,13 @@ function avviaBussolaViva() {
       prossimoGiro: performance.now() + 8000 + Math.random() * 8000,
       perdeIlFilo: 0,          // la piccola deriva di chi ri-ascolta
       prossimoFiloperduto: 0,
-      fase: Math.random() * Math.PI * 2,  // il tremito Ã¨ un respiro lento, mica un fremito
+      fase: Math.random() * Math.PI * 2,  // il tremito è un respiro lento, mica un fremito
       freq: 0.08 + Math.random() * 0.12,
       tremore: 0.25 + Math.random() * 0.25
     };
   });
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    VIVA.ferma = true; // chi ha chiesto calma al telefono, calma avrÃ 
+    VIVA.ferma = true; // chi ha chiesto calma al telefono, calma avrà
     return;
   }
   requestAnimationFrame(loopBussolaViva);
@@ -553,12 +553,12 @@ function loopBussolaViva(t) {
 
 function stepAgo(A, dt, t) {
   let bers = A.bersaglio;
-  // il nord che vale: l'ago magnetico corretto se c'Ã¨, altrimenti dove stai camminando
+  // il nord che vale: l'ago magnetico corretto se c'è, altrimenti dove stai camminando
   const nord = BVERA.heading != null ? BVERA.heading : BVERA.corso;
   const sveglia = BVERA.attiva && nord != null && A.bersaglio != null;
   if (sveglia) {
     // BUSSOLA SVEGLIA: angolo nel mondo meno dove sei rivolto tu = dove sta l'ago
-    // sul quadrante. Strada piÃ¹ corta: mai il giro completo quando passi da 359 a 0.
+    // sul quadrante. Strada più corta: mai il giro completo quando passi da 359 a 0.
     bers = A.bersaglio - nord;
     while (bers - A.angolo > 180) bers -= 360;
     while (bers - A.angolo < -180) bers += 360;
@@ -577,7 +577,7 @@ function stepAgo(A, dt, t) {
       A.prossimoFiloperduto = t + 25000 + Math.random() * 35000;
     }
     A.perdeIlFilo *= Math.exp(-dt / 3.5); // il filo si ritrova piano
-    // l'ago del luogo, quando la bussola Ã¨ sveglia, NON perde mai il filo: deve essere vero
+    // l'ago del luogo, quando la bussola è sveglia, NON perde mai il filo: deve essere vero
     const filo = (sveglia && A.tipo === 'grande') ? 0 : A.perdeIlFilo;
     molla(A, bers + filo, 7, 2.8, dt);
   }
@@ -614,10 +614,10 @@ function spegniLancetta(tipo) {
 // Il telefono ha una bussola magnetica e sa dove sei. ENTRAMBE le cose restano
 // sul telefono: qui si calcola l'angolo vero verso il luogo, e non parte mai
 // niente. Al server arrivano sempre e solo i luoghi pubblici.
-// La declinazione magnetica in Italia Ã¨ di ~4 gradi EST (WMM2025, 2026): l'ago
-// del telefono punta il nord magnetico, ma il nord VERO Ã¨ 4 gradi piÃ¹ a ovest.
+// La declinazione magnetica in Italia è di ~4 gradi EST (WMM2025, 2026): l'ago
+// del telefono punta il nord magnetico, ma il nord VERO è 4 gradi più a ovest.
 // Senza correzione la rotta sbaglia di ~70 metri ogni chilometro camminato.
-// Stima nazionale: tra una provincia e l'altra varia meno di 1 grado (â17 m/km),
+// Stima nazionale: tra una provincia e l'altra varia meno di 1 grado (≈17 m/km),
 // ben dentro il raggio del check-in. Da rifinire coi test sul campo.
 const DECLINAZIONE = 4.0;
 
@@ -631,8 +631,8 @@ function rottaVera(lat1, lon1, lat2, lon2) {
   return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
 }
 
-// V8.12: quanto manca al luogo â calcolato sul telefono, mostrato sul telefono.
-// Chi segue l'ago deve sapere se il passo giusto Ã¨ "ancora un po'" o "sei arrivato".
+// V8.12: quanto manca al luogo — calcolato sul telefono, mostrato sul telefono.
+// Chi segue l'ago deve sapere se il passo giusto è "ancora un po'" o "sei arrivato".
 function aggiornaDistanza(d) {
   const el = document.getElementById('distanza-luogo');
   if (!el) return;
@@ -643,18 +643,18 @@ function aggiornaDistanza(d) {
   }
   el.classList.remove('vicino');
   el.textContent = d >= 1000
-    ? 'â ' + (d / 1000).toFixed(1).replace('.', ',') + t('kmLuogo')
-    : 'â ' + (Math.round(d / 10) * 10) + t('mLuogo');
+    ? '≈ ' + (d / 1000).toFixed(1).replace('.', ',') + t('kmLuogo')
+    : '≈ ' + (Math.round(d / 10) * 10) + t('mLuogo');
 }
 
 function leggiNord(e) {
-  // Safari/vecchi iPhone: webkitCompassHeading Ã¨ il nord MAGNETICO (senso orario).
+  // Safari/vecchi iPhone: webkitCompassHeading è il nord MAGNETICO (senso orario).
   // Nord vero = magnetico + declinazione: V8.12, o chi cammina sbaglia rotta.
   if (typeof e.webkitCompassHeading === 'number' && !isNaN(e.webkitCompassHeading)) {
     BVERA.heading = (e.webkitCompassHeading + DECLINAZIONE) % 360;
     return;
   }
-  // Android assoluto: alpha conta in senso antiorario â si rigira. Anche questi
+  // Android assoluto: alpha conta in senso antiorario — si rigira. Anche questi
   // sensori in pratica si allineano al nord magnetico: stessa correzione.
   if (e.absolute && e.alpha != null) BVERA.heading = (360 - e.alpha + DECLINAZIONE) % 360;
 }
@@ -668,7 +668,7 @@ async function svegliaAgo() {
         typeof DeviceOrientationEvent.requestPermission === 'function') {
       const perm = await DeviceOrientationEvent.requestPermission();
       if (perm !== 'granted') {
-        alert('Senza il permesso dei sensori l\'ago resta addormentato: la bussola si vedrÃ , ma punterÃ  solo nel gioco.');
+        alert('Senza il permesso dei sensori l\'ago resta addormentato: la bussola si vedrà, ma punterà solo nel gioco.');
         return;
       }
     }
@@ -679,7 +679,7 @@ async function svegliaAgo() {
         // La posizione vive SOLO qui: serve all'ago per la rotta vera, non parte mai.
         BVERA.pos = { lat: pos.coords.latitude, lon: pos.coords.longitude };
         // Il passo del pellegrino: mentre CAMMINI, il GPS sa verso dove vai
-        // (course, giÃ  dal nord vero). Se il magnetometro tace o lo disturbano
+        // (course, già dal nord vero). Se il magnetometro tace o lo disturbano
         // cover e metallo, la direzione di marcia fa da guida.
         if (typeof pos.coords.heading === 'number' && !isNaN(pos.coords.heading) &&
             (pos.coords.speed == null || pos.coords.speed > 0.7)) {
@@ -690,7 +690,7 @@ async function svegliaAgo() {
           aggiornaDistanza(distanzaMetri(BVERA.pos.lat, BVERA.pos.lon, poiCorrente.lat, poiCorrente.lon));
         }
       }, function () {
-        // niente GPS: l'ago userÃ  la rotta dal capoluogo, resta comunque una bussola
+        // niente GPS: l'ago userà la rotta dal capoluogo, resta comunque una bussola
       }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 });
     }
     BVERA.attiva = true;
@@ -702,7 +702,7 @@ async function svegliaAgo() {
   }
 }
 
-// ===== IL CHECK-IN: "Il luogo Ã¨ raggiunto" =====
+// ===== IL CHECK-IN: "Il luogo è raggiunto" =====
 // Il GPS si legge una volta sola, qui nel browser. La posizione NON viene
 // salvata, NON viene inviata: serve solo a confrontare la distanza dal POI
 // e muore in questa funzione. Al server partono solo { utente_id, poi_id }.
@@ -724,7 +724,7 @@ function checkIn() {
     return;
   }
   if (poiCorrente.lat == null || poiCorrente.lon == null) {
-    alert('Questo luogo non ha ancora coordinate: la stella non puÃ² posarsi.');
+    alert('Questo luogo non ha ancora coordinate: la stella non può posarsi.');
     return;
   }
   if (!navigator.geolocation) {
@@ -735,10 +735,10 @@ function checkIn() {
   const btn = document.getElementById('btn-visita');
   const etichetta = btn.textContent;
   btn.disabled = true;
-  btn.textContent = 'â¨ la bussola ascoltaâ¦';
+  btn.textContent = '✨ la bussola ascolta…';
 
   navigator.geolocation.getCurrentPosition(function (pos) {
-    // La posizione vive SOLO qui: confronto sul telefono, poi non serve piÃ¹.
+    // La posizione vive SOLO qui: confronto sul telefono, poi non serve più.
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
     const d = distanzaMetri(lat, lon, poiCorrente.lat, poiCorrente.lon);
@@ -760,12 +760,12 @@ function checkIn() {
         btn.disabled = false;
         btn.textContent = etichetta;
         if (!data.ok) { alert(data.error || 'Il luogo non ha accolto la firma.'); return; }
-        // V8.21, secondo giro: chi torna non Ã¨ zittito. Se il luogo Ã¨ profondo
-        // lo spirito parla di nuovo, con una parola nuova; se Ã¨ muto, la vecchia
-        // gentilezza della stella giÃ  posata.
+        // V8.21, secondo giro: chi torna non è zittito. Se il luogo è profondo
+        // lo spirito parla di nuovo, con una parola nuova; se è muto, la vecchia
+        // gentilezza della stella già posata.
         if (data.gia_visitato) {
           if (data.custode && data.custode.nome) { mostraCustode(data.custode, data.nome, poiCorrente.id); return; }
-          alert('Avevi giÃ  lasciato la tua stella qui.');
+          alert('Avevi già lasciato la tua stella qui.');
           return;
         }
         mostraStella(data.nome, data.stelle, data.custode, poiCorrente.id);
@@ -785,11 +785,11 @@ function checkIn() {
 function mostraStella(nomePoi, stelle, custode, poiId) {
   const toast = document.createElement('div');
   toast.className = 'toast-corvo';
-  toast.textContent = 'â­ Una stella si Ã¨ posata: ' + nomePoi + ' â ' + stelle + (stelle === 1 ? ' stella in collezione' : ' stelle in collezione');
+  toast.textContent = '⭐ Una stella si è posata: ' + nomePoi + ' — ' + stelle + (stelle === 1 ? ' stella in collezione' : ' stelle in collezione');
   document.querySelector('.screen').appendChild(toast);
   setTimeout(() => toast.classList.add('spegni'), 6000);
   setTimeout(() => toast.remove(), 6600);
-  // V8.21 â IL CUSTODE: se il luogo Ã¨ profondo, lo spirito del posto
+  // V8.21 — IL CUSTODE: se il luogo è profondo, lo spirito del posto
   // aspetta che la stella sia posata, poi si presenta. Nessuna fretta: prima la
   // stella, poi la voce. La voce ruota: ogni ascolto, una parola diversa.
   if (custode && custode.nome) {
@@ -797,7 +797,7 @@ function mostraStella(nomePoi, stelle, custode, poiId) {
   }
 }
 
-// ===== V8.21 â IL CUSTODE DEL LUOGO =====
+// ===== V8.21 — IL CUSTODE DEL LUOGO =====
 // Nei luoghi profondi (livello 2 nel DB), al check-in ti accoglie lo spirito
 // del posto: narra la leggenda in prima persona. Testo statico che arriva col
 // check-in dal server: nessuna posizione, nessun dato nuovo, solo la voce
@@ -808,8 +808,8 @@ function mostraCustode(custode, nomePoi, poiId) {
   document.getElementById('custode-racconto').textContent = custode.racconto || '';
   const m = document.getElementById('modale-custode');
   if (!m) return;
-  // V8.21, secondo giro â LA FIAMMELLA RISPONDE: il custode Ã¨ ricontattabile.
-  // Se ha piÃ¹ di un racconto, l'anima puÃ² chiedere ancora da qui, senza
+  // V8.21, secondo giro — LA FIAMMELLA RISPONDE: il custode è ricontattabile.
+  // Se ha più di un racconto, l'anima può chiedere ancora da qui, senza
   // rifare il giro del mondo: il bottone nasce al volo nella modale.
   const box = m.querySelector('.modale-box');
   let btnAncora = document.getElementById('custode-ancora');
@@ -817,7 +817,7 @@ function mostraCustode(custode, nomePoi, poiId) {
     btnAncora = document.createElement('button');
     btnAncora.id = 'custode-ancora';
     btnAncora.className = 'btn-modale fantasma';
-    btnAncora.textContent = 'ð¯ï¸ Chiedi ancora alla fiammella';
+    btnAncora.textContent = '🕯️ Chiedi ancora alla fiammella';
     box.insertBefore(btnAncora, document.getElementById('btn-custode-via'));
   }
   btnAncora.style.display = (custode.totale && custode.totale > 1) ? '' : 'none';
@@ -853,9 +853,9 @@ async function apriCollezione() {
         const el = document.createElement('div');
         el.className = 'stella-raccolta';
         const quando = new Date(S.visitato_il).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        el.innerHTML = '<div class="stella">â­</div>' +
+        el.innerHTML = '<div class="stella">⭐</div>' +
                        '<div class="nome">' + escapeHtml(S.nome) + '</div>' +
-                       '<div class="quando">' + escapeHtml(S.provincia) + ' Â· ' + quando + '</div>';
+                       '<div class="quando">' + escapeHtml(S.provincia) + ' · ' + quando + '</div>';
         lista.appendChild(el);
       });
     }
@@ -868,7 +868,7 @@ async function apriCollezione() {
 // ===== IL CORVO =====
 function apriScrittura() {
   if (!destinatario) {
-    alert('Non c\'Ã¨ nessuno a cui affidare il corvo: sei da solo nel tuo cielo, per ora.');
+    alert('Non c\'è nessuno a cui affidare il corvo: sei da solo nel tuo cielo, per ora.');
     return;
   }
   document.getElementById('lettera-dest').textContent = destinatario.nome;
@@ -892,14 +892,14 @@ async function inviaLettera() {
     });
     if (!resp.ok) {
       const d = await resp.json().catch(() => ({}));
-      alert(d.error || 'Il corvo non Ã¨ riuscito a partire');
+      alert(d.error || 'Il corvo non è riuscito a partire');
       return;
     }
     chiudiModale('modale-scrittura');
     // il corvo spicca il volo
     const corvo = document.createElement('div');
     corvo.className = 'corvo-volo';
-    corvo.textContent = 'ð¦ââ¬';
+    corvo.textContent = '🐦‍⬛';
     document.querySelector('.screen').appendChild(corvo);
     setTimeout(() => corvo.remove(), 1700);
   } catch (e) {
@@ -921,7 +921,7 @@ async function apriPosta() {
         const el = document.createElement('div');
         el.className = 'lettera-ricevuta';
         const quando = new Date(L.creata_il).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        el.innerHTML = '<div class="da">ð¦ââ¬ da ' + escapeHtml(L.mittente_nome) + '</div>' +
+        el.innerHTML = '<div class="da">🐦‍⬛ da ' + escapeHtml(L.mittente_nome) + '</div>' +
                        '<div class="testo">' + escapeHtml(L.testo) + '</div>' +
                        '<div class="quando">' + quando + '</div>';
         lista.appendChild(el);
@@ -943,7 +943,7 @@ async function apriPiazza() {
     disegnaVoci(data.voci || []);
   } catch (e) {
     document.getElementById('piazza-lista').innerHTML =
-      '<div class="lettera-ricevuta"><div class="testo">La piazza Ã¨ avvolta nella nebbia (server non raggiungibile).</div></div>';
+      '<div class="lettera-ricevuta"><div class="testo">La piazza è avvolta nella nebbia (server non raggiungibile).</div></div>';
   }
 }
 
@@ -957,7 +957,7 @@ function disegnaVoci(voci) {
   for (const v of voci) {
     const el = document.createElement('div');
     el.className = 'lettera-ricevuta';
-    el.innerHTML = '<div class="da">ð£ ' + escapeHtml(v.nome) + '</div>' +
+    el.innerHTML = '<div class="da">📣 ' + escapeHtml(v.nome) + '</div>' +
                    '<div class="testo">' + escapeHtml(v.testo) + '</div>';
     lista.appendChild(el);
   }
@@ -975,7 +975,7 @@ async function inviaVoce() {
     });
     if (!resp.ok) {
       const d = await resp.json().catch(() => ({}));
-      alert(d.error || 'La voce si Ã¨ persa nel vento');
+      alert(d.error || 'La voce si è persa nel vento');
       return;
     }
     area.value = '';
@@ -1003,7 +1003,7 @@ async function inviaFeedback() {
     });
     if (!resp.ok) {
       const d = await resp.json().catch(() => ({}));
-      alert(d.error || 'Il corvo non Ã¨ riuscito a partire');
+      alert(d.error || 'Il corvo non è riuscito a partire');
       return;
     }
     area.value = '';
@@ -1011,12 +1011,12 @@ async function inviaFeedback() {
     // il corvo spicca il volo verso i costruttori
     const corvo = document.createElement('div');
     corvo.className = 'corvo-volo';
-    corvo.textContent = 'ð¦ââ¬';
+    corvo.textContent = '🐦‍⬛';
     document.querySelector('.screen').appendChild(corvo);
     setTimeout(() => corvo.remove(), 1700);
     const toast = document.createElement('div');
     toast.className = 'toast-corvo';
-    toast.textContent = 'ð¦ââ¬ Il corvo ha preso il tuo messaggio. Grazie, anima.';
+    toast.textContent = '🐦‍⬛ Il corvo ha preso il tuo messaggio. Grazie, anima.';
     document.querySelector('.screen').appendChild(toast);
     setTimeout(() => toast.classList.add('spegni'), 4500);
     setTimeout(() => toast.remove(), 5100);
@@ -1027,11 +1027,11 @@ async function inviaFeedback() {
 
 // ===== LA GUIDA (V8.15): i primi passi =====
 const GUIDA_STEP_IT = [
-  { titolo: 'Benvenuta, anima', testo: 'Questa Ã¨ Pyxis, la bussola delle presenze. Punta i luoghi di potere e le anime che viaggiano nel cerchio con te. Niente paura: qui si impara camminando.' },
-  { titolo: 'Le tre lancette', testo: 'La grande punta il Luogo di Potere (granato). La media, la prima anima vicina (smeraldo). La piccola, la seconda (zaffiro). Tocca un ago â o la sua riga nella pergamena â e ti dirÃ  chi sta indicando.' },
-  { titolo: 'La rotta vera', testo: 'Sul telefono, sveglia l\'ago con ð§­: la bussola seguirÃ  la direzione VERA del luogo. Girati finchÃ© il granato entra nella porta d\'ottone in alto al quadrante â stai guardando verso il luogo. Poi cammina: sotto la bussola appare quanto manca.' },
-  { titolo: 'La stella', testo: 'Entro 500 metri dal luogo, il bottone â¨ si accende: la stella si posa e va nella tua collezione. La tua posizione resta sul telefono â mai salvata, mai inviata: Ã¨ la pietra angolare di questo mondo.' },
-  { titolo: 'Il corvo e la piazza', testo: 'Con ð¦ââ¬ scrivi una lettera all\'anima piÃ¹ vicina; nella piazza lasciano pensieri tutte le anime; con ðï¸ parli ai costruttori. Ora il sentiero Ã¨ tuo. Buon viaggio, anima.' }
+  { titolo: 'Benvenuta, anima', testo: 'Questa è Pyxis, la bussola delle presenze. Punta i luoghi di potere e le anime che viaggiano nel cerchio con te. Niente paura: qui si impara camminando.' },
+  { titolo: 'Le tre lancette', testo: 'La grande punta il Luogo di Potere (granato). La media, la prima anima vicina (smeraldo). La piccola, la seconda (zaffiro). Tocca un ago — o la sua riga nella pergamena — e ti dirà chi sta indicando.' },
+  { titolo: 'La rotta vera', testo: 'Sul telefono, sveglia l\'ago con 🧭: la bussola seguirà la direzione VERA del luogo. Girati finché il granato entra nella porta d\'ottone in alto al quadrante — stai guardando verso il luogo. Poi cammina: sotto la bussola appare quanto manca.' },
+  { titolo: 'La stella', testo: 'Entro 500 metri dal luogo, il bottone ✨ si accende: la stella si posa e va nella tua collezione. La tua posizione resta sul telefono — mai salvata, mai inviata: è la pietra angolare di questo mondo.' },
+  { titolo: 'Il corvo e la piazza', testo: 'Con 🐦‍⬛ scrivi una lettera all\'anima più vicina; nella piazza lasciano pensieri tutte le anime; con 🗝️ parli ai costruttori. Ora il sentiero è tuo. Buon viaggio, anima.' }
 ];
 let guidaIndice = 0;
 
@@ -1044,7 +1044,7 @@ function apriGuida() {
 function disegnaGuida() {
   const passi = GUIDA_STEP();
   const s = passi[guidaIndice];
-  document.getElementById('guida-titolo').textContent = (guidaIndice + 1) + ' Â· ' + s.titolo;
+  document.getElementById('guida-titolo').textContent = (guidaIndice + 1) + ' · ' + s.titolo;
   document.getElementById('guida-testo').textContent = s.testo;
   document.getElementById('btn-guida-avanti').textContent = guidaIndice === passi.length - 1 ? t('entraCerchio') : t('avanti');
   const punti = document.getElementById('guida-punti');
@@ -1058,15 +1058,15 @@ function disegnaGuida() {
 
 const GUIDA_STEP_EN = [
   { titolo: 'Welcome, soul', testo: 'This is Pyxis, the compass of presences. It points to places of power and to the souls travelling the circle with you. No fear: here you learn by walking.' },
-  { titolo: 'The three needles', testo: 'The large one points to the Place of Power (garnet). The middle one, the nearest soul (emerald). The small one, the second (sapphire). Tap a needle â or its row on the parchment â and it will tell you who it is pointing at.' },
-  { titolo: 'The true bearing', testo: 'On your phone, wake the needle with ð§­: the compass will follow the REAL direction of the place. Turn until the garnet enters the brass door at the top of the dial â you are facing the place. Then walk: below the compass you will see how far is left.' },
-  { titolo: 'The star', testo: 'Within 500 metres of the place, the â¨ button lights up: the star settles and joins your collection. Your position stays on your phone â never saved, never sent: that is the cornerstone of this world.' },
-  { titolo: 'The raven and the square', testo: 'With ð¦ââ¬ you write a letter to the nearest soul; in the square all souls leave their thoughts; with ðï¸ you speak to the makers. Now the path is yours. Fair journey, soul.' }
+  { titolo: 'The three needles', testo: 'The large one points to the Place of Power (garnet). The middle one, the nearest soul (emerald). The small one, the second (sapphire). Tap a needle — or its row on the parchment — and it will tell you who it is pointing at.' },
+  { titolo: 'The true bearing', testo: 'On your phone, wake the needle with 🧭: the compass will follow the REAL direction of the place. Turn until the garnet enters the brass door at the top of the dial — you are facing the place. Then walk: below the compass you will see how far is left.' },
+  { titolo: 'The star', testo: 'Within 500 metres of the place, the ✨ button lights up: the star settles and joins your collection. Your position stays on your phone — never saved, never sent: that is the cornerstone of this world.' },
+  { titolo: 'The raven and the square', testo: 'With 🐦‍⬛ you write a letter to the nearest soul; in the square all souls leave their thoughts; with 🗝️ you speak to the makers. Now the path is yours. Fair journey, soul.' }
 ];
 function GUIDA_STEP() { return LINGUA.corrente === 'en' ? GUIDA_STEP_EN : GUIDA_STEP_IT; }
 
 function avantiGuida() {
-  // V8.19: bug della guida â GUIDA_STEP Ã¨ una funzione da V8.17: .length era 0
+  // V8.19: bug della guida — GUIDA_STEP è una funzione da V8.17: .length era 0
   // e la guida si chiudeva al primo "Avanti", senza mai mostrare i passi 2-5.
   if (guidaIndice < GUIDA_STEP().length - 1) {
     guidaIndice++;
@@ -1100,32 +1100,32 @@ function avviaSSE() {
     caricaLancette();
   });
 
-  // una stella si Ã¨ posata: qualcuno in provincia ha raggiunto un luogo
+  // una stella si è posata: qualcuno in provincia ha raggiunto un luogo
   evtSource.addEventListener('poi-visitato', e => {
     const d = JSON.parse(e.data);
-    if (d.da === utente.nome) return; // la mia stella l'ho giÃ  vista
+    if (d.da === utente.nome) return; // la mia stella l'ho già vista
     const toast = document.createElement('div');
     toast.className = 'toast-corvo';
-    toast.textContent = 'â­ ' + d.da + ' ha raccolto una stella: ' + d.poi;
+    toast.textContent = '⭐ ' + d.da + ' ha raccolto una stella: ' + d.poi;
     document.querySelector('.screen').appendChild(toast);
     setTimeout(() => toast.classList.add('spegni'), 5000);
     setTimeout(() => toast.remove(), 5600);
   });
 
-  // un corvo Ã¨ planato: lettera in arrivo
+  // un corvo è planato: lettera in arrivo
   evtSource.addEventListener('lettera', e => {
     const d = JSON.parse(e.data);
     if (d.destinatario_id !== utente.id) return;
     const toast = document.createElement('div');
     toast.className = 'toast-corvo';
-    toast.textContent = 'ð¦ââ¬ Un corvo Ã¨ planato: lettera da ' + d.da;
+    toast.textContent = '🐦‍⬛ Un corvo è planato: lettera da ' + d.da;
     toast.addEventListener('click', () => { toast.remove(); apriPosta(); });
     document.querySelector('.screen').appendChild(toast);
     setTimeout(() => toast.classList.add('spegni'), 5000);
     setTimeout(() => toast.remove(), 5600);
   });
 
-  // una voce nuova Ã¨ arrivata in piazza (da qualunque provincia)
+  // una voce nuova è arrivata in piazza (da qualunque provincia)
   evtSource.addEventListener('voce', e => {
     const modale = document.getElementById('modale-piazza');
     if (modale && !modale.classList.contains('nascosto')) apriPiazza();
@@ -1135,4 +1135,3 @@ function avviaSSE() {
     console.log('SSE disconnesso, riconnetto...');
   };
 }
-
