@@ -33,6 +33,12 @@
 //        Friuli-Venezia Giulia, Valle d'Aosta): 29 luoghi in tutto.
 // - V8.20: le stanze della Lombardia — 24 nuovi POI (12 province, 2 ciascuna):
 //        53 luoghi in tutto. Seed idempotente: INSERT OR IGNORE.
+// - V8.21: i custodi dei luoghi — colonne livello / custode_nome /
+//        custode_racconto sulla tabella poi (migrazione automatica anche sui
+//        DB esistenti). I luoghi PROFONDI (livello 2) hanno uno spirito che
+//        accoglie l'anima al check-in e narra la leggenda in prima persona.
+//        Piloti: la Segnaressa (Rotonda), il Medico della Peste (Poveglia),
+//        il Re Laurino (Catinaccio). /api/checkin restituisce il custode, se c'è.
 
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
@@ -43,7 +49,7 @@ const DB_PATH = require('path').join(__dirname, 'pyxis.db');
 
 // ============ DATABASE ============
 const db = new DatabaseSync(DB_PATH);
-db.exec(`
+db.exec(\`
   CREATE TABLE IF NOT EXISTS utenti (
     id TEXT PRIMARY KEY,
     nome TEXT NOT NULL UNIQUE,
@@ -101,13 +107,18 @@ db.exec(`
     testo TEXT NOT NULL,
     creata_il TEXT NOT NULL
   );
-`);
+\`);
 
 // Migrazione: se un DB già esistente non ha lat/lon sui POI, aggiungile
 const colonnePoi = db.prepare('PRAGMA table_info(poi)').all().map(c => c.name);
 if (!colonnePoi.includes('lat')) db.exec('ALTER TABLE poi ADD COLUMN lat REAL');
 if (!colonnePoi.includes('lon')) db.exec('ALTER TABLE poi ADD COLUMN lon REAL');
 if (!colonnePoi.includes('evidenza')) db.exec('ALTER TABLE poi ADD COLUMN evidenza INTEGER NOT NULL DEFAULT 0');
+// V8.21 — I CUSTODI DEI LUOGHI: livello 1 = luogo comune (stella e via),
+// livello 2 = luogo PROFONDO, con lo spirito che accoglie l'anima.
+if (!colonnePoi.includes('livello')) db.exec('ALTER TABLE poi ADD COLUMN livello INTEGER NOT NULL DEFAULT 1');
+if (!colonnePoi.includes('custode_nome')) db.exec('ALTER TABLE poi ADD COLUMN custode_nome TEXT');
+if (!colonnePoi.includes('custode_racconto')) db.exec('ALTER TABLE poi ADD COLUMN custode_racconto TEXT');
 
 // POI reali d'Italia (luoghi di potere/naturali con leggenda) — Veneto completo,
 // + prima ondata del Nord (Trentino, Friuli, Valle d'Aosta), + Lombardia completa (V8.20).
@@ -184,6 +195,22 @@ for (const p of poiSeed) {
 // Vale anche per i DB già esistenti: la migrazione gira a ogni avvio.
 const rotonda = poiSeed.find(p => p[0] === 'poi-ro-rotonda');
 db.prepare('UPDATE poi SET evidenza = 1, descrizione = ? WHERE id = ?').run(rotonda[3], rotonda[0]);
+
+// V8.21 — I CUSTODI DEI LUOGHI: i POI profondi (livello 2) accolgono chi si
+// posa nel cerchio con la voce dello spirito del posto, che narra la leggenda
+// in prima persona. Aggiornamento idempotente come il resto del seed (solo
+// UPDATE sui POI esistenti: gli id non si toccano MAI). Le voci si aggiungono
+// a ondate, come le stanze. Decisa da Carlo: non tutti i POI la meritano —
+// solo i luoghi più profondi. Gli altri restano muti: stella e via.
+const custodiSeed = [
+  ['poi-ro-rotonda', 'La Segnaressa', "Ah. Un'altra anima che arriva col fiatato del Po in gola. Quando qui non c'era nessun tempio, questo prato era nostro: noi, il vento, i roghi d'erba. Poi alzarono l'ottagono, e le nostre feste impararono a farsi piccole, come le fiammelle di un altare. Ma ascolta: sotto il pavimento, la terra batte ancora il tempo. Vieni a notte fatta, con rispetto, e forse mi vedrai girare tra le colonne. E non dire a nessuno che ti ho parlato: alle segnaresse non piace essere citate."],
+  ['poi-ve-poveglia', 'Il Medico della Peste', "Metti via quel sorriso, viandante: quest'isola non accoglie, archivia. Io arrivai con la maschera piena d'erbe e il campanello all'ordine. La febbre non chiedeva i nomi, e io li scrivevo tutti, tutti, perché nessuno andasse perso. La laguna qui è fatta di cenere: l'erba che calpesti è vite. Gira in barca, anima, e saluta: ci sono luoghi che si visitano solo raccontandoli. E ora qualcuno l'ha fatto, grazie a te."],
+  ['poi-bz-laurino', 'Re Laurino', "Ehilà, anima! Sei venuto per l'enrosadira, vero? Il mio giardino di rose che brucia di rosa ogni sera, quando la luce non è più giorno e non è ancora notte. Lo piantai io, per amore. Poi gli uomini mi presero il regno, e il cielo mi volle beffare: «Che tu non possa essere visto né di giorno né di notte». Ecco perché il mio rosso dura soltanto in quell'ora sospesa. Goditela. E sappi che dietro ogni rosa che ammiri c'è un re che brontola ancora."],
+];
+const insCustode = db.prepare('UPDATE poi SET livello = 2, custode_nome = ?, custode_racconto = ? WHERE id = ?');
+for (const c of custodiSeed) {
+  insCustode.run(c[1], c[2], c[0]);
+}
 
 // ============ LA DIREZIONE VERA ============
 // Capoluoghi: punti di riferimento PUBBLICI per le rotte della bussola.
@@ -370,7 +397,7 @@ function readBody(req) {
 // ============ PRESENZE VERE (V8.7 — Opzione A) ============
 // Una presenza conta solo se il suo cuore batte da meno di 5 minuti.
 // online_da è una stringa ISO UTC prodotta da new Date().toISOString()
-// (es. 2026-11-14T15:57:19.945Z): la soglia va confrontata per ORDINE
+// (es. 2026-11-14T15:57:19.945Z): la soglia va confrontare per ORDINE
 // LESSICOGRAFICO (stesso formato → ordinamento corretto), NON con
 // datetime('now') di SQLite, che genererebbe un formato diverso.
 const TTL_PRESENZE_MS = 5 * 60 * 1000;
@@ -392,7 +419,7 @@ setInterval(spazzaPresenze, 60 * 1000);
 const clients = new Set(); // { res, provincia }
 
 function broadcast(provincia, event, data) {
-  const msg = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  const msg = \`event: \${event}\ndata: \${JSON.stringify(data)}\n\n\`;
   for (const c of clients) {
     if (c.provincia === provincia) {
       try { c.res.write(msg); } catch (e) { clients.delete(c); }
@@ -402,7 +429,7 @@ function broadcast(provincia, event, data) {
 
 // V8.13 — LA PIAZZA: il cerchio delle voci è di TUTTE le province, non di una sola
 function broadcastTutti(event, data) {
-  const msg = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  const msg = \`event: \${event}\ndata: \${JSON.stringify(data)}\n\n\`;
   for (const c of clients) {
     try { c.res.write(msg); } catch (e) { clients.delete(c); }
   }
@@ -415,7 +442,7 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  const url = new URL(req.url, `http://localhost:${PORT}`);
+  const url = new URL(req.url, \`http://localhost:\${PORT}\`);
   const path = url.pathname;
 
   // CORS preflight
@@ -567,12 +594,12 @@ const server = http.createServer(async (req, res) => {
     const viva = sogliaPresenze();
 
     // Altri utenti online nella stessa provincia (escluso me)
-    const altri = db.prepare(`
+    const altri = db.prepare(\`
       SELECT u.id, u.nome, u.tipo FROM utenti u
       JOIN presenze p ON u.id = p.utente_id
       WHERE u.provincia = ? AND u.id != ? AND p.online_da >= ?
       ORDER BY p.online_da ASC
-    `).all(provincia, mioId || '', viva);
+    \`).all(provincia, mioId || '', viva);
 
     // Il luogo di potere della provincia: quello messo in evidenza, altrimenti
     // il primo in ordine stabile. lat/lon servono al TELEFONO per il confronto
@@ -588,12 +615,12 @@ const server = http.createServer(async (req, res) => {
 
     // Le anime: le più vicine ovunque (distanza tra capoluoghi, non tra persone).
     // Stessa provincia = distanza zero = nessuna rotta possibile: angolo d'albergo.
-    const anime = db.prepare(`
+    const anime = db.prepare(\`
       SELECT u.id, u.nome, u.tipo, u.provincia, p.online_da FROM utenti u
       JOIN presenze p ON u.id = p.utente_id
       WHERE u.id != ? AND p.online_da >= ?
       ORDER BY p.online_da ASC
-    `).all(mioId || '', viva);
+    \`).all(mioId || '', viva);
     const conDistanza = anime.map(a => ({
       ...a,
       _d: distanzaTraRif(mioRif, RIF_PROVINCIA[a.provincia] || null)
@@ -629,7 +656,8 @@ const server = http.createServer(async (req, res) => {
 
       const u = db.prepare('SELECT id, nome, provincia FROM utenti WHERE id = ?').get(utente_id);
       if (!u) return json(res, 404, { error: 'Anima sconosciuta' });
-      const p = db.prepare('SELECT id, nome FROM poi WHERE id = ?').get(poi_id);
+      // V8.21: si legge anche il custode, se il luogo è profondo
+      const p = db.prepare('SELECT id, nome, livello, custode_nome, custode_racconto FROM poi WHERE id = ?').get(poi_id);
       if (!p) return json(res, 404, { error: 'Luogo sconosciuto' });
 
       const gia = db.prepare('SELECT 1 FROM visite WHERE utente_id = ? AND poi_id = ?').get(utente_id, poi_id);
@@ -642,7 +670,10 @@ const server = http.createServer(async (req, res) => {
 
       broadcast(u.provincia, 'poi-visitato', { da: u.nome, poi: p.nome });
 
-      return json(res, 201, { ok: true, gia_visitato: false, nome: p.nome, stelle });
+      // V8.21: se il luogo è profondo e ha un custode, l'anima lo incontra
+      const custode = (p.livello >= 2 && p.custode_nome) ? { nome: p.custode_nome, racconto: p.custode_racconto } : null;
+
+      return json(res, 201, { ok: true, gia_visitato: false, nome: p.nome, stelle, custode });
     } catch (e) {
       return json(res, 500, { error: e.message });
     }
@@ -652,12 +683,12 @@ const server = http.createServer(async (req, res) => {
   if (path === '/api/collezione' && req.method === 'GET') {
     const mioId = url.searchParams.get('id');
     if (!mioId) return json(res, 400, { error: 'id mancante' });
-    const stelle = db.prepare(`
+    const stelle = db.prepare(\`
       SELECT v.poi_id, p.nome, p.provincia, p.descrizione, v.visitato_il
       FROM visite v JOIN poi p ON p.id = v.poi_id
       WHERE v.utente_id = ?
       ORDER BY v.visitato_il DESC
-    `).all(mioId);
+    \`).all(mioId);
     return json(res, 200, { stelle, totale: stelle.length });
   }
 
@@ -683,7 +714,7 @@ const server = http.createServer(async (req, res) => {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': 'Content-Type',
     });
-    res.write(`event: connesso\ndata: ${JSON.stringify({ provincia, ok: true })}\n\n`);
+    res.write(\`event: connesso\ndata: \${JSON.stringify({ provincia, ok: true })}\n\n\`);
 
     const client = { res, provincia };
     clients.add(client);
@@ -692,7 +723,7 @@ const server = http.createServer(async (req, res) => {
     // (senza questo rintocco, una sessione lunga morirebbe di TTL a 5 minuti)
     const hb = setInterval(() => {
       try {
-        res.write(`: ping\n\n`);
+        res.write(\`: ping\n\n\`);
         if (mioId) db.prepare('INSERT OR REPLACE INTO presenze (utente_id, provincia, online_da) VALUES (?, ?, ?)')
           .run(mioId, provincia, new Date().toISOString());
       } catch (e) { clearInterval(hb); clients.delete(client); }
@@ -737,8 +768,8 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`🧭 Pyxis backend in ascolto su http://localhost:${PORT}`);
-  console.log(`   Database: ${DB_PATH}`);
-  console.log(`   Frontend servito da: ${__dirname}/..`);
-  console.log(`   Pietra angolare: nessuna posizione utente viene mai salvata o trasmessa.`);
+  console.log(\`🧭 Pyxis backend in ascolto su http://localhost:\${PORT}\`);
+  console.log(\`   Database: \${DB_PATH}\`);
+  console.log(\`   Frontend servito da: \${__dirname}/..\`);
+  console.log(\`   Pietra angolare: nessuna posizione utente viene mai salvata o trasmessa.\`);
 });
