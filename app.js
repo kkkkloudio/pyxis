@@ -35,6 +35,9 @@
 // tanto traversa in volo — e quando le lettere partono è lui a portarle via
 // dallo schermo. Toccagli e ti risponde a modo suo. Chi ha chiesto meno
 // movimento al telefono lo trova appollaiato e in silenzio (ma parla).
+// Il suo nome è Muninn, memoria di Odino — quello che Odino temeva perdesse
+// la strada: per questo ciò che il nostro porta non si perde mai, e torna
+// sempre alla fine di ogni viaggio.
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -120,7 +123,8 @@ const TESTI = {
     placeholderFeedback: "Scrivi al di là del gioco…",
     corvoFrase1: "cra.",
     corvoFrase2: "le lettere viaggiano di notte.",
-    corvoFrase3: "io porto le parole. le stelle le portate voi."
+    corvoFrase3: "io porto le parole. le stelle le portate voi.",
+    corvoFrase4: "mi chiamo Muninn. ciò che porto non si perde mai."
   },
   en: {
     subBussola: "the compass of presences",
@@ -181,7 +185,8 @@ const TESTI = {
     placeholderFeedback: "Write from beyond the game…",
     corvoFrase1: "cra.",
     corvoFrase2: "letters travel by night.",
-    corvoFrase3: "i carry the words. the stars are yours to gather."
+    corvoFrase3: "i carry the words. the stars are yours to gather.",
+    corvoFrase4: "my name is Muninn — what i carry is never lost."
   }
 };
 
@@ -1122,9 +1127,9 @@ function avviaCorvo() {
   CORVO.el = document.createElement('div');
   CORVO.el.className = 'corvo-pet';
   CORVO.el.id = 'corvo-pet';
-  CORVO.el.title = 'il corvo di Pyxis';
+  CORVO.el.title = 'Muninn, il corvo di Pyxis';
   CORVO.el.setAttribute('role', 'button');
-  CORVO.el.setAttribute('aria-label', 'il corvo di Pyxis');
+  CORVO.el.setAttribute('aria-label', 'Muninn, il corvo di Pyxis');
   CORVO.el.tabIndex = 0;
   CORVO.el.innerHTML = CORVO_SVG;
   screen.appendChild(CORVO.el);
@@ -1260,7 +1265,7 @@ function corvoReagisci(cosa) {
 
 function toccoCorvo() {
   if (CORVO.stato === 'partito') return;   // è in cielo: non si disturbano i voli di servizio
-  const frasi = [t('corvoFrase1'), t('corvoFrase2'), t('corvoFrase3')];
+  const frasi = [t('corvoFrase1'), t('corvoFrase2'), t('corvoFrase3'), t('corvoFrase4')];
   const frase = frasi[CORVO.frasiViste % frasi.length];
   CORVO.frasiViste++;
   const vecchia = CORVO.el.querySelector('.corvo-bolla');
