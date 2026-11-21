@@ -9,14 +9,14 @@
 // - V8.14: FEEDBACK — parola ai costruttori: POST /api/feedback (si legge dal DB)
 // - V5: lancette flip — grande=luogo di potere (POI), media=prima anima, piccola=seconda anima
 // - V5: check-in — PIETRA ANGOLARE: mai trattenere, salvare o trasmettere la
-//        posizione dell'utente. Il confronto GPS avviene SOLO sul telefono:
+//        posizione dell\'utente. Il confronto GPS avviene SOLO sul telefono:
 //        al server arriva unicamente { utente_id, poi_id }. Nessuna coordinata
-//        dell'utente esiste nel DB. Le colonne lat/lon della tabella poi sono
+//        dell\'utente esiste nel DB. Le colonne lat/lon della tabella poi sono
 //        coordinate di LUOGHI PUBBLICI, non di persone.
 // - V6: direzione vera — le lancette puntano la ROTTA tra luoghi pubblici
 //        (capoluoghi e POI), mai tra persone. Anime: le più vicine ovunque,
 //        misurate tra capoluoghi. Stessa provincia = nessuna rotta possibile:
-//        angolo d'albergo, dolce e fisso per coppia.
+//        angolo d\'albergo, dolce e fisso per coppia.
 // - V8.7: presenze vere (Opzione A) — una presenza conta solo se il suo
 //        cuore batte da meno di 5 minuti. Nessuna anima "appesa" resta nella
 //        legenda: tab chiusa male, telefono morto o riavvio del server non
@@ -24,32 +24,32 @@
 //        restano spente (il client le lascia vagare, come da canone VIVA).
 // - V8.9: la mappa si riempie — due luoghi per provincia (15 POI totali).
 //        Venezia finalmente in mappa (Bovolo + Poveglia). Coordinate stimate
-//        da rifinire a mano. NOTA: l'id 'poi-ve-ponte' (Ponte Scaligero) ha
+//        da rifinire a mano. NOTA: l\'id 'poi-ve-ponte' (Ponte Scaligero) ha
 //        il prefisso VE ma il luogo è a VERONA — non rinominarlo: con
 //        INSERT OR IGNORE un id nuovo creerebbe una riga doppia nel DB.
-// - V8.10: le porte d'Italia — RIF_PROVINCIA copre tutte le 107 province:
+// - V8.10: le porte d\'Italia — RIF_PROVINCIA copre tutte le 107 province:
 //        le anime vicine puntano con la rotta vera da qualunque capoluogo.
 // - V8.11: le stanze del Nord, prima ondata — 14 nuovi POI (Trentino,
-//        Friuli-Venezia Giulia, Valle d'Aosta): 29 luoghi in tutto.
+//        Friuli-Venezia Giulia, Valle d\'Aosta): 29 luoghi in tutto.
 // - V8.20: le stanze della Lombardia — 24 nuovi POI (12 province, 2 ciascuna):
 //        53 luoghi in tutto. Seed idempotente: INSERT OR IGNORE.
 // - V8.21: i custodi dei luoghi — colonne livello / custode_nome /
 //        custode_racconto sulla tabella poi (migrazione automatica anche sui
 //        DB esistenti). I luoghi PROFONDI (livello 2) hanno uno spirito che
-//        accoglie l'anima al check-in e narra la leggenda in prima persona.
+//        accoglie l\'anima al check-in e narra la leggenda in prima persona.
 //        Piloti: la Segnaressa (Rotonda), il Medico della Peste (Poveglia),
-//        il Re Laurino (Catinaccio). /api/checkin restituisce il custode, se c'è.
+//        il Re Laurino (Catinaccio). /api/checkin restituisce il custode, se c\'è.
 // - V8.21, secondo giro: il custode è RICONTATTABILE. Parla a OGNI check-in
 //        sul luogo profondo (anche a chi è già passato), ogni volta con una
 //        parola diversa: ogni custode ha più racconti, che ruotano col numero
-//        di ascolti di quell'anima su quel luogo (tabella ascolti). In più
+//        di ascolti di quell\'anima su quel luogo (tabella ascolti). In più
 //        GET /api/custode fa risentire la voce senza rifare il check-in:
-//        la fiammella risponde dal luogo, quante volte l'anima la chiede.
+//        la fiammella risponde dal luogo, quante volte l\'anima la chiede.
 // - V8.22: le stanze del Piemonte — 16 nuovi POI (8 province, 2 ciascuna):
 //        69 luoghi in tutto. E LA CHIAVE AL CANCELLO: GET /api/custode ora
 //        risponde solo a chi ha già posato la stella su quel luogo.
 // - V8.23: le stanze di Liguria e Emilia-Romagna — 26 nuovi POI (13 province,
-//        2 ciascuna): 95 luoghi in tutto. Il Nord d'Italia è completo. Il seed
+//        2 ciascuna): 95 luoghi in tutto. Il Nord d\'Italia è completo. Il seed
 //        resta idempotente: INSERT OR IGNORE, id mai toccati.
 
 const http = require('http');
@@ -127,13 +127,13 @@ if (!colonnePoi.includes('lat')) db.exec('ALTER TABLE poi ADD COLUMN lat REAL');
 if (!colonnePoi.includes('lon')) db.exec('ALTER TABLE poi ADD COLUMN lon REAL');
 if (!colonnePoi.includes('evidenza')) db.exec('ALTER TABLE poi ADD COLUMN evidenza INTEGER NOT NULL DEFAULT 0');
 // V8.21 — I CUSTODI DEI LUOGHI: livello 1 = luogo comune (stella e via),
-// livello 2 = luogo PROFONDO, con lo spirito che accoglie l'anima.
+// livello 2 = luogo PROFONDO, con lo spirito che accoglie l\'anima.
 if (!colonnePoi.includes('livello')) db.exec('ALTER TABLE poi ADD COLUMN livello INTEGER NOT NULL DEFAULT 1');
 if (!colonnePoi.includes('custode_nome')) db.exec('ALTER TABLE poi ADD COLUMN custode_nome TEXT');
 if (!colonnePoi.includes('custode_racconto')) db.exec('ALTER TABLE poi ADD COLUMN custode_racconto TEXT');
 
-// POI reali d'Italia (luoghi di potere/naturali con leggenda) — Veneto completo,
-// + prima ondata del Nord (Trentino, Friuli, Valle d'Aosta), + Lombardia completa (V8.20),
+// POI reali d\'Italia (luoghi di potere/naturali con leggenda) — Veneto completo,
+// + prima ondata del Nord (Trentino, Friuli, Valle d\'Aosta), + Lombardia completa (V8.20),
 // + il Piemonte completo (V8.22). Si espande regione per regione.
 // Coordinate approssimative dei LUOGHI (dati pubblici): da rifinire a mano quando serve precisione.
 const poiSeed = [
@@ -217,34 +217,34 @@ const poiSeed = [
 
   // V8.23 — le stanze di Liguria e Emilia-Romagna (20/11/2026): 2 POI per
   // provincia, 4 liguri + 9 emiliano-romagnole. Con questa ondata il Nord
-  // d'Italia è completo. Leggende verificate una per una via ricerca;
+  // d\'Italia è completo. Leggende verificate una per una via ricerca;
   // coordinate = stime da cartografo pigro (più incerte: Tino, Bussana, Canossa).
-  ['poi-ge-lanterna', 'Lanterna di Genova', 'Genova', 'Il faro simbolo della Superba, il più alto del Mediterraneo, accende i suoi fuochi da nove secoli. La tradizione racconta che il primo costruttore venne gettato nel vuoto dalla cima, perché non potesse replicare altrove un'opera così perfetta. Dal 1543 veglia sul porto', 44.4135, 8.8825, null],
-  ['poi-ge-sanlorenzo', 'Cattedrale di San Lorenzo', 'Genova', 'Nel tesoro del duomo riposa il Sacro Catino, il piatto di vetro verde che la leggenda identifica col Graal dell'Ultima Cena. E nella navata destra è esposta la bomba della RAF del 1941: sfondò il tetto e non esplose. I genovesi la chiamano la grazia di San Lorenzo', 44.4077, 8.9302, null],
-  ['poi-im-bussana', 'Bussana Vecchia', 'Imperia', 'Il borgo che il terremoto del 1887 colpì durante la messa: la volta della chiesa crollò sui fedeli, e i sopravvissuti fondarono Bussana Nuova. Per ottant'anni rimase fantasma, poi gli artisti lo risvegliarono tra le rovine', 43.8559, 7.7817, null],
-  ['poi-im-triora', 'Triora, il borgo delle streghe', 'Imperia', 'Il paese della caccia alle streghe più famosa d'Italia: nella carestia del 1588 venti donne finirono nelle carceri di Ca' de Baggiure, torturate e accusate di ogni male. Ogni agosto la festa Strigora riporta i loro nomi a tutta la valle', 43.9600, 7.7161, null],
+  ['poi-ge-lanterna', 'Lanterna di Genova', 'Genova', 'Il faro simbolo della Superba, il più alto del Mediterraneo, accende i suoi fuochi da nove secoli. La tradizione racconta che il primo costruttore venne gettato nel vuoto dalla cima, perché non potesse replicare altrove un\'opera così perfetta. Dal 1543 veglia sul porto', 44.4135, 8.8825, null],
+  ['poi-ge-sanlorenzo', 'Cattedrale di San Lorenzo', 'Genova', 'Nel tesoro del duomo riposa il Sacro Catino, il piatto di vetro verde che la leggenda identifica col Graal dell\'Ultima Cena. E nella navata destra è esposta la bomba della RAF del 1941: sfondò il tetto e non esplose. I genovesi la chiamano la grazia di San Lorenzo', 44.4077, 8.9302, null],
+  ['poi-im-bussana', 'Bussana Vecchia', 'Imperia', 'Il borgo che il terremoto del 1887 colpì durante la messa: la volta della chiesa crollò sui fedeli, e i sopravvissuti fondarono Bussana Nuova. Per ottant\'anni rimase fantasma, poi gli artisti lo risvegliarono tra le rovine', 43.8559, 7.7817, null],
+  ['poi-im-triora', 'Triora, il borgo delle streghe', 'Imperia', 'Il paese della caccia alle streghe più famosa d\'Italia: nella carestia del 1588 venti donne finirono nelle carceri di Ca\' de Baggiure, torturate e accusate di ogni male. Ogni agosto la festa Strigora riporta i loro nomi a tutta la valle', 43.9600, 7.7161, null],
   ['poi-sp-portovenere', 'Portovenere, Chiesa di San Pietro', 'La Spezia', 'Il promontorio che fu tempio di Venere, e dal suo nome nacque il nome del borgo. Sotto la chiesa a strisce bianche e nere si apre la grotta dove Lord Byron nuotava di notte, attraversando il golfo per arrivare a Lerici', 44.0643, 9.8440, null],
-  ['poi-sp-tino', 'Isola del Tino, San Venerio', 'La Spezia', 'L'eremita che nel 610 si ritirò su quest'isola e accendeva fuochi sulla cima per guidare i naviganti nelle notti senza luna: il primo farista d'Italia, patrono del golfo. La leggenda lo vuole anche domatore del drago di Capo Corvo, sprofondato nel mare', 44.0344, 9.8506, null],
+  ['poi-sp-tino', 'Isola del Tino, San Venerio', 'La Spezia', 'L\'eremita che nel 610 si ritirò su quest\'isola e accendeva fuochi sulla cima per guidare i naviganti nelle notti senza luna: il primo farista d\'Italia, patrono del golfo. La leggenda lo vuole anche domatore del drago di Capo Corvo, sprofondato nel mare', 44.0344, 9.8506, null],
   ['poi-sv-priamar', 'Fortezza del Priamar', 'Savona', 'Il promontorio dove sorgeva la Savona medievale, rasa al suolo dalla Repubblica di Genova dopo la resa: sopra le macerie della città sconfitta i vincitori innalzarono la fortezza. Camminandoci si cammina su una città sepolta', 44.3070, 8.4811, null],
   ['poi-sv-misericordia', 'Santuario della Misericordia', 'Savona', 'Il 18 marzo 1536 la Madonna apparve al contadino Antonio Botta nella valle del Letimbro, mentre Savona stava per soccombere a Genova: il messaggio fu «misericordia e non giustizia». Divenne patrona della città e di tutta la Repubblica', 44.2863, 8.4622, null],
-  ['poi-bo-garisenda', 'Torre Garisenda', 'Bologna', 'La torre che pende come un gigante incerto, e che Dante scelse come paragone nel pozzo dei giganti dell'Inferno: chi passa sotto la sua ombra cammina dentro un verso della Commedia', 44.4943, 11.3436, null],
+  ['poi-bo-garisenda', 'Torre Garisenda', 'Bologna', 'La torre che pende come un gigante incerto, e che Dante scelse come paragone nel pozzo dei giganti dell\'Inferno: chi passa sotto la sua ombra cammina dentro un verso della Commedia', 44.4943, 11.3436, null],
   ['poi-bo-petronio', 'Basilica di San Petronio', 'Bologna', 'Sul pavimento della navata sinistra corre la linea del sole progettata da Cassini nel 1655: la meridiana più lunga del mondo, 66,8 metri che misurano ancora oggi il mezzogiorno dentro una chiesa mai finita', 44.4936, 11.3422, null],
-  ['poi-fe-estense', 'Castello Estense', 'Ferrara', 'La rocca circondata dall'acqua dove nel 1425 morirono la giovane Parisina e il suo figliastro Ugo, giustiziati entrambi per volere di Niccolò III. La leggenda vuole che lei ritorni ancora, di notte, a cercare il suo giovane amore perduto', 44.8375, 11.6200, null],
-  ['poi-fe-schifanoia', 'Palazzo Schifanoia', 'Ferrara', 'Il Salone dei Mesi è un calendario di astrologia in affresco: dodici mesi, i segni dello zodiaco, i decani e gli dèi che governano i giorni, voluti da Borso d'Este. Un orologio celeste dipinto nel cielo di una sala', 44.8397, 11.6186, null],
-  ['poi-fc-malatestiana', 'Biblioteca Malatestiana', 'Forlì-Cesena', 'La prima biblioteca civica d'Europa, voluta da Malatesta Novello nel 1452: i codici incatenati ai plutei dell'Aula del Nuti, esattamente come cinque secoli fa. Patrimonio UNESCO: qui il Rinascimento non è mai finito', 44.1394, 12.2439, null],
-  ['poi-fc-ravaldino', 'Rocca di Ravaldino', 'Forlì-Cesena', 'La rocca di Caterina Sforza, la tigre di Forlì: nel 1499 la difese armi in pugno contro l'esercito di Cesare Borgia, mentre i notabili della città trattavano la resa. Cadde, ma la tigre entrò nella leggenda', 44.2217, 12.0430, null],
-  ['poi-mo-ghirlandina', 'Torre Ghirlandina', 'Modena', 'La torre custodisce nella Sala della Secchia il ricordo della guerra più strana d'Italia: nel 1325 modenesi e bolognesi si batterono a Zappolino per una secchia rubata da un pozzo. Il bottino di legno fece più rumore di duemila caduti', 44.6458, 10.9253, null],
-  ['poi-mo-nonantola', 'Abbazia di Nonantola', 'Modena', 'L'abbazia fondata da sant'Anselmo nel 752, con la cripta a sessantaquattro colonne e l'altare che custodisce le reliquie di papa San Silvestro. Tra le sue pergamene firmano anche Carlo Magno e Matilde di Canossa', 44.6792, 11.0018, null],
-  ['poi-pr-battistero', 'Battistero di Parma', 'Parma', 'L'ottagono rosa di Benedetto Antelami: dentro, quattordici statue raccontano i mesi e le stagioni, e lo zodiaco corre sotto la cupola dipinta. Un cielo di pietra che misura il tempo', 44.8017, 10.3274, null],
-  ['poi-pr-torrechiara', 'Castello di Torrechiara', 'Parma', 'Il castello d'amore: Pier Maria Rossi lo costruì per Bianca Pellegrini, e la Camera d'Oro ne affresca la glorificazione. L'unico ciclo medievale italiano interamente dedicato all'amor cortese tra due persone vere', 44.4806, 10.2581, null],
-  ['poi-pc-gropparello', 'Castello di Gropparello', 'Piacenza', 'La leggenda di Rosania: la castellana che cedette all'antico amore Lancillotto mentre il marito era in guerra, e tornando lui la murò viva. La sua donna bianca vagherebbe ancora le stanze della rocca sulla gola della Val Chiavenna', 44.8172, 9.7059, null],
+  ['poi-fe-estense', 'Castello Estense', 'Ferrara', 'La rocca circondata dall\'acqua dove nel 1425 morirono la giovane Parisina e il suo figliastro Ugo, giustiziati entrambi per volere di Niccolò III. La leggenda vuole che lei ritorni ancora, di notte, a cercare il suo giovane amore perduto', 44.8375, 11.6200, null],
+  ['poi-fe-schifanoia', 'Palazzo Schifanoia', 'Ferrara', 'Il Salone dei Mesi è un calendario di astrologia in affresco: dodici mesi, i segni dello zodiaco, i decani e gli dèi che governano i giorni, voluti da Borso d\'Este. Un orologio celeste dipinto nel cielo di una sala', 44.8397, 11.6186, null],
+  ['poi-fc-malatestiana', 'Biblioteca Malatestiana', 'Forlì-Cesena', 'La prima biblioteca civica d\'Europa, voluta da Malatesta Novello nel 1452: i codici incatenati ai plutei dell\'Aula del Nuti, esattamente come cinque secoli fa. Patrimonio UNESCO: qui il Rinascimento non è mai finito', 44.1394, 12.2439, null],
+  ['poi-fc-ravaldino', 'Rocca di Ravaldino', 'Forlì-Cesena', 'La rocca di Caterina Sforza, la tigre di Forlì: nel 1499 la difese armi in pugno contro l\'esercito di Cesare Borgia, mentre i notabili della città trattavano la resa. Cadde, ma la tigre entrò nella leggenda', 44.2217, 12.0430, null],
+  ['poi-mo-ghirlandina', 'Torre Ghirlandina', 'Modena', 'La torre custodisce nella Sala della Secchia il ricordo della guerra più strana d\'Italia: nel 1325 modenesi e bolognesi si batterono a Zappolino per una secchia rubata da un pozzo. Il bottino di legno fece più rumore di duemila caduti', 44.6458, 10.9253, null],
+  ['poi-mo-nonantola', 'Abbazia di Nonantola', 'Modena', 'L\'abbazia fondata da sant\'Anselmo nel 752, con la cripta a sessantaquattro colonne e l\'altare che custodisce le reliquie di papa San Silvestro. Tra le sue pergamene firmano anche Carlo Magno e Matilde di Canossa', 44.6792, 11.0018, null],
+  ['poi-pr-battistero', 'Battistero di Parma', 'Parma', 'L\'ottagono rosa di Benedetto Antelami: dentro, quattordici statue raccontano i mesi e le stagioni, e lo zodiaco corre sotto la cupola dipinta. Un cielo di pietra che misura il tempo', 44.8017, 10.3274, null],
+  ['poi-pr-torrechiara', 'Castello di Torrechiara', 'Parma', 'Il castello d\'amore: Pier Maria Rossi lo costruì per Bianca Pellegrini, e la Camera d\'Oro ne affresca la glorificazione. L\'unico ciclo medievale italiano interamente dedicato all\'amor cortese tra due persone vere', 44.4806, 10.2581, null],
+  ['poi-pc-gropparello', 'Castello di Gropparello', 'Piacenza', 'La leggenda di Rosania: la castellana che cedette all\'antico amore Lancillotto mentre il marito era in guerra, e tornando lui la murò viva. La sua donna bianca vagherebbe ancora le stanze della rocca sulla gola della Val Chiavenna', 44.8172, 9.7059, null],
   ['poi-pc-pontegobbo', 'Ponte Gobbo di Bobbio', 'Piacenza', 'Il ponte gobbo sul Trebbia, undici archi disuguali come una colonna rotta: la leggenda vuole che sia stato il diavolo a innalzarlo in una notte, per un patto con san Colombano che il santo volle e poi raggirò. Undici arcate di signoria e di mistero', 44.8414, 9.3817, null],
-  ['poi-ra-dante', 'Tomba di Dante', 'Ravenna', 'L'ultimo rifugio del poeta esule. Le sue ossa sono scomparse e ricomparse per due secoli: nascoste dai frati nel 1810, ritrovate per caso in una parete nel 1865, nascoste ancora nel 1944 e restituite. Firenze chiede di riaverle: Ravenna non sente', 44.4183, 12.2016, null],
-  ['poi-ra-gallaplacidia', 'Mausoleo di Galla Placidia', 'Ravenna', 'Lo scrigno dei mosaici più antichi dell'Occidente: la volta è un cielo di stelle azzurre così profondo che si dice abbia ispirato la notte di Cole Porter. L'imperatrice che volle questo cielo non ci riposa da nessuna parte', 44.4190, 12.2030, null],
-  ['poi-re-canossa', 'Castello di Canossa', 'Reggio Emilia', 'La rocca di Matilde dove nel 1077 l'imperatore Enrico IV attese tre giorni nella neve, scalzo e in cilizio, perché il papa gli sciogliesse la scomunica. Un re in ginocchio, e una contessa che decideva i destini d'Europa', 44.5652, 10.4376, null],
-  ['poi-re-ghiara', 'Tempio della Beata Vergine della Ghiara', 'Reggio Emilia', 'Il 29 aprile 1596 il giovane Marchino, muto e sordo dalla nascita, ritrovò parola e udito davanti all'immagine dipinta sul cantone. La città rispose alzando un tempio, che ancora custodisce quell'immagine', 44.6984, 10.6320, null],
-  ['poi-ri-malatestiano', 'Tempio Malatestiano', 'Rimini', 'La chiesa-mausoleo di Sigismondo Malatesta e del suo amore Isotta: papa Pio II lo processò in contumacia e ne bruciò l'immagine in piazza a Roma, come a un eretico. Il tempio non fu mai finito, e la sua ombra non si è mai inginocchiata', 44.0620, 12.5730, null],
-  ['poi-ri-sanleo', 'Forte di San Leo', 'Rimini', 'La rocca sullo strapiombo dove morì nel 1795 il conte di Cagliostro, l'alchimista più chiacchierato d'Europa, rinchiuso in una cella scavata nella roccia e senza porta: si entrava solo dal pertugio sopra la testa. Da San Leo non si scappa, e lui non ne uscì', 43.8986, 12.3403, null],
+  ['poi-ra-dante', 'Tomba di Dante', 'Ravenna', 'L\'ultimo rifugio del poeta esule. Le sue ossa sono scomparse e ricomparse per due secoli: nascoste dai frati nel 1810, ritrovate per caso in una parete nel 1865, nascoste ancora nel 1944 e restituite. Firenze chiede di riaverle: Ravenna non sente', 44.4183, 12.2016, null],
+  ['poi-ra-gallaplacidia', 'Mausoleo di Galla Placidia', 'Ravenna', 'Lo scrigno dei mosaici più antichi dell\'Occidente: la volta è un cielo di stelle azzurre così profondo che si dice abbia ispirato la notte di Cole Porter. L\'imperatrice che volle questo cielo non ci riposa da nessuna parte', 44.4190, 12.2030, null],
+  ['poi-re-canossa', 'Castello di Canossa', 'Reggio Emilia', 'La rocca di Matilde dove nel 1077 l\'imperatore Enrico IV attese tre giorni nella neve, scalzo e in cilizio, perché il papa gli sciogliesse la scomunica. Un re in ginocchio, e una contessa che decideva i destini d\'Europa', 44.5652, 10.4376, null],
+  ['poi-re-ghiara', 'Tempio della Beata Vergine della Ghiara', 'Reggio Emilia', 'Il 29 aprile 1596 il giovane Marchino, muto e sordo dalla nascita, ritrovò parola e udito davanti all\'immagine dipinta sul cantone. La città rispose alzando un tempio, che ancora custodisce quell\'immagine', 44.6984, 10.6320, null],
+  ['poi-ri-malatestiano', 'Tempio Malatestiano', 'Rimini', 'La chiesa-mausoleo di Sigismondo Malatesta e del suo amore Isotta: papa Pio II lo processò in contumacia e ne bruciò l\'immagine in piazza a Roma, come a un eretico. Il tempio non fu mai finito, e la sua ombra non si è mai inginocchiata', 44.0620, 12.5730, null],
+  ['poi-ri-sanleo', 'Forte di San Leo', 'Rimini', 'La rocca sullo strapiombo dove morì nel 1795 il conte di Cagliostro, l\'alchimista più chiacchierato d\'Europa, rinchiuso in una cella scavata nella roccia e senza porta: si entrava solo dal pertugio sopra la testa. Da San Leo non si scappa, e lui non ne uscì', 43.8986, 12.3403, null],
 
 ];
 const insPoi = db.prepare('INSERT OR IGNORE INTO poi (id, nome, provincia, descrizione, lat, lon, creato_da, creato_il) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
@@ -269,25 +269,25 @@ db.prepare('UPDATE poi SET evidenza = 1, descrizione = ? WHERE id = ?').run(roto
 // Secondo giro della stessa sera: il custode è ricontattabile. Ogni custode
 // ha PIÙ racconti (custode_racconto = array JSON); a ogni ascolto la voce
 // cambia, in rotazione. Chi torna non è mai zittito: lo spirito ha sempre
-// una parola nuova per l'anima che ritorna.
+// una parola nuova per l\'anima che ritorna.
 const custodiSeed = [
   ['poi-ro-rotonda', 'La Segnaressa', [
-    "Ah. Un'altra anima che arriva col fiatato del Po in gola. Quando qui non c'era nessun tempio, questo prato era nostro: noi, il vento, i roghi d'erba. Poi alzarono l'ottagono, e le nostre feste impararono a farsi piccole, come le fiammelle di un altare. Ma ascolta: sotto il pavimento, la terra batte ancora il tempo. Vieni a notte fatta, con rispetto, e forse mi vedrai girare tra le colonne. E non dire a nessuno che ti ho parlato: alle segnaresse non piace essere citate.",
-    "Torna, che qui si parla meglio la seconda volta. Conta le mie colonne un giorno: otto facce, come otto erano le erbe del nostro sabato, come otto i nodi della fune. I muratori hanno scelto l'ottagono credendo di averlo inventato loro: glielo ha suggerito la terra, che ha la memoria lunga e non si smentisce mai. E quando il Po entra nel delta e si perde, io lo sento da qui: corre sui tetti come un gatto nero. Tu non lo sentiresti. Sei giovane di orecchio.",
-    "In inverno questo prato è mio e di nessun altro. Le sorelle arrivano coi baroni nei piedi e la luna in bocca, e ci si scalda come si può: col rogo dell'erba secca e con le parole. Tu me ne hai portate, di parole, anima di ritorno, e questo conta più della legna. Tieni la stella che ti sei guadagnata, e se ti chiedono del calore di stanotte di' pure che era il vento del Po. Il vento scusa tutto, da queste parti."
+    "Ah. Un\'altra anima che arriva col fiatato del Po in gola. Quando qui non c\'era nessun tempio, questo prato era nostro: noi, il vento, i roghi d\'erba. Poi alzarono l\'ottagono, e le nostre feste impararono a farsi piccole, come le fiammelle di un altare. Ma ascolta: sotto il pavimento, la terra batte ancora il tempo. Vieni a notte fatta, con rispetto, e forse mi vedrai girare tra le colonne. E non dire a nessuno che ti ho parlato: alle segnaresse non piace essere citate.",
+    "Torna, che qui si parla meglio la seconda volta. Conta le mie colonne un giorno: otto facce, come otto erano le erbe del nostro sabato, come otto i nodi della fune. I muratori hanno scelto l\'ottagono credendo di averlo inventato loro: glielo ha suggerito la terra, che ha la memoria lunga e non si smentisce mai. E quando il Po entra nel delta e si perde, io lo sento da qui: corre sui tetti come un gatto nero. Tu non lo sentiresti. Sei giovane di orecchio.",
+    "In inverno questo prato è mio e di nessun altro. Le sorelle arrivano coi baroni nei piedi e la luna in bocca, e ci si scalda come si può: col rogo dell\'erba secca e con le parole. Tu me ne hai portate, di parole, anima di ritorno, e questo conta più della legna. Tieni la stella che ti sei guadagnata, e se ti chiedono del calore di stanotte di' pure che era il vento del Po. Il vento scusa tutto, da queste parti."
   ]],
   ['poi-ve-poveglia', 'Il Medico della Peste', [
-    "Metti via quel sorriso, viandante: quest'isola non accoglie, archivia. Io arrivai con la maschera piena d'erbe e il campanello all'ordine. La febbre non chiedeva i nomi, e io li scrivevo tutti, tutti, perché nessuno andasse perso. La laguna qui è fatta di cenere: l'erba che calpesti è vite. Gira in barca, anima, e saluta: ci sono luoghi che si visitano solo raccontandoli. E ora qualcuno l'ha fatto, grazie a te.",
-    "Senti la campana? No, non la senti: sotto il mare di cenere dormono ancora le mie bordone. Io camminavo il perimetro col campanello alla cintura, e i vivi si facevano piccoli al passaggio. Non per paura di me: per pietà di sé stessi. Sai cosa si diceva allora? Meglio il lago che il lazzaretto. E invece furono tutti e due. Gira, anima. E quando passi sopra il punto dove il canale finisce, ringrazia piano: per ognuno dei numeri che non conterai mai, c'è una riga scritta da me.",
-    "Poi venne il secolo dei mattoni, e sopra le mie spalle alzarono l'ospedale. Pazzi, li chiamavano, e li chiudevano qui perché la laguna dimentica in fretta. Io me ne stavo nelle fondamenta e ascoltavo le voci arrivare dai piani alti: sapevano tutte la stessa canzone, la canzone di chi è stato archiviato. Nel sessantotto chiusero anche quella porta. Da allora l'isola ha smesso di mentire: è semplicemente ciò che era. Un archivio. E io ne sono l'usciere."
+    "Metti via quel sorriso, viandante: quest\'isola non accoglie, archivia. Io arrivai con la maschera piena d\'erbe e il campanello all\'ordine. La febbre non chiedeva i nomi, e io li scrivevo tutti, tutti, perché nessuno andasse perso. La laguna qui è fatta di cenere: l\'erba che calpesti è vite. Gira in barca, anima, e saluta: ci sono luoghi che si visitano solo raccontandoli. E ora qualcuno l\'ha fatto, grazie a te.",
+    "Senti la campana? No, non la senti: sotto il mare di cenere dormono ancora le mie bordone. Io camminavo il perimetro col campanello alla cintura, e i vivi si facevano piccoli al passaggio. Non per paura di me: per pietà di sé stessi. Sai cosa si diceva allora? Meglio il lago che il lazzaretto. E invece furono tutti e due. Gira, anima. E quando passi sopra il punto dove il canale finisce, ringrazia piano: per ognuno dei numeri che non conterai mai, c\'è una riga scritta da me.",
+    "Poi venne il secolo dei mattoni, e sopra le mie spalle alzarono l\'ospedale. Pazzi, li chiamavano, e li chiudevano qui perché la laguna dimentica in fretta. Io me ne stavo nelle fondamenta e ascoltavo le voci arrivare dai piani alti: sapevano tutte la stessa canzone, la canzone di chi è stato archiviato. Nel sessantotto chiusero anche quella porta. Da allora l\'isola ha smesso di mentire: è semplicemente ciò che era. Un archivio. E io ne sono l\'usciere."
   ]],
   ['poi-bz-laurino', 'Re Laurino', [
-    "Ehilà, anima! Sei venuto per l'enrosadira, vero? Il mio giardino di rose che brucia di rosa ogni sera, quando la luce non è più giorno e non è ancora notte. Lo piantai io, per amore. Poi gli uomini mi presero il regno, e il cielo mi volle beffare: «Che tu non possa essere visto né di giorno né di notte». Ecco perché il mio rosso dura soltanto in quell'ora sospesa. Goditela. E sappi che dietro ogni rosa che ammiri c'è un re che brontola ancora.",
-    "Vuoi sapere quando vengo meglio? A sera, quando il sole si mette di lato e il cielo non sa più se coprirsi o scoprirsi. Capirai anche tu, allora, il valore degli spiragli: «Né di giorno né di notte», mi dissero. Un re sepolto sotto il prato le sentenze le capisce al volo. Per questo l'enrosadira non è la mia vendetta: è la mia fuga. Di' a chi sale il Catinaccio che ogni rosa è la pietra di una notte scappata. Ma dillo piano: il cielo ha l'udito fine.",
-    "Ti ho mai raccontato perché proprio rose? Erano l'unica cosa che i miei nani non riuscivano a forgiare nell'oro. Le portai su dalla valle più in basso e le piantai tra i monti, perché la roccia imparasse la tenerezza. Poi vennero a prendermi in tanti, per una fanciulla che non voleva essere mia. Persi il giardino, persi il regno: il tempo si tenne tutto. E la tenerezza color fragola che vedi ogni sera è l'unica moneta che il tempo mi rende indietro."
+    "Ehilà, anima! Sei venuto per l\'enrosadira, vero? Il mio giardino di rose che brucia di rosa ogni sera, quando la luce non è più giorno e non è ancora notte. Lo piantai io, per amore. Poi gli uomini mi presero il regno, e il cielo mi volle beffare: «Che tu non possa essere visto né di giorno né di notte». Ecco perché il mio rosso dura soltanto in quell\'ora sospesa. Goditela. E sappi che dietro ogni rosa che ammiri c\'è un re che brontola ancora.",
+    "Vuoi sapere quando vengo meglio? A sera, quando il sole si mette di lato e il cielo non sa più se coprirsi o scoprirsi. Capirai anche tu, allora, il valore degli spiragli: «Né di giorno né di notte», mi dissero. Un re sepolto sotto il prato le sentenze le capisce al volo. Per questo l\'enrosadira non è la mia vendetta: è la mia fuga. Di' a chi sale il Catinaccio che ogni rosa è la pietra di una notte scappata. Ma dillo piano: il cielo ha l\'udito fine.",
+    "Ti ho mai raccontato perché proprio rose? Erano l\'unica cosa che i miei nani non riuscivano a forgiare nell\'oro. Le portai su dalla valle più in basso e le piantai tra i monti, perché la roccia imparasse la tenerezza. Poi vennero a prendermi in tanti, per una fanciulla che non voleva essere mia. Persi il giardino, persi il regno: il tempo si tenne tutto. E la tenerezza color fragola che vedi ogni sera è l\'unica moneta che il tempo mi rende indietro."
   ]],
 ];
-// custode_racconto contiene l'ARRAY dei racconti in JSON: idempotente come
+// custode_racconto contiene l\'ARRAY dei racconti in JSON: idempotente come
 // tutto il seed (un solo UPDATE per riga, gli id non si toccano MAI).
 const insCustode = db.prepare('UPDATE poi SET livello = 2, custode_nome = ?, custode_racconto = ? WHERE id = ?');
 for (const c of custodiSeed) {
@@ -297,7 +297,7 @@ for (const c of custodiSeed) {
 // ---- La voce che ruota (V8.21, secondo giro) ----
 // Quante volte QUESTA anima ha ascoltato QUESTO custode: serve a dare ogni
 // volta un racconto diverso. Solo un contatore: nome, luogo e numero. Nessuna
-// posizione, nessun testo dell'utente. Coerente con la pietra angolare.
+// posizione, nessun testo dell\'utente. Coerente con la pietra angolare.
 db.exec(`CREATE TABLE IF NOT EXISTS ascolti (
   utente_id TEXT NOT NULL,
   poi_id TEXT NOT NULL,
@@ -333,11 +333,11 @@ function parlaCustode(p, utenteId) {
 // ============ LA DIREZIONE VERA ============
 // Capoluoghi: punti di riferimento PUBBLICI per le rotte della bussola.
 // Precisione da cartografo pigro (~km): per un ago è più che sufficiente.
-// Le 107 porte d'Italia (V8.10): tutte le province, tutte le rotte.
+// Le 107 porte d\'Italia (V8.10): tutte le province, tutte le rotte.
 // I luoghi di potere arrivano dopo, regione per regione: dove non sono ancora
-// mappati, l'ago grande vaga e le anime puntano comunque con la rotta vera.
+// mappati, l\'ago grande vaga e le anime puntano comunque con la rotta vera.
 const RIF_PROVINCIA = {
-  // Valle d'Aosta
+  // Valle d\'Aosta
   'Aosta': [45.737, 7.32],
   // Piemonte
   'Alessandria': [44.913, 8.621],
@@ -485,7 +485,7 @@ function distanzaTraRif(a, b) {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-// Angolo d'albergo per chi è vicinissimo: piccolo scarto fisso per coppia (±25°),
+// Angolo d\'albergo per chi è vicinissimo: piccolo scarto fisso per coppia (±25°),
 // deterministico — due anime vicine non si sovrappongono mai, e ogni giorno è uguale.
 function scartoStabile(idA, idB) {
   const h = crypto.createHash('md5').update(String(idA) + ':' + String(idB)).digest('hex');
@@ -529,7 +529,7 @@ function spazzaPresenze() {
   db.prepare('DELETE FROM presenze WHERE online_da < ?').run(sogliaPresenze());
 }
 
-// Spazzata all'avvio (ripulisce i fantasmi del passato) e poi ogni minuto.
+// Spazzata all\'avvio (ripulisce i fantasmi del passato) e poi ogni minuto.
 spazzaPresenze();
 setInterval(spazzaPresenze, 60 * 1000);
 
@@ -721,7 +721,7 @@ const server = http.createServer(async (req, res) => {
 
     // Il luogo di potere della provincia: quello messo in evidenza, altrimenti
     // il primo in ordine stabile. lat/lon servono al TELEFONO per il confronto
-    // del check-in: sono coordinate di luoghi pubblici, non la posizione dell'utente.
+    // del check-in: sono coordinate di luoghi pubblici, non la posizione dell\'utente.
     const poi = db.prepare('SELECT id, nome, descrizione, provincia, lat, lon FROM poi WHERE provincia = ? ORDER BY evidenza DESC, id LIMIT 1').get(provincia);
 
     // La rotta della lancetta grande: dal capoluogo della mia provincia
@@ -732,7 +732,7 @@ const server = http.createServer(async (req, res) => {
       : 0; // geografia non ancora mappata: il luogo batte a nord
 
     // Le anime: le più vicine ovunque (distanza tra capoluoghi, non tra persone).
-    // Stessa provincia = distanza zero = nessuna rotta possibile: angolo d'albergo.
+    // Stessa provincia = distanza zero = nessuna rotta possibile: angolo d\'albergo.
     const anime = db.prepare(`
       SELECT u.id, u.nome, u.tipo, u.provincia, p.online_da FROM utenti u
       JOIN presenze p ON u.id = p.utente_id
@@ -763,7 +763,7 @@ const server = http.createServer(async (req, res) => {
 
   // ---- POST /api/checkin ---- ("Il luogo è raggiunto")
   // PIETRA ANGOLARE: questo endpoint accetta SOLO { utente_id, poi_id }.
-  // Nessuna coordinata dell'utente viene mai accettata, salvata o loggata:
+  // Nessuna coordinata dell\'utente viene mai accettata, salvata o loggata:
   // la verifica della vicinanza avviene interamente sul telefono del client.
   if (path === '/api/checkin' && req.method === 'POST') {
     try {
@@ -790,7 +790,7 @@ const server = http.createServer(async (req, res) => {
 
       broadcast(u.provincia, 'poi-visitato', { da: u.nome, poi: p.nome });
 
-      // V8.21: se il luogo è profondo e ha un custode, l'anima lo incontra.
+      // V8.21: se il luogo è profondo e ha un custode, l\'anima lo incontra.
       // Secondo giro: la voce ruota, parlaCustode sceglie il racconto giusto.
       const custode = parlaCustode(p, utente_id);
 
@@ -802,7 +802,7 @@ const server = http.createServer(async (req, res) => {
 
   // ---- GET /api/custode?poi_id=X&utente_id=Y ---- (V8.21, secondo giro:
   // risentire la voce senza rifare il check-in. La fiammella risponde dal
-  // luogo, quante volte l'anima la chiede. Solo contatore di ascolti: zero
+  // luogo, quante volte l\'anima la chiede. Solo contatore di ascolti: zero
   // posizioni, come sempre.)
   if (path === '/api/custode' && req.method === 'GET') {
     const poiId = url.searchParams.get('poi_id');
@@ -816,7 +816,7 @@ const server = http.createServer(async (req, res) => {
 
     // V8.22 — LA CHIAVE AL CANCELLO: la fiammella parla solo a chi ha già
     // posato la stella in questo luogo. Il bottone client appare comunque
-    // solo dopo un check-in, ma ora è l'API stessa a fare la guardia.
+    // solo dopo un check-in, ma ora è l\'API stessa a fare la guardia.
     const visitato = db.prepare('SELECT 1 FROM visite WHERE utente_id = ? AND poi_id = ?').get(utenteId, poiId);
     if (!visitato) return json(res, 403, { error: 'La fiammella parla solo a chi ha già posato la stella in questo luogo' });
 
