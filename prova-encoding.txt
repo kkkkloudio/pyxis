@@ -1,7 +1,0 @@
-T1:apostrofo escape singolo A[l\'anima]Z
-T2:apostrofo escape doppio A[l\\'anima]Z
-T3:tipografico A[l’anima]Z
-T4:backslash semplice A[l\anima]Z
-T5:apostrofo+spazio Ca[\' de Baggiure]Z
-T6:doppio quoting interno "l'anima dentro doppi"
-T7:escape in doppi "l\'anima doppi"]Z
