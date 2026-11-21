@@ -544,17 +544,41 @@
     font-family:'IM Fell English', serif; font-size:10px; color:#8a7a5a;
   }
 
-  .corvo-volo {
-    position:absolute; top:22%; left:-80px; z-index:160;
-    font-size:32px; pointer-events:none;
-    text-shadow:0 0 12px rgba(232,205,133,.5);
-    animation: volo-corvo 1.6s ease-in forwards;
+/* ===== V8.24 — IL CORVO DI PYXIS: il pet della notte ===== */
+  .corvo-pet {
+    position:absolute; left:0; bottom:44px; z-index:15;
+    width:34px; cursor:pointer; outline:none;
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,.55));
+    will-change:transform;
   }
-  @keyframes volo-corvo {
-    0%   { transform:translate(0,0) rotate(-8deg); opacity:0; }
-    15%  { opacity:1; }
-    100% { transform:translate(460px,130px) rotate(6deg); opacity:0; }
+  .corvo-pet:focus-visible { filter:drop-shadow(0 3px 3px rgba(0,0,0,.55)) drop-shadow(0 0 8px rgba(232,205,133,.6)); }
+  .corvo-pet svg { display:block; width:100%; height:auto; }
+  .corvo-pet.cammina .corvo-corpo { animation: corvo-cammina .34s ease-in-out infinite; }
+  .corvo-pet.becca .corvo-testa { animation: corvo-beccata .55s ease-in-out; transform-origin:78% 30%; }
+  .corvo-pet.salta .corvo-corpo { animation: corvo-salto .42s ease-in-out; }
+  .corvo-pet.vola .zampe { display:none; }
+  .corvo-pet.vola .ala-l { animation: corvo-ala .24s ease-in-out infinite; transform-origin:32% 22%; }
+  @keyframes corvo-cammina { 0%,100% { transform:translateY(0) rotate(0deg); } 50% { transform:translateY(-1.3px) rotate(-1.2deg); } }
+  @keyframes corvo-beccata { 0%,100% { transform:rotate(0deg); } 38% { transform:rotate(17deg); } 70% { transform:rotate(4deg); } }
+  @keyframes corvo-salto { 0%,100% { transform:translateY(0); } 45% { transform:translateY(-8px); } }
+  @keyframes corvo-ala { 0%,100% { transform:rotate(0deg); } 50% { transform:rotate(-36deg); } }
+  .corvo-bolla {
+    position:absolute; bottom:30px; left:50%;
+    white-space:nowrap; pointer-events:none;
+    background:linear-gradient(170deg,#f3ead2,#e6d4ac);
+    border:1px solid #8a6a3a; border-radius:10px 10px 10px 2px;
+    padding:4px 10px;
+    font-family:'IM Fell English', serif; font-style:italic; font-size:11px; color:#221a10;
+    box-shadow:0 4px 14px rgba(0,0,0,.55);
+    animation: corvo-bolla 2.5s ease forwards;
   }
+  @keyframes corvo-bolla {
+    0% { opacity:0; transform:translate(-50%,4px); }
+    14% { opacity:1; transform:translate(-50%,0); }
+    80% { opacity:1; }
+    100% { opacity:0; transform:translate(-50%,-4px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .corvo-pet.cammina .corvo-corpo { animation:none; } }
 
   .toast-corvo {
     position:absolute; top:64px; left:50%; transform:translateX(-50%);
@@ -786,7 +810,7 @@
 
     <button class="btn-lingua" id="btn-lingua">🇮🇹 IT</button>
 
-    <div class="pyxis-label">Pyxis · V8.23</div>
+    <div class="pyxis-label">Pyxis · V8.24</div>
   </div>
 </div>
 
