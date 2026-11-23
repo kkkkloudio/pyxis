@@ -78,8 +78,6 @@ const TESTI = {
     dettMedia: "anima più vicina",
     dettPiccola: "seconda anima",
     visita: "✨ Il luogo è raggiunto",
-    lettera: "🐦‍⬛ Scrivi una lettera al vicino",
-    posta: "la posta — le lettere ricevute",
     collezione: "la collezione — le stelle raccolte",
     piazza: "la piazza — le voci di tutte le anime",
     feedback: "🗝️ parola ai costruttori",
@@ -103,22 +101,15 @@ const TESTI = {
     avanti: "Avanti",
     entraCerchio: "Entra nel cerchio",
     saltaGuida: "Salta la guida",
-    affida: "🐦‍⬛ Affida al corvo",
-    affidaChiave: "🗝️ Affida al corvo",
     rimettiPenna: "Rimetti la penna",
     chiudi: "Chiudi",
     lasciaVoce: "📣 Lascia la voce",
-    scritturaTitolo: "Una lettera al vicino",
-    scritturaSub: "il corvo la porterà a ",
-    postaTitolo: "La posta",
-    postaSub: "i corvi che sono giunti fin qui",
     collezioneTitolo: "La collezione",
     collezioneSub: "le stelle raccolte sui luoghi di potere",
     piazzaTitolo: "La piazza",
     piazzaSub: "le voci lasciate da tutte le anime",
     feedbackTitolo: "Parola ai costruttori",
     feedbackSub: "cosa non torna, cosa sogni — il corvo lo porta a chi ha fatto la bussola",
-    placeholderLettera: "Scrivi con l\'inchiostro della notte…",
     placeholderPiazza: "Lascia un pensiero nel cerchio…",
     placeholderFeedback: "Scrivi al di là del gioco…",
     corvoFrase1: "cra.",
@@ -140,8 +131,6 @@ const TESTI = {
     dettMedia: "nearest soul",
     dettPiccola: "second soul",
     visita: "✨ The place is reached",
-    lettera: "🐦‍⬛ Write a letter to the neighbour",
-    posta: "the mail — letters received",
     collezione: "the collection — stars gathered",
     piazza: "the square — voices of all souls",
     feedback: "🗝️ word to the makers",
@@ -165,22 +154,15 @@ const TESTI = {
     avanti: "Next",
     entraCerchio: "Enter the circle",
     saltaGuida: "Skip the guide",
-    affida: "🐦‍⬛ Entrust to the raven",
-    affidaChiave: "🗝️ Entrust to the raven",
     rimettiPenna: "Put the pen back",
     chiudi: "Close",
     lasciaVoce: "📣 Leave a voice",
-    scritturaTitolo: "A letter to the neighbour",
-    scritturaSub: "the raven will carry it to ",
-    postaTitolo: "The mail",
-    postaSub: "the ravens that have landed here",
     collezioneTitolo: "The collection",
     collezioneSub: "the stars gathered at places of power",
     piazzaTitolo: "The square",
     piazzaSub: "voices left by all souls",
     feedbackTitolo: "Word to the makers",
     feedbackSub: "what is off, what you dream — the raven carries it to those who made the compass",
-    placeholderLettera: "Write with the ink of the night…",
     placeholderPiazza: "Leave a thought in the circle…",
     placeholderFeedback: "Write from beyond the game…",
     corvoFrase1: "cra.",
@@ -219,8 +201,6 @@ function applicaLingua() {
   const sveglia = document.getElementById('btn-sveglia');
   if (sveglia && !BVERA.attiva) sveglia.textContent = t('sveglia');
   setId('btn-visita', 'visita');
-  setId('btn-lettera', 'lettera');
-  setId('btn-posta', 'posta');
   setId('btn-collezione', 'collezione');
   setId('btn-piazza', 'piazza');
   setId('btn-feedback', 'feedback');
@@ -234,16 +214,11 @@ function applicaLingua() {
     const h3 = box.querySelector('h3'); if (h3 && tk) h3.textContent = t(tk);
     const s = box.querySelector('.sub'); if (s && sk) s.textContent = t(sk);
   };
-  modale('modale-scrittura', 'scritturaTitolo', null); // il sub contiene il nome: si traduce a parte
-  modale('modale-posta', 'postaTitolo', 'postaSub');
   modale('modale-collezione', 'collezioneTitolo', 'collezioneSub');
   modale('modale-piazza', 'piazzaTitolo', 'piazzaSub');
   modale('modale-feedback', 'feedbackTitolo', 'feedbackSub');
   modale('modale-guida', 'guidaTitolo', 'guidaSub');
-  const subScrittura = document.querySelector('#modale-scrittura .sub');
-  if (subScrittura && subScrittura.childNodes[0]) subScrittura.childNodes[0].textContent = t('scritturaSub');
   setId('btn-affida', 'affida');
-  setId('btn-annulla-lettera', 'rimettiPenna');
   setId('btn-chiudi-posta', 'chiudi');
   setId('btn-chiudi-collezione', 'chiudi');
   setId('btn-voce', 'lasciaVoce');
@@ -251,7 +226,6 @@ function applicaLingua() {
   setId('btn-feedback-invia', 'affidaChiave');
   setId('btn-chiudi-feedback', 'rimettiPenna');
   setId('btn-chiudi-guida', 'saltaGuida');
-  setPh('lettera-testo', 'placeholderLettera');
   setPh('piazza-testo', 'placeholderPiazza');
   setPh('feedback-testo', 'placeholderFeedback');
 
@@ -277,21 +251,6 @@ let destinatario = null;   // l\'anima più vicina (lancetta media): { id, nome 
 let poiCorrente = null;     // il luogo di potere (lancetta grande): { id, nome, lat, lon }
 
 document.addEventListener('DOMContentLoaded', function () {
-  // ===== IL SIPARIO: lo scrigno si apre =====
-  const apertura = document.getElementById('apertura');
-  if (apertura) {
-    let chiusa = false;
-    const chiudiApertura = () => {
-      if (chiusa) return;
-      chiusa = true;
-      apertura.style.transition = 'opacity .6s';
-      apertura.style.opacity = '0';
-      apertura.style.pointerEvents = 'none';
-      setTimeout(() => apertura.remove(), 700);
-    };
-    apertura.addEventListener('click', chiudiApertura);
-    setTimeout(chiudiApertura, 3300); // il sipario va via da solo
-  }
 
   applicaLingua(); // V8.17: la lingua scelta veste la pagina prima di tutto
   const select = document.getElementById('provincia');
@@ -352,11 +311,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (btnSveglia) btnSveglia.addEventListener('click', svegliaAgo);
 
   // ===== il corvo =====
-  document.getElementById('btn-lettera').addEventListener('click', apriScrittura);
-  document.getElementById('btn-posta').addEventListener('click', apriPosta);
-  document.getElementById('btn-affida').addEventListener('click', inviaLettera);
-  document.getElementById('btn-annulla-lettera').addEventListener('click', () => chiudiModale('modale-scrittura'));
-  document.getElementById('btn-chiudi-posta').addEventListener('click', () => chiudiModale('modale-posta'));
 
   // ===== il check-in e la collezione =====
   document.getElementById('btn-visita').addEventListener('click', checkIn);
@@ -404,7 +358,6 @@ function aggiornaLancette(l, totale) {
   const itemG = document.querySelector('.legenda-item[data-tipo="grande"]');
   const itemM = document.querySelector('.legenda-item[data-tipo="media"]');
   const itemP = document.querySelector('.legenda-item[data-tipo="piccola"]');
-  const btnLettera = document.getElementById('btn-lettera');
   const btnVisita = document.getElementById('btn-visita');
 
   INFO_AGO.grande = null; INFO_AGO.media = null; INFO_AGO.piccola = null;
@@ -440,18 +393,16 @@ function aggiornaLancette(l, totale) {
   // MEDIA: l\'anima più vicina (destinataria del corvo)
   if (l.media) {
     puntaLancetta('media', l.media.angolo);
-    itemM.style.display = '';
+    itemM.style.display = 'none';
     itemM.querySelector('.nome').textContent = l.media.nome;
     itemM.querySelector('.dett').textContent = 'anima più vicina';
     destinatario = { id: l.media.id, nome: l.media.nome };
     INFO_AGO.media = { nome: l.media.nome };
-    btnLettera.disabled = false;
   } else {
     // Nessuna anima vicina: lancetta spenta, corvo senza meta
     itemM.style.display = 'none';
     destinatario = null;
     spegniLancetta('media');
-    btnLettera.disabled = true;
   }
 
   // PICCOLA: la seconda anima
@@ -482,6 +433,7 @@ const COLORI_AGO = { grande:'#d98a6a', media:'#7cc9a2', piccola:'#8ab0e0' };
 const DETTI_AGO  = { grande:'il luogo di potere', media:'l\'anima più vicina', piccola:'la seconda anima' };
 
 function selezionaAgo(tipo) {
+  if (tipo === 'media' || tipo === 'piccola') return; // anime vicine: in futuro
   if (!tipo) return;
   agoSelezionato = (agoSelezionato === tipo) ? null : tipo;
   document.querySelectorAll('.legenda-item').forEach(i =>
@@ -801,7 +753,7 @@ function checkIn() {
 
 function mostraStella(nomePoi, stelle, custode, poiId) {
   const toast = document.createElement('div');
-  toast.className = 'toast-corvo';
+  toast.className = 'toast-veloce';
   toast.textContent = '⭐ Una stella si è posata: ' + nomePoi + ' — ' + stelle + (stelle === 1 ? ' stella in collezione' : ' stelle in collezione');
   document.querySelector('.screen').appendChild(toast);
   setTimeout(() => toast.classList.add('spegni'), 6000);
@@ -884,67 +836,12 @@ async function apriCollezione() {
 }
 
 // ===== IL CORVO =====
-function apriScrittura() {
-  if (!destinatario) {
-    alert('Non c\'è nessuno a cui affidare il corvo: sei da solo nel tuo cielo, per ora.');
-    return;
-  }
-  document.getElementById('lettera-dest').textContent = destinatario.nome;
-  document.getElementById('lettera-testo').value = '';
-  document.getElementById('modale-scrittura').classList.remove('nascosto');
-  document.getElementById('lettera-testo').focus();
-}
 
 function chiudiModale(id) {
   document.getElementById(id).classList.add('nascosto');
 }
 
-async function inviaLettera() {
-  const testo = document.getElementById('lettera-testo').value.trim();
-  if (!testo) return;
-  try {
-    const resp = await fetch(API + '/api/lettera', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mittente_id: utente.id, destinatario_id: destinatario.id, testo })
-    });
-    if (!resp.ok) {
-      const d = await resp.json().catch(() => ({}));
-      alert(d.error || 'Il corvo non è riuscito a partire');
-      return;
-    }
-    chiudiModale('modale-scrittura');
-    corvoReagisci('partenza'); // V8.24: stavolta la lettera la porta lui, in carne e piume
-  } catch (e) {
-    alert('Il corvo non trova la via (server non raggiungibile): ' + e.message);
-  }
-}
 
-async function apriPosta() {
-  if (!utente) return;
-  try {
-    const resp = await fetch(API + '/api/lettere?id=' + encodeURIComponent(utente.id));
-    const data = await resp.json();
-    const lista = document.getElementById('posta-lista');
-    lista.innerHTML = '';
-    if (!data.lettere.length) {
-      lista.innerHTML = '<div class="lettera-ricevuta"><div class="testo">Nessuna lettera, per ora. La bussola sa attendere.</div></div>';
-    } else {
-      data.lettere.forEach(L => {
-        const el = document.createElement('div');
-        el.className = 'lettera-ricevuta';
-        const quando = new Date(L.creata_il).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        el.innerHTML = '<div class="da">🐦‍⬛ da ' + escapeHtml(L.mittente_nome) + '</div>' +
-                       '<div class="testo">' + escapeHtml(L.testo) + '</div>' +
-                       '<div class="quando">' + quando + '</div>';
-        lista.appendChild(el);
-      });
-    }
-    document.getElementById('modale-posta').classList.remove('nascosto');
-  } catch (e) {
-    alert('La posta non risponde (server non raggiungibile): ' + e.message);
-  }
-}
 
 // ===== LA PIAZZA (V8.13): le voci di tutte le anime =====
 async function apriPiazza() {
@@ -1023,7 +920,7 @@ async function inviaFeedback() {
     chiudiModale('modale-feedback');
     corvoReagisci('partenza'); // V8.24: verso i costruttori, col becco pieno
     const toast = document.createElement('div');
-    toast.className = 'toast-corvo';
+    toast.className = 'toast-veloce';
     toast.textContent = '🐦‍⬛ Il corvo ha preso il tuo messaggio. Grazie, anima.';
     document.querySelector('.screen').appendChild(toast);
     setTimeout(() => toast.classList.add('spegni'), 4500);
@@ -1035,11 +932,10 @@ async function inviaFeedback() {
 
 // ===== LA GUIDA (V8.15): i primi passi =====
 const GUIDA_STEP_IT = [
-  { titolo: 'Benvenuta, anima', testo: 'Questa è Pyxis, la bussola delle presenze. Punta i luoghi di potere e le anime che viaggiano nel cerchio con te. Niente paura: qui si impara camminando.' },
-  { titolo: 'Le tre lancette', testo: 'La grande punta il Luogo di Potere (granato). La media, la prima anima vicina (smeraldo). La piccola, la seconda (zaffiro). Tocca un ago — o la sua riga nella pergamena — e ti dirà chi sta indicando.' },
-  { titolo: 'La rotta vera', testo: 'Sul telefono, sveglia l\'ago con 🧭: la bussola seguirà la direzione VERA del luogo. Girati finché il granato entra nella porta d\'ottone in alto al quadrante — stai guardando verso il luogo. Poi cammina: sotto la bussola appare quanto manca.' },
-  { titolo: 'La stella', testo: 'Entro 500 metri dal luogo, il bottone ✨ si accende: la stella si posa e va nella tua collezione. La tua posizione resta sul telefono — mai salvata, mai inviata: è la pietra angolare di questo mondo.' },
-  { titolo: 'Il corvo e la piazza', testo: 'Con 🐦‍⬛ scrivi una lettera all\'anima più vicina; nella piazza lasciano pensieri tutte le anime; con 🗝️ parli ai costruttori. Ora il sentiero è tuo. Buon viaggio, anima.' }
+  { titolo: 'Benvenuta, anima', testo: 'Questa è la bussola. L\'ago grande punta il luogo più vicino a te. Toccalo: ti dice chi punta e dove.' },
+  { titolo: 'Sveglia l\'ago', testo: 'Con il bottone 🧭 l\'ago si sveglia e punta la direzione VERA nel mondo: girati finché la punta rossa entra nella porta in alto. Poi cammina: sotto vedi quanto manca.' },
+  { titolo: 'La stella', testo: 'Quando sei vicino al luogo, il bottone ✨ si accende: tocca e raccogli la stella. La tua posizione resta sul telefono, non esce mai.' },
+  { titolo: 'Il corvo', testo: 'In basso cammina un corvo: toccalo e ti parla. A volte porta messaggi da chi sta dietro a questo progetto. Ora il viaggio è tuo.' }
 ];
 let guidaIndice = 0;
 
@@ -1065,11 +961,10 @@ function disegnaGuida() {
 }
 
 const GUIDA_STEP_EN = [
-  { titolo: 'Welcome, soul', testo: 'This is Pyxis, the compass of presences. It points to places of power and to the souls travelling the circle with you. No fear: here you learn by walking.' },
-  { titolo: 'The three needles', testo: 'The large one points to the Place of Power (garnet). The middle one, the nearest soul (emerald). The small one, the second (sapphire). Tap a needle — or its row on the parchment — and it will tell you who it is pointing at.' },
-  { titolo: 'The true bearing', testo: 'On your phone, wake the needle with 🧭: the compass will follow the REAL direction of the place. Turn until the garnet enters the brass door at the top of the dial — you are facing the place. Then walk: below the compass you will see how far is left.' },
-  { titolo: 'The star', testo: 'Within 500 metres of the place, the ✨ button lights up: the star settles and joins your collection. Your position stays on your phone — never saved, never sent: that is the cornerstone of this world.' },
-  { titolo: 'The raven and the square', testo: 'With 🐦‍⬛ you write a letter to the nearest soul; in the square all souls leave their thoughts; with 🗝️ you speak to the makers. Now the path is yours. Fair journey, soul.' }
+  { titolo: 'Welcome, soul', testo: 'This is the compass. The big needle points to the nearest place. Tap it: it tells you what it points at and where.' },
+  { titolo: 'Wake the needle', testo: 'With the 🧭 button the needle wakes and points the REAL direction in the world: turn until the red tip enters the door at the top. Then walk: below you see how far is left.' },
+  { titulo: 'The star', testo: 'When you are near the place, the ✨ button lights up: tap and collect the star. Your location stays on the phone, it never leaves.' },
+  { titulo: 'The raven', testo: 'At the bottom a raven walks: tap it and it talks to you. Sometimes it brings messages from who is behind this project. Now the journey is yours.' }
 ];
 function GUIDA_STEP() { return LINGUA.corrente === 'en' ? GUIDA_STEP_EN : GUIDA_STEP_IT; }
 
@@ -1099,15 +994,24 @@ function escapeHtml(s) {
 // e fermo — ma parla comunque, con garbo. Nessun dato, nessuna posizione:
 // solo piume, inchiostro e un filo di lore.
 
-const CORVO_SVG = '<svg viewBox="0 0 64 44" class="corvo-svg" aria-hidden="true">'
-  + '<g class="zampe"><path d="M33 33 L33 40 M33 40 L29 43 M33 40 L36 43 M37 33 L37 40" stroke="#6a5535" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>'
+const CORVO_SVG = '<svg viewBox="0 0 120 84" class="corvo-svg" aria-hidden="true">'
+  + '<defs><radialGradient id="corvo-aura" cx="50%" cy="45%" r="60%"><stop offset="0%" stop-color="#e8cd85" stop-opacity=".28"/><stop offset="55%" stop-color="#8a6a3a" stop-opacity=".10"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient></defs>'
+  + '<ellipse class="corvo-aura" cx="60" cy="40" rx="56" ry="40" fill="url(#corvo-aura)"/>'
+  + '<g class="zampe"><path d="M56 62 L56 76 M56 76 L50 81 M56 76 L61 81 M65 62 L65 76 M65 76 L60 81 M65 76 L70 81" stroke="#8a7248" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>'
   + '<g class="corvo-corpo">'
   + '<g class="corvo-testa">'
-  + '<path class="corvo-sagoma" d="M47 11 C44 5.5, 37 3, 32 5.5 C28 7.5, 27.5 11, 28 13 L9 20 C5.5 21.5, 5.5 23.5, 9 24.5 L28 28 C27.5 31.5, 31 34, 37 33.5 C43 33, 46.5 28, 47.5 21 C48.5 15, 48 12, 47 11 Z" fill="#171310" stroke="#0a0806" stroke-width="1"/>'
-  + '<path class="corvo-becco" d="M46.5 10.5 L55 14.5 L46.5 18.5 Z" fill="#8a7248"/>'
-  + '<circle class="corvo-occhio" cx="41" cy="11.5" r="1.7" fill="#e8cd85"/>'
+  + '<path class="corvo-sagoma" d="M88 20 C83 10, 69 6, 58 11 C51 14, 50 21, 51 25 L18 39 C12 41.5, 12 45, 18 47 L51 53 C50 60, 57 66, 68 65.5 C81 65, 86 53, 88 39 C89.5 28, 90 24, 88 20 Z" fill="#14100d" stroke="#000" stroke-width="1.4"/>'
+  + '<path d="M51 26 L26 37 M51 33 L28 42 M52 40 L32 46 M54 47 L38 51" stroke="#2b241b" stroke-width="1.1" fill="none" stroke-linecap="round"/>'
+  + '<path d="M54 30 C60 34, 64 40, 65 47 M50 24 C58 28, 63 35, 64 43" stroke="#1d1812" stroke-width="1" fill="none"/>'
+  + '<path class="corvo-becco" d="M87 19 C94 20, 101 24, 106 30 C100 31.5, 91 30, 85 26 Z" fill="#c9a45c" stroke="#6a5535" stroke-width="1"/>'
+  + '<path d="M87 19 C94 20, 101 24, 106 30" stroke="#e8cd85" stroke-width=".8" fill="none" opacity=".7"/>'
+  + '<circle class="corvo-occhio" cx="76" cy="21" r="3.2" fill="#e8cd85"/>'
+  + '<circle cx="77" cy="20" r="1.2" fill="#fff"/>'
+  + '<circle cx="76" cy="21" r="5.2" fill="none" stroke="#e8cd85" stroke-width=".6" opacity=".35"/>'
   + '</g>'
-  + '<path class="ala ala-l" d="M31 14 C24 16, 20.5 23, 23 28 C29 26.5, 33.5 21, 34 15.5 Z" fill="#211c15" stroke="#0a0806" stroke-width="0.7"/>'
+  + '<path class="ala ala-l" d="M58 26 C44 30, 37 44, 42 53 C54 50, 62 39, 63 29 Z" fill="#1f1913" stroke="#000" stroke-width="1"/>'
+  + '<path d="M46 36 C51 39, 56 44, 59 50 M43 42 C48 45, 53 49, 57 53" stroke="#14100d" stroke-width="1" fill="none" stroke-linecap="round"/>'
+  + '<path class="ala ala-r" d="M60 24 C70 18, 80 18, 87 24 C80 26, 70 28, 62 29 Z" fill="#241d15" stroke="#000" stroke-width=".8"/>'
   + '</g></svg>';
 
 const CORVO = {
@@ -1219,7 +1123,6 @@ function loopCorvo(nowMs) {
   requestAnimationFrame(loopCorvo);
 }
 
-// il corvo porta la lettera: sparisce nel cielo, poi rientra dal bordo
 function corvoParte() {
   const el = CORVO.el;
   entraStato('partito', 0);
@@ -1274,7 +1177,7 @@ function toccoCorvo() {
   bolla.className = 'corvo-bolla';
   bolla.textContent = frase;
   CORVO.el.appendChild(bolla);
-  setTimeout(function () { if (bolla.parentNode) bolla.remove(); }, 2600);
+  setTimeout(function () { if (bolla.parentNode) bolla.remove(); }, 7000);
   if (CORVO.stato === 'cammina' || CORVO.stato === 'fermo') {
     CORVO.el.classList.add('salta');
     setTimeout(function () { if (CORVO.el) CORVO.el.classList.remove('salta'); }, 450);
@@ -1282,6 +1185,15 @@ function toccoCorvo() {
 }
 
 // ===== SSE (real-time) =====
+// toast: chiudi al click (delegato, vale per tutti i toast-corvo)
+document.addEventListener('click', (e) => {
+  const t = e.target.closest && e.target.closest('.toast-corvo');
+  if (t && !t.classList.contains('spegni')) {
+    t.classList.add('spegni');
+    setTimeout(() => t.remove(), 450);
+  }
+});
+
 function avviaSSE() {
   if (!utente) return;
   if (evtSource) evtSource.close();
@@ -1290,6 +1202,31 @@ function avviaSSE() {
 
   evtSource.addEventListener('connesso', e => {
     console.log('SSE connesso:', JSON.parse(e.data));
+  });
+
+  // V8.25: il corvo porta le notizie di chi gestisce Pyxis a TUTTI gli utenti
+  evtSource.addEventListener('corvo-messaggio', e => {
+    const d = JSON.parse(e.data);
+    if (typeof corvoParte === 'function') corvoParte();   // il corvo spicca il volo
+    // bolla con la notizia quando torna
+    setTimeout(() => {
+      if (!CORVO.el) return;
+      const vecchia = CORVO.el.querySelector('.corvo-bolla');
+      if (vecchia) vecchia.remove();
+      const bolla = document.createElement('div');
+      bolla.className = 'corvo-bolla';
+      bolla.textContent = '🐦‍⬛ ' + d.testo;
+      CORVO.el.appendChild(bolla);
+      setTimeout(() => { if (bolla.parentNode) bolla.remove(); }, 7000);
+    }, 3600);
+    // messaggio del corvo: resta finché non lo tocchi (niente auto-chiusura)
+    document.querySelectorAll('.toast-corvo[data-msg="1"]').forEach(t => t.remove());
+    const toast = document.createElement('div');
+    toast.className = 'toast-corvo';
+    toast.setAttribute('data-msg', '1');
+    toast.innerHTML = '<div class="toast-corpo">🐦‍⬛ ' + d.testo.replace(/</g, '&lt;') + '<small>tocca per la bussola</small></div>';
+    toast.addEventListener('click', () => { toast.classList.add('spegni'); setTimeout(() => toast.remove(), 380); });
+    document.body.appendChild(toast);
   });
 
   evtSource.addEventListener('nuovo-utente', e => {
@@ -1303,7 +1240,7 @@ function avviaSSE() {
     const d = JSON.parse(e.data);
     if (d.da === utente.nome) return; // la mia stella l\'ho già vista
     const toast = document.createElement('div');
-    toast.className = 'toast-corvo';
+    toast.className = 'toast-veloce';
     toast.textContent = '⭐ ' + d.da + ' ha raccolto una stella: ' + d.poi;
     corvoReagisci('occhiata'); // V8.24: una stella altrove — il corvo annusa l\'aria
     document.querySelector('.screen').appendChild(toast);
@@ -1317,9 +1254,9 @@ function avviaSSE() {
     if (d.destinatario_id !== utente.id) return;
     corvoReagisci('arrivo'); // V8.24: il corvo traversa rapido — qualcosa è giunto
     const toast = document.createElement('div');
-    toast.className = 'toast-corvo';
+    toast.className = 'toast-veloce';
     toast.textContent = '🐦‍⬛ Un corvo è planato: lettera da ' + d.da;
-    toast.addEventListener('click', () => { toast.remove(); apriPosta(); });
+    toast.addEventListener('click', () => toast.remove());
     document.querySelector('.screen').appendChild(toast);
     setTimeout(() => toast.classList.add('spegni'), 5000);
     setTimeout(() => toast.remove(), 5600);

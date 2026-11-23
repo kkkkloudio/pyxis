@@ -546,7 +546,9 @@ function broadcast(provincia, event, data) {
 }
 
 // V8.13 — LA PIAZZA: il cerchio delle voci è di TUTTE le province, non di una sola
+let ultimoMessaggioCorvo = null; // {testo, alle} — l'ultimo avviso del corvo
 function broadcastTutti(event, data) {
+  if (event === 'corvo-messaggio') ultimoMessaggioCorvo = data;
   const msg = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
   for (const c of clients) {
     try { c.res.write(msg); } catch (e) { clients.delete(c); }
@@ -847,6 +849,22 @@ const server = http.createServer(async (req, res) => {
     return json(res, 200, { poi: lista });
   }
 
+  // ---- POST /api/corvo-messaggio ---- (admin: il corvo porta le notizie a tutti)
+  if (path === '/api/corvo-messaggio' && req.method === 'POST') {
+    const auth = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const token = process.env.CORVO_ADMIN_TOKEN || '';
+    if (!token || auth !== token) return json(res, 401, { error: 'non autorizzato' });
+    try {
+      const body = await readBody(req);
+      const testo = String(body.testo || '').trim().slice(0, 300);
+      if (!testo) return json(res, 400, { error: 'testo mancante' });
+      broadcastTutti('corvo-messaggio', { testo, alle: new Date().toISOString() });
+      return json(res, 200, { ok: true, utenti: clients.size });
+    } catch (e) {
+      return json(res, 500, { error: e.message });
+    }
+  }
+
   // ---- GET /api/events?provincia=X&id=TUO ----
   // SSE: stream real-time per la provincia
   if (path === '/api/events' && req.method === 'GET') {
@@ -862,6 +880,9 @@ const server = http.createServer(async (req, res) => {
       'Access-Control-Allow-Headers': 'Content-Type',
     });
     res.write(`event: connesso\ndata: ${JSON.stringify({ provincia, ok: true })}\n\n`);
+    if (ultimoMessaggioCorvo) {  // replay sempre finché esiste un messaggio
+      res.write(`event: corvo-messaggio\ndata: ${JSON.stringify(ultimoMessaggioCorvo)}\n\n`);
+    }
 
     const client = { res, provincia };
     clients.add(client);
