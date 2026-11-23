@@ -79,9 +79,9 @@
     margin-bottom:4px;
   }
   .sottotitolo {
-    font-family:'IM Fell English', serif;
+    font-family:'Cormorant Garamond', Georgia, serif;
     font-size:13px; color:#a8987a; font-style:italic; text-align:center;
-    margin-bottom:22px;
+    margin-bottom:14px;
   }
 
   /* ===== IL QUADRANTE — ETÀ DEL LEGNO (V8.6): betulla chiara, segni bruciati ===== */
@@ -90,7 +90,7 @@
      restano in proporzione qualunque sia la sua taglia */
   .bussola-wrap {
     position:relative;
-    --k:1.12; /* vetrina desktop — V8.16: la bussola comanda */
+    --k:1.0; /* mobile-first: l'app vive sul telefono */
     width:calc(300px * var(--k));
     height:calc(300px * var(--k));
     animation: alito-bussola 5s ease-in-out infinite;
@@ -219,13 +219,13 @@
   }
   .caption-bussola {
     margin-top:12px; min-height:18px; text-align:center;
-    font-family:'IM Fell English', serif; font-style:italic; font-size:13px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:13px;
     color:#9a8c6a; transition:color .3s;
   }
   /* V8.12 — la distanza del pellegrino: appare solo con la bussola sveglia */
   .distanza-luogo {
     margin-top:2px; min-height:16px; text-align:center;
-    font-family:'IM Fell English', serif; font-style:italic; font-size:12px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:12px;
     color:#9fe8c0;
   }
   .distanza-luogo.vicino { color:#e8cd85; text-shadow:0 0 10px rgba(232,205,133,.45); }
@@ -246,7 +246,7 @@
     display:none; margin-top:8px; cursor:pointer;
     background:rgba(184,150,62,.10); border:1px solid #b8963e; border-radius:18px;
     padding:10px 20px;
-    font-family:'IM Fell English', serif; font-style:italic; font-size:14px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:14px;
     color:#e8cd85;
     animation: chiama-sveglia 2.4s ease-in-out infinite;
     transition:.15s;
@@ -301,7 +301,7 @@
     font-size:15px; font-weight:700; color:#221a10;
   }
   .legenda-item .dett {
-    font-family:'IM Fell English', serif; font-style:italic;
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic;
     font-size:12px; color:#5a4530;
   }
 
@@ -320,7 +320,7 @@
   .btn-corvo:disabled { opacity:.3; cursor:not-allowed; box-shadow:none; }
   .btn-posta {
     margin-top:10px; background:transparent; border:none; cursor:pointer;
-    font-family:'IM Fell English', serif; font-style:italic; font-size:12px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:12px;
     color:#b8a878; text-decoration:underline;
   }
   .btn-posta:hover { color:#e8cd85; }
@@ -329,12 +329,12 @@
   .nota {
     position:absolute; bottom:24px; left:0; right:0;
     text-align:center;
-    font-family:'IM Fell English', serif; font-size:11px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-size:11px;
     color:#8a7a5a; font-style:italic; z-index:10;
   }
   .pyxis-label {
     position:absolute; bottom:8px; left:20px;
-    font-family:'IM Fell English', serif; font-size:9px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-size:9px;
     color:rgba(184,150,62,.4); z-index:10;
   }
   /* V8.17 — il selettore lingua: piccolo come la firma, in fondo a destra */
@@ -342,7 +342,7 @@
     position:absolute; bottom:8px; right:20px; z-index:11;
     background:transparent; border:1px solid rgba(184,150,62,.25); border-radius:10px;
     padding:3px 8px; cursor:pointer;
-    font-family:'IM Fell English', serif; font-size:9px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-size:9px;
     color:rgba(184,150,62,.4); transition:.15s;
   }
   .btn-lingua:hover { color:rgba(184,150,62,.8); border-color:rgba(184,150,62,.5); }
@@ -368,7 +368,7 @@
     margin-bottom:4px; text-transform:uppercase;
   }
   .iscrizione-box .sub {
-    font-family:'IM Fell English', serif; font-size:12px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-size:12px;
     color:#5a4530; font-style:italic; text-align:center; margin-bottom:18px;
   }
   .campo { margin-bottom:14px; }
@@ -396,26 +396,11 @@
   }
   .btn-inizia:hover { box-shadow:inset 0 2px 4px rgba(255,200,160,.25), 0 0 18px rgba(138,38,38,.5); }
   .privacy {
-    margin-top:12px; font-family:'IM Fell English', serif;
+    margin-top:12px; font-family:'Cormorant Garamond', Georgia, serif;
     font-size:10px; color:#6a5a40; font-style:italic; text-align:center;
   }
 
   /* ===== L'APERTURA ===== */
-  .apertura {
-    position:absolute; inset:0; z-index:150; cursor:pointer;
-    background:radial-gradient(100% 70% at 50% 30%, #101628, #07090f 70%);
-    animation: sipario-via .8s ease 2.55s forwards;
-  }
-  .apertura::before {
-    content:''; position:absolute; inset:0; pointer-events:none;
-    width:1px; height:1px; border-radius:50%; background:transparent;
-    box-shadow: 31px 15px 0.8px rgba(214,222,240,.55), 84px 112px 0.8px rgba(214,222,240,.55), 137px 209px 0.8px rgba(214,222,240,.55), 190px 306px 0.8px rgba(214,222,240,.55), 243px 403px 0.8px rgba(214,222,240,.55), 296px 500px 0.8px rgba(214,222,240,.55), 349px 597px 0.8px rgba(214,222,240,.55), 16px 694px 0.8px rgba(214,222,240,.55), 69px 791px 0.8px rgba(214,222,240,.55), 122px 48px 0.8px rgba(214,222,240,.55), 175px 145px 0.8px rgba(214,222,240,.55), 228px 242px 0.8px rgba(214,222,240,.55), 281px 339px 0.8px rgba(214,222,240,.55), 334px 436px 0.8px rgba(214,222,240,.55), 387px 533px 0.8px rgba(214,222,240,.55), 54px 630px 0.8px rgba(214,222,240,.55), 107px 727px 0.8px rgba(214,222,240,.55), 160px 824px 0.8px rgba(214,222,240,.55), 213px 81px 0.8px rgba(214,222,240,.55), 266px 178px 0.8px rgba(214,222,240,.55), 319px 275px 0.8px rgba(214,222,240,.55), 372px 372px 0.8px rgba(214,222,240,.55), 39px 469px 0.8px rgba(214,222,240,.55), 92px 566px 0.8px rgba(214,222,240,.55), 145px 663px 0.8px rgba(214,222,240,.55), 198px 760px 0.8px rgba(214,222,240,.55), 251px 17px 0.8px rgba(214,222,240,.55), 304px 114px 0.8px rgba(214,222,240,.55), 357px 211px 0.8px rgba(214,222,240,.55), 24px 308px 0.8px rgba(214,222,240,.55), 77px 405px 0.8px rgba(214,222,240,.55), 130px 502px 0.8px rgba(214,222,240,.55), 183px 599px 0.8px rgba(214,222,240,.55), 236px 696px 0.8px rgba(214,222,240,.55), 289px 793px 0.8px rgba(214,222,240,.55), 342px 50px 0.8px rgba(214,222,240,.55), 9px 147px 0.8px rgba(214,222,240,.55), 62px 244px 0.8px rgba(214,222,240,.55), 115px 341px 0.8px rgba(214,222,240,.55), 168px 438px 0.8px rgba(214,222,240,.55), 221px 535px 0.8px rgba(214,222,240,.55), 274px 632px 0.8px rgba(214,222,240,.55), 327px 729px 0.8px rgba(214,222,240,.55), 380px 826px 0.8px rgba(214,222,240,.55), 47px 83px 0.8px rgba(214,222,240,.55), 100px 180px 0.8px rgba(214,222,240,.55), 153px 277px 0.8px rgba(214,222,240,.55), 206px 374px 0.8px rgba(214,222,240,.55), 259px 471px 0.8px rgba(214,222,240,.55), 312px 568px 0.8px rgba(214,222,240,.55), 365px 665px 0.8px rgba(214,222,240,.55), 32px 762px 0.8px rgba(214,222,240,.55), 85px 19px 0.8px rgba(214,222,240,.55), 138px 116px 0.8px rgba(214,222,240,.55), 191px 213px 0.8px rgba(214,222,240,.55), 244px 310px 0.8px rgba(214,222,240,.55), 297px 407px 0.8px rgba(214,222,240,.55), 350px 504px 0.8px rgba(214,222,240,.55);
-  }
-  .apertura::after {
-    content:''; position:absolute; inset:0; pointer-events:none;
-    width:1px; height:1px; border-radius:50%; background:transparent;
-    box-shadow: 31px 15px 1.5px rgba(232,205,133,.85), 16px 694px 1.5px rgba(232,205,133,.85), 387px 533px 1.5px rgba(232,205,133,.85), 372px 372px 1.5px rgba(232,205,133,.85), 357px 211px 1.5px rgba(232,205,133,.85), 342px 50px 1.5px rgba(232,205,133,.85), 327px 729px 1.5px rgba(232,205,133,.85), 312px 568px 1.5px rgba(232,205,133,.85), 297px 407px 1.5px rgba(232,205,133,.85);
-  }
   .scrigno {
     position:absolute; left:50%; top:44%;
     width:280px; height:280px; margin:-140px 0 0 -140px;
@@ -440,34 +425,8 @@
     from { filter:drop-shadow(0 0 0 rgba(232,205,133,0)); }
     to   { filter:drop-shadow(0 0 22px rgba(232,205,133,.5)); }
   }
-  .apertura-cera {
-    position:absolute; left:50%; top:44%; z-index:5;
-    width:104px; height:104px; margin:-52px 0 0 -52px;
-    filter:drop-shadow(0 6px 14px rgba(0,0,0,.65));
-    animation: cera-si-spezza .65s ease 1.15s forwards;
-  }
   @keyframes cera-si-spezza { to { transform:scale(1.75) rotate(10deg); opacity:0; } }
-  .apertura-scritte {
-    position:absolute; left:0; right:0; top:calc(44% + 170px); text-align:center;
-  }
-  .apertura-titolo {
-    font-family:'Cinzel', serif; font-size:30px; font-weight:700; letter-spacing:11px;
-    color:#e8cd85; text-shadow:0 0 22px rgba(232,205,133,.45);
-    animation: titolo-appare 1.2s ease .75s both;
-  }
-  .apertura-sub {
-    font-family:'IM Fell English', serif; font-style:italic;
-    font-size:13px; color:#9a8c6a; margin-top:6px;
-    animation: titolo-appare 1.2s ease 1.15s both;
-  }
-  .apertura-nota {
-    position:absolute; bottom:24px; left:0; right:0; text-align:center;
-    font-family:'IM Fell English', serif; font-style:italic;
-    font-size:10px; color:#6a5c40;
-    animation: titolo-appare 1s ease 2.05s both;
-  }
-  @keyframes titolo-appare { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes sipario-via { to { opacity:0; visibility:hidden; } }
+  @keyframes titolo-appare { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } } }
 
   /* ===== MODALI ===== */
   .modale {
@@ -491,7 +450,7 @@
     color:#221a10; text-align:center; text-transform:uppercase; margin-bottom:4px;
   }
   .modale-box .sub {
-    font-family:'IM Fell English', serif; font-size:12px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-size:12px;
     color:#5a4530; font-style:italic; text-align:center; margin-bottom:14px;
   }
   .modale-box textarea {
@@ -526,7 +485,7 @@
     color:#221a10; font-style:italic;
   }
   .lettera-ricevuta .quando {
-    font-family:'IM Fell English', serif; font-size:10px; color:#8a7a5a; margin-top:4px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-size:10px; color:#8a7a5a; margin-top:4px;
   }
 
   .stella-raccolta {
@@ -541,59 +500,84 @@
   }
   .stella-raccolta .quando {
     width:100%;
-    font-family:'IM Fell English', serif; font-size:10px; color:#8a7a5a;
+    font-family:'Cormorant Garamond', Georgia, serif; font-size:10px; color:#8a7a5a;
   }
 
 /* ===== V8.24 — IL CORVO DI PYXIS: il pet della notte ===== */
   .corvo-pet {
-    position:absolute; left:0; bottom:44px; z-index:15;
-    width:34px; cursor:pointer; outline:none;
+    position:absolute; left:0; bottom:22px; z-index:15;
+    width:150px; cursor:pointer; outline:none;
     filter:drop-shadow(0 3px 3px rgba(0,0,0,.55));
     will-change:transform;
   }
   .corvo-pet:focus-visible { filter:drop-shadow(0 3px 3px rgba(0,0,0,.55)) drop-shadow(0 0 8px rgba(232,205,133,.6)); }
   .corvo-pet svg { display:block; width:100%; height:auto; }
-  .corvo-pet.cammina .corvo-corpo { animation: corvo-cammina .34s ease-in-out infinite; }
-  .corvo-pet.becca .corvo-testa { animation: corvo-beccata .55s ease-in-out; transform-origin:78% 30%; }
-  .corvo-pet.salta .corvo-corpo { animation: corvo-salto .42s ease-in-out; }
+  .corvo-pet .corvo-aura { animation: corvo-aura 3.2s ease-in-out infinite; }
+  .corvo-pet.cammina .corvo-corpo { animation: corvo-cammina .5s ease-in-out infinite; }
+  .corvo-pet.becca .corvo-testa { animation: corvo-beccata .6s cubic-bezier(.34,1.56,.64,1); transform-origin:82% 32%; }
+  .corvo-pet.salta .corvo-corpo { animation: corvo-salto .55s cubic-bezier(.34,1.56,.64,1); }
   .corvo-pet.vola .zampe { display:none; }
-  .corvo-pet.vola .ala-l { animation: corvo-ala .24s ease-in-out infinite; transform-origin:32% 22%; }
-  @keyframes corvo-cammina { 0%,100% { transform:translateY(0) rotate(0deg); } 50% { transform:translateY(-1.3px) rotate(-1.2deg); } }
-  @keyframes corvo-beccata { 0%,100% { transform:rotate(0deg); } 38% { transform:rotate(17deg); } 70% { transform:rotate(4deg); } }
-  @keyframes corvo-salto { 0%,100% { transform:translateY(0); } 45% { transform:translateY(-8px); } }
-  @keyframes corvo-ala { 0%,100% { transform:rotate(0deg); } 50% { transform:rotate(-36deg); } }
+  .corvo-pet.vola .ala-l { animation: corvo-ala .3s ease-in-out infinite; transform-origin:48% 32%; }
+  .corvo-pet.vola .ala-r { animation: corvo-ala-r .3s ease-in-out infinite; transform-origin:70% 30%; }
+  .corvo-pet.vola .corvo-aura { animation-duration: 1.2s; }
+  @keyframes corvo-aura { 0%,100% { opacity:.55; transform:scale(1); } 50% { opacity:1; transform:scale(1.07); } }
+  @keyframes corvo-cammina { 0%,100% { transform:translateY(0) rotate(0deg); } 30% { transform:translateY(-2.2px) rotate(-1.6deg); } 65% { transform:translateY(-1px) rotate(1deg); } }
+  @keyframes corvo-beccata { 0%,100% { transform:rotate(0deg); } 35% { transform:rotate(22deg); } 65% { transform:rotate(6deg); } 82% { transform:rotate(14deg); } }
+  @keyframes corvo-salto { 0%,100% { transform:translateY(0) scale(1); } 40% { transform:translateY(-12px) scale(1.03); } 70% { transform:translateY(-3px); } }
+  @keyframes corvo-ala { 0%,100% { transform:rotate(0deg); } 50% { transform:rotate(-42deg); } }
+  @keyframes corvo-ala-r { 0%,100% { transform:rotate(0deg); } 50% { transform:rotate(24deg); } }
   .corvo-bolla {
     position:absolute; bottom:30px; left:50%;
     white-space:nowrap; pointer-events:none;
     background:linear-gradient(170deg,#f3ead2,#e6d4ac);
     border:1px solid #8a6a3a; border-radius:10px 10px 10px 2px;
     padding:4px 10px;
-    font-family:'IM Fell English', serif; font-style:italic; font-size:11px; color:#221a10;
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:11px; color:#221a10;
     box-shadow:0 4px 14px rgba(0,0,0,.55);
-    animation: corvo-bolla 2.5s ease forwards;
+    animation: corvo-bolla 7s ease forwards;
   }
   @keyframes corvo-bolla {
     0% { opacity:0; transform:translate(-50%,4px); }
     14% { opacity:1; transform:translate(-50%,0); }
-    80% { opacity:1; }
+    85% { opacity:1; }
     100% { opacity:0; transform:translate(-50%,-4px); }
   }
   @media (prefers-reduced-motion: reduce) { .corvo-pet.cammina .corvo-corpo { animation:none; } }
 
   .toast-corvo {
-    position:absolute; top:64px; left:50%; transform:translateX(-50%);
-    z-index:130; max-width:300px; text-align:center;
-    background:rgba(16,12,8,.95); color:#efe6cd;
-    border:1px solid #b8963e; border-radius:6px;
-    padding:10px 18px;
-    font-family:'IM Fell English', serif; font-style:italic; font-size:13px;
-    cursor:pointer; box-shadow:0 0 24px rgba(184,150,62,.3);
-    animation: toast-appare .4s ease both;
+    position:fixed; inset:0; z-index:300;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(5,6,10,.92);
+    cursor:pointer;
+    animation: toast-in .25s ease both;
   }
-  .toast-corvo.spegni { opacity:0; transition:opacity .5s; pointer-events:none; }
-  @keyframes toast-appare {
-    from { opacity:0; transform:translate(-50%,-10px); }
-    to   { opacity:1; transform:translate(-50%,0); }
+  .toast-corvo .toast-corpo {
+    width:min(86vw, 460px); text-align:center; padding:40px 30px;
+    background:linear-gradient(160deg,#1a140d,#0f0b07);
+    color:#f2e9d0; border:1px solid #b8963e; border-radius:12px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:26px; line-height:1.55;
+    box-shadow:0 0 54px rgba(184,150,62,.5);
+  }
+  .toast-corvo .toast-corpo small { display:block; margin-top:18px; font-size:14px; color:#a8905c; font-style:normal; letter-spacing:1px; }
+  .toast-corvo.spegni { opacity:0; transition:opacity .35s; pointer-events:none; }
+  .toast-veloce {
+    position:absolute; top:56px; left:50%; transform:translateX(-50%);
+    z-index:130; max-width:320px; text-align:center;
+    background:rgba(16,12,8,.95); color:#efe6cd;
+    border:1px solid #b8963e; border-radius:8px;
+    padding:10px 18px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:15px;
+    box-shadow:0 0 24px rgba(184,150,62,.3);
+    animation: toast-in .3s ease both;
+    pointer-events:none;
+  }
+  .toast-veloce.spegni { opacity:0; transition:opacity .4s; }
+  @keyframes toast-in {
+    from { opacity:0; }
+    to   { opacity:1; }
+  }
+  @media (max-width:600px) {
+    .toast-corvo .toast-corpo { font-size:24px; padding:34px 24px; }
   }
 
   /* ===== V8.21 — IL CUSTODE DEL LUOGO ===== */
@@ -605,39 +589,12 @@
   @keyframes alito-custode { 0%,100% { opacity:.7; } 50% { opacity:1; } }
   @media (prefers-reduced-motion: reduce) { .custode-fuoco { animation:none; } }
   .custode-racconto {
-    font-family:'IM Fell English', serif; font-style:italic;
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic;
     font-size:15px; color:#221a10; line-height:1.55;
     overflow-y:auto; margin-bottom:14px; min-height:110px;
   }
   #modale-custode .modale-box { animation: srotola .8s ease both; }
   #modale-custode .modale-box h3 { color:#5c1414; }
-
-  /* ===== V8.25 — IL PROCLAMA DI MUNINN ===== */
-  /* La piattaforma parla a tutte le anime: il corvo consegna la lettera su una
-     pergamena che copre il cerchio. Nessun sipario a tempo: la lettera resta
-     finché l'anima non la rilascia con un tocco — poi Muninn si leva in volo
-     e torna la notte di sempre. */
-  #modale-proclama { background:rgba(3,4,8,.84); z-index:140; }
-  #modale-proclama .modale-box { max-width:340px; animation: srotola .7s ease both; cursor:pointer; }
-  .proclama-corvo { text-align:center; margin-bottom:2px; }
-  .proclama-corvo svg { width:60px; height:auto; filter:drop-shadow(0 3px 3px rgba(0,0,0,.35)); }
-  .proclama-corvo .ala-l { animation: corvo-ala .55s ease-in-out infinite; transform-origin:32% 22%; }
-  #modale-proclama.consegna .proclama-corvo { animation: proclama-si-leva .42s ease forwards; }
-  .proclama-testo {
-    font-family:'Cormorant Garamond', serif; font-size:18px; line-height:1.5;
-    color:#1d1408; white-space:pre-line;
-    background:#faf4e2; border:1px solid #6a5320; border-radius:3px;
-    padding:14px; margin-bottom:10px; overflow-y:auto; max-height:44vh;
-  }
-  .proclama-firma {
-    font-family:'IM Fell English', serif; font-style:italic; font-size:12px;
-    color:#5a4530; text-align:right; margin-bottom:12px;
-  }
-  @keyframes proclama-si-leva { to { transform:translate(130px,-300px) rotate(9deg); opacity:0; } }
-  @media (prefers-reduced-motion: reduce) {
-    .proclama-corvo .ala-l { animation:none; }
-    #modale-proclama.consegna .proclama-corvo { animation:none; }
-  }
 
   /* ===== SUL TELEFONO VERO ===== */
   @media (max-width:600px) {
@@ -649,35 +606,24 @@
     .titolo { font-size:18px; letter-spacing:5px; }
     .content { padding:36px 14px 16px; }
     .scrigno { width:240px; height:240px; margin:-120px 0 0 -120px; }
-    .apertura-scritte { top:calc(44% + 148px); }
+    .modale { position:fixed; inset:0; z-index:400; padding:16px; align-items:flex-start; padding-top:8vh; }
+    .modale-box { max-width:100%; width:100%; max-height:80vh; overflow-y:auto; padding:26px 22px; font-size:17px; }
+    .modale-box h3 { font-size:24px; }
+    .modale-box .sub { font-size:15px; }
   }
   /* telefoni più generosi: la bussola respira ancora di più */
   @media (max-width:600px) and (min-width:420px) { .bussola-wrap { --k:1.42; } }
   /* telefonini più piccoli: la bussola si stringe senza perdere la sua parte */
   @media (max-width:600px) and (max-width:380px) and (min-width:341px) { .bussola-wrap { --k:1.16; } }
   @media (max-width:340px) { .bussola-wrap { --k:0.98; } }
+  /* desktop: la bussola respira di più */
+  @media (min-width:601px) { .bussola-wrap { --k:1.12; } }
 </style>
 </head>
 <body>
 
 <div class="phone">
   <div class="screen">
-
-    <div class="apertura" id="apertura">
-      <div class="scrigno">
-        <div class="scrigno-fondo">
-          <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" class="quadrante" aria-hidden="true"><defs><linearGradient id="betulla" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9d5ac"/><stop offset=".5" stop-color="#d9bf8c"/><stop offset="1" stop-color="#bfa170"/></linearGradient><radialGradient id="faccia"><stop offset="0" stop-color="#f0e0b8"/><stop offset=".75" stop-color="#e2cc9c"/><stop offset="1" stop-color="#cfae7a"/></radialGradient><radialGradient id="alito"><stop offset="0" stop-color="#3a6a8a" stop-opacity=".10"/><stop offset="1" stop-color="#3a6a8a" stop-opacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="141" fill="none" stroke="url(#betulla)" stroke-width="9"/><circle cx="150" cy="150" r="135.5" fill="none" stroke="#8a6a44" stroke-width="1"/><circle cx="150" cy="150" r="133" fill="none" stroke="#3a2a1a" stroke-width="3" stroke-dasharray="1.2 22.1" opacity="0.65"/><circle cx="150" cy="150" r="126.5" fill="url(#faccia)" stroke="#8a6a44" stroke-width="1.4"/><circle cx="150" cy="150" r="95" fill="url(#alito)"/><polygon points="150,58 154,146 150,242 146,146" fill="#241a10" stroke="#4a3620" stroke-width="0.8"/><polygon points="58,150 146,154 242,150 146,146" fill="#241a10" stroke="#4a3620" stroke-width="0.8"/><g transform="rotate(45 150 150)"><polygon points="150,94 152.5,146 150,206 147.5,146" fill="#3c2e1c" stroke="#4a3620" stroke-width="0.6"/><polygon points="94,150 146,152.5 206,150 146,147.5" fill="#3c2e1c" stroke="#4a3620" stroke-width="0.6"/></g><g transform="translate(192.9,46.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/></g><g transform="translate(253.5,107.1)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 A7 7 0 0 0 0 -5.5 Z" fill="#6a4a28"/></g><g transform="translate(253.5,192.9)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 1 0 5.5 Z" fill="#6a4a28"/></g><g transform="translate(192.9,253.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#3a2a1a"/></g><g transform="translate(107.1,253.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/></g><g transform="translate(46.5,192.9)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><circle r="5.5" fill="#6a4a28"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#3a2a1a"/></g><g transform="translate(46.5,107.1)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 Z" fill="#6a4a28"/></g><g transform="translate(107.1,46.5)"><circle r="5.5" fill="#3a2a1a" stroke="#4a3620" stroke-width="0.7"/><path d="M0 -5.5 A5.5 5.5 0 0 0 0 5.5 A7 7 0 0 1 0 -5.5 Z" fill="#6a4a28"/></g><text x="150" y="40" class="simbolo">N · TERRA</text><text x="259" y="153" class="simbolo">E · ARIA</text><text x="150" y="272" class="simbolo">S · FUOCO</text><text x="41" y="153" class="simbolo">O · ACQUA</text></svg>
-          <div class="scrigno-img"></div>
-        </div>
-      </div>
-      <img src="assets/wax.png" class="apertura-cera" alt="Sigillo di cera">
-      <div class="apertura-scritte">
-        <div class="apertura-titolo">PYXIS</div>
-        <div class="apertura-sub">lo scrigno che punta alle presenze</div>
-      </div>
-      <div class="apertura-nota">tocca per aprire</div>
-    </div>
-
     <div class="vignette"></div>
 
     <div class="content">
@@ -692,6 +638,11 @@
           <div class="campo">
             <label for="nome">Nome d'arte</label>
             <input type="text" id="nome" placeholder="es. LunaNera" maxlength="20" autocomplete="off">
+          </div>
+
+          <div class="campo">
+            <label for="password">Password (min 4 caratteri — la prima volta la scegli, poi è il tuo rientro)</label>
+            <input type="password" id="password" placeholder="••••••" minlength="4" maxlength="64" autocomplete="off">
           </div>
 
           <div class="campo">
@@ -716,8 +667,8 @@
           <div class="fiammella f1"></div>
           <div class="fiammella f2"></div>
           <div class="fiammella f3"></div>
-          <div class="lancetta piccola" data-tipo="piccola"><div class="ago ago-piccola"></div><div class="gemma gemma-piccola"></div></div>
-          <div class="lancetta media" data-tipo="media"><div class="ago ago-media"></div><div class="gemma gemma-media"></div></div>
+          <div class="lancetta piccola nascosta" data-tipo="piccola" style="display:none"><div class="ago ago-piccola"></div><div class="gemma gemma-piccola"></div></div>
+          <div class="lancetta media nascosta" data-tipo="media" style="display:none"><div class="ago ago-media"></div><div class="gemma gemma-media"></div></div>
           <div class="lancetta grande" data-tipo="grande"><div class="ago ago-grande"></div><div class="gemma gemma-grande"></div></div>
           <div class="perno"></div>
           <div class="porta"></div>
@@ -736,25 +687,23 @@
               <div class="dett">luogo di potere più vicino</div>
             </div>
           </div>
-          <div class="legenda-item" data-tipo="media">
+          <div class="legenda-item nascosta" data-tipo="media" style="display:none">
             <div class="barra media"></div>
             <div class="testo">
               <div class="nome">Luna Rossa</div>
               <div class="dett">anima più vicina</div>
             </div>
           </div>
-          <div class="legenda-item" data-tipo="piccola">
+          <div class="legenda-item nascosta" data-tipo="piccola" style="display:none">
             <div class="barra piccola"></div>
             <div class="testo">
-              <div class="nome">Corvo Nero</div>
+              <div class="nome">Eco Nera</div>
               <div class="dett">seconda anima</div>
             </div>
           </div>
         </div>
 
         <button class="btn-corvo" id="btn-visita" disabled>✨ Il luogo è raggiunto</button>
-        <button class="btn-corvo" id="btn-lettera" disabled>🐦‍⬛ Scrivi una lettera al vicino</button>
-        <button class="btn-posta" id="btn-posta">la posta — le lettere ricevute</button>
         <button class="btn-posta" id="btn-collezione">la collezione — le stelle raccolte</button>
         <button class="btn-posta" id="btn-piazza">la piazza — le voci di tutte le anime</button>
         <button class="btn-posta" id="btn-feedback">🗝️ parola ai costruttori</button>
@@ -762,25 +711,6 @@
         <button class="btn-posta" id="btn-uscita" onclick="localStorage.removeItem('pyxis-utente');location.reload()">lascia lo scrigno</button>
 
         <div class="nota">la posizione resta sul telefono · mai salvata · mai inviata · solo la bussola sa</div>
-      </div>
-    </div>
-
-    <div class="modale nascosto" id="modale-scrittura">
-      <div class="modale-box">
-        <h3>Una lettera al vicino</h3>
-        <div class="sub">il corvo la porterà a <strong id="lettera-dest">…</strong></div>
-        <textarea id="lettera-testo" maxlength="500" placeholder="Scrivi con l'inchiostro della notte…"></textarea>
-        <button class="btn-modale" id="btn-affida">🐦‍⬛ Affida al corvo</button>
-        <button class="btn-modale fantasma" id="btn-annulla-lettera">Rimetti la penna</button>
-      </div>
-    </div>
-
-    <div class="modale nascosto" id="modale-posta">
-      <div class="modale-box">
-        <h3>La posta</h3>
-        <div class="sub">i corvi che sono giunti fin qui</div>
-        <div id="posta-lista"></div>
-        <button class="btn-modale fantasma" id="btn-chiudi-posta">Chiudi</button>
       </div>
     </div>
 
@@ -835,33 +765,6 @@
       </div>
     </div>
 
-    <!-- V8.25 — IL PROCLAMA DI MUNINN: la piattaforma parla a tutte le anime.
-         Il corvo consegna la lettera su una pergamena grande; l'anima la legge
-         con calma e la rilascia con un tocco. Nessun sipario che svanisce da
-         solo: il proclama aspetta, il corvo pure. -->
-    <div class="modale nascosto" id="modale-proclama">
-      <div class="modale-box">
-        <div class="proclama-corvo" aria-hidden="true">
-          <svg viewBox="0 0 64 44">
-            <g class="zampe"><path d="M33 33 L33 40 M33 40 L29 43 M33 40 L36 43 M37 33 L37 40" stroke="#6a5535" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>
-            <g class="corvo-corpo">
-              <g class="corvo-testa">
-                <path d="M47 11 C44 5.5, 37 3, 32 5.5 C28 7.5, 27.5 11, 28 13 L9 20 C5.5 21.5, 5.5 23.5, 9 24.5 L28 28 C27.5 31.5, 31 34, 37 33.5 C43 33, 46.5 28, 47.5 21 C48.5 15, 48 12, 47 11 Z" fill="#171310" stroke="#0a0806" stroke-width="1"/>
-                <path d="M46.5 10.5 L55 14.5 L46.5 18.5 Z" fill="#8a7248"/>
-                <circle cx="41" cy="11.5" r="1.7" fill="#e8cd85"/>
-              </g>
-              <path class="ala ala-l" d="M31 14 C24 16, 20.5 23, 23 28 C29 26.5, 33.5 21, 34 15.5 Z" fill="#211c15" stroke="#0a0806" stroke-width="0.7"/>
-            </g>
-          </svg>
-        </div>
-        <h3>Il proclama</h3>
-        <div class="sub">Muninn lo porta a tutte le anime</div>
-        <div class="proclama-testo" id="proclama-testo"></div>
-        <div class="proclama-firma">— i costruttori di Pyxis</div>
-        <button class="btn-modale" id="btn-proclamo-via">🐦‍⬛ Ho letto — riparti, corvo</button>
-      </div>
-    </div>
-
     <button class="btn-lingua" id="btn-lingua">🇮🇹 IT</button>
 
     <div class="pyxis-label">Pyxis</div>
@@ -869,5 +772,6 @@
 </div>
 
 <script src="app.js"></script>
+<script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");</script>
 </body>
 </html>

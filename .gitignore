@@ -30,3 +30,4 @@ node_modules/
 # GitHub Actions cache
 .github/workflows/.cache/
 server/pyxis.db
+server/pyxis.db.backup-*
