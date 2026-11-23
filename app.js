@@ -263,15 +263,17 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('btn-inizia').addEventListener('click', async function () {
     const nome = document.getElementById('nome').value.trim();
     const provincia = document.getElementById('provincia').value;
+    const password = document.getElementById('password').value;
 
-    if (!nome) return alert("Scegli un nome d\'arte");
+    if (!nome) return alert("Scegli un nome d'arte");
     if (!provincia) return alert('Scegli la provincia');
+    if (password.length < 4) return alert('Scegli la parola d\'accesso: min 4 caratteri. La prima volta la scegli, poi è il tuo rientro');
 
     try {
       const resp = await fetch(API + '/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, provincia })
+        body: JSON.stringify({ nome, provincia, password })
       });
       const testo = await resp.text();
       let data;
