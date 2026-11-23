@@ -612,6 +612,33 @@
   #modale-custode .modale-box { animation: srotola .8s ease both; }
   #modale-custode .modale-box h3 { color:#5c1414; }
 
+  /* ===== V8.25 — IL PROCLAMA DI MUNINN ===== */
+  /* La piattaforma parla a tutte le anime: il corvo consegna la lettera su una
+     pergamena che copre il cerchio. Nessun sipario a tempo: la lettera resta
+     finché l'anima non la rilascia con un tocco — poi Muninn si leva in volo
+     e torna la notte di sempre. */
+  #modale-proclama { background:rgba(3,4,8,.84); z-index:140; }
+  #modale-proclama .modale-box { max-width:340px; animation: srotola .7s ease both; cursor:pointer; }
+  .proclama-corvo { text-align:center; margin-bottom:2px; }
+  .proclama-corvo svg { width:60px; height:auto; filter:drop-shadow(0 3px 3px rgba(0,0,0,.35)); }
+  .proclama-corvo .ala-l { animation: corvo-ala .55s ease-in-out infinite; transform-origin:32% 22%; }
+  #modale-proclama.consegna .proclama-corvo { animation: proclama-si-leva .42s ease forwards; }
+  .proclama-testo {
+    font-family:'Cormorant Garamond', serif; font-size:18px; line-height:1.5;
+    color:#1d1408; white-space:pre-line;
+    background:#faf4e2; border:1px solid #6a5320; border-radius:3px;
+    padding:14px; margin-bottom:10px; overflow-y:auto; max-height:44vh;
+  }
+  .proclama-firma {
+    font-family:'IM Fell English', serif; font-style:italic; font-size:12px;
+    color:#5a4530; text-align:right; margin-bottom:12px;
+  }
+  @keyframes proclama-si-leva { to { transform:translate(130px,-300px) rotate(9deg); opacity:0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .proclama-corvo .ala-l { animation:none; }
+    #modale-proclama.consegna .proclama-corvo { animation:none; }
+  }
+
   /* ===== SUL TELEFONO VERO ===== */
   @media (max-width:600px) {
     body { padding:0; }
@@ -808,9 +835,36 @@
       </div>
     </div>
 
+    <!-- V8.25 — IL PROCLAMA DI MUNINN: la piattaforma parla a tutte le anime.
+         Il corvo consegna la lettera su una pergamena grande; l'anima la legge
+         con calma e la rilascia con un tocco. Nessun sipario che svanisce da
+         solo: il proclama aspetta, il corvo pure. -->
+    <div class="modale nascosto" id="modale-proclama">
+      <div class="modale-box">
+        <div class="proclama-corvo" aria-hidden="true">
+          <svg viewBox="0 0 64 44">
+            <g class="zampe"><path d="M33 33 L33 40 M33 40 L29 43 M33 40 L36 43 M37 33 L37 40" stroke="#6a5535" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>
+            <g class="corvo-corpo">
+              <g class="corvo-testa">
+                <path d="M47 11 C44 5.5, 37 3, 32 5.5 C28 7.5, 27.5 11, 28 13 L9 20 C5.5 21.5, 5.5 23.5, 9 24.5 L28 28 C27.5 31.5, 31 34, 37 33.5 C43 33, 46.5 28, 47.5 21 C48.5 15, 48 12, 47 11 Z" fill="#171310" stroke="#0a0806" stroke-width="1"/>
+                <path d="M46.5 10.5 L55 14.5 L46.5 18.5 Z" fill="#8a7248"/>
+                <circle cx="41" cy="11.5" r="1.7" fill="#e8cd85"/>
+              </g>
+              <path class="ala ala-l" d="M31 14 C24 16, 20.5 23, 23 28 C29 26.5, 33.5 21, 34 15.5 Z" fill="#211c15" stroke="#0a0806" stroke-width="0.7"/>
+            </g>
+          </svg>
+        </div>
+        <h3>Il proclama</h3>
+        <div class="sub">Muninn lo porta a tutte le anime</div>
+        <div class="proclama-testo" id="proclama-testo"></div>
+        <div class="proclama-firma">— i costruttori di Pyxis</div>
+        <button class="btn-modale" id="btn-proclamo-via">🐦‍⬛ Ho letto — riparti, corvo</button>
+      </div>
+    </div>
+
     <button class="btn-lingua" id="btn-lingua">🇮🇹 IT</button>
 
-    <div class="pyxis-label">Pyxis · V8.24</div>
+    <div class="pyxis-label">Pyxis · V8.25</div>
   </div>
 </div>
 

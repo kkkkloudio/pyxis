@@ -38,6 +38,10 @@
 // Il suo nome è Muninn, memoria di Odino — quello che Odino temeva perdesse
 // la strada: per questo ciò che il nostro porta non si perde mai, e torna
 // sempre alla fine di ogni viaggio.
+// V8.25 — IL PROCLAMA DI MUNINN: la piattaforma parla a tutte le anime. Il
+// corvo consegna la lettera su una pergamena che copre il cerchio, e se ne
+// resta lì, zitto e immobile, finché l\'anima non la rilascia con un tocco.
+// Nessun sipario che svanisce da solo: un proclama vero aspetta chi legge.
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -124,7 +128,10 @@ const TESTI = {
     corvoFrase1: "cra.",
     corvoFrase2: "le lettere viaggiano di notte.",
     corvoFrase3: "io porto le parole. le stelle le portate voi.",
-    corvoFrase4: "mi chiamo Muninn. ciò che porto non si perde mai."
+    corvoFrase4: "mi chiamo Muninn. ciò che porto non si perde mai.",
+    proclamaTitolo: "Il proclama",
+    proclamaSub: "Muninn lo porta a tutte le anime",
+    proclamaVai: "🐦‍⬛ Ho letto — riparti, corvo"
   },
   en: {
     subBussola: "the compass of presences",
@@ -186,7 +193,10 @@ const TESTI = {
     corvoFrase1: "cra.",
     corvoFrase2: "letters travel by night.",
     corvoFrase3: "i carry the words. the stars are yours to gather.",
-    corvoFrase4: "my name is Muninn — what i carry is never lost."
+    corvoFrase4: "my name is Muninn — what i carry is never lost.",
+    proclamaTitolo: "The proclamation",
+    proclamaSub: "Muninn carries it to every soul",
+    proclamaVai: "🐦‍⬛ I have read — fly on, raven"
   }
 };
 
@@ -240,6 +250,7 @@ function applicaLingua() {
   modale('modale-piazza', 'piazzaTitolo', 'piazzaSub');
   modale('modale-feedback', 'feedbackTitolo', 'feedbackSub');
   modale('modale-guida', 'guidaTitolo', 'guidaSub');
+  modale('modale-proclama', 'proclamaTitolo', 'proclamaSub'); // V8.25: il proclama parla la lingua dell'anima
   const subScrittura = document.querySelector('#modale-scrittura .sub');
   if (subScrittura && subScrittura.childNodes[0]) subScrittura.childNodes[0].textContent = t('scritturaSub');
   setId('btn-affida', 'affida');
@@ -251,6 +262,7 @@ function applicaLingua() {
   setId('btn-feedback-invia', 'affidaChiave');
   setId('btn-chiudi-feedback', 'rimettiPenna');
   setId('btn-chiudi-guida', 'saltaGuida');
+  setId('btn-proclamo-via', 'proclamaVai');
   setPh('lettera-testo', 'placeholderLettera');
   setPh('piazza-testo', 'placeholderPiazza');
   setPh('feedback-testo', 'placeholderFeedback');
@@ -377,6 +389,9 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('btn-lingua').addEventListener('click', cambiaLingua);
   // V8.21 — il custode congeda l\'anima quando la parola è ricevuta
   document.getElementById('btn-custode-via').addEventListener('click', () => chiudiModale('modale-custode'));
+  // V8.25 — il proclama di Muninn: la lettera si rilascia con un tocco, MAI da sola
+  document.getElementById('btn-proclamo-via').addEventListener('click', chiudiProclama);
+  document.querySelector('#modale-proclama .modale-box').addEventListener('click', chiudiProclama);
 });
 
 function mostraBussola() {
@@ -386,6 +401,7 @@ function mostraBussola() {
     utente.nome + ' · ' + utente.provincia;
   avviaBussolaViva(); // gli aghi prendono vita appena lo scrigno si apre
   avviaCorvo();        // V8.24: e il corvo prende a passeggiare lungo la notte
+  controllaProclama(); // V8.25: e se la piattaforma ha parlato, il corvo consegna
   if (!localStorage.getItem('pyxis-guida')) apriGuida(); // V8.15: la prima volta, l\'anima viene accompagnata
 }
 
@@ -1281,6 +1297,48 @@ function toccoCorvo() {
   }
 }
 
+// ===== V8.25 — IL PROCLAMA DI MUNINN =====
+// La piattaforma parla a tutte le anime: i costruttori affiggono un proclama,
+// e il corvo lo consegna su una pergamena che copre il cerchio. Il canone è
+// tassativo: la lettera non svanisce da sola, nessun sipario a tempo — resta
+// sullo schermo finché l\'anima non la rilascia con un tocco. Poi Muninn si
+// leva in volo e torna la notte di sempre. Consegnato una volta, non ritorna:
+// la memoria del corvo non disturpa due volte la stessa anima.
+async function controllaProclama() {
+  if (!utente) return;
+  try {
+    const resp = await fetch(API + '/api/proclama');
+    const data = await resp.json();
+    if (data && data.proclama) mostraProclama(data.proclama);
+  } catch (e) { /* il proclama può attendere: la bussola no */ }
+}
+
+function mostraProclama(p) {
+  const m = document.getElementById('modale-proclama');
+  if (!m || !p) return;
+  if (localStorage.getItem('pyxis-proclamo-visto') === String(p.id)) return; // già consegnato
+  document.getElementById('proclama-testo').textContent = p.testo;
+  m.dataset.proclamoId = String(p.id);
+  m.classList.remove('nascosto');
+  const pet = document.getElementById('corvo-pet');
+  if (pet) pet.style.display = 'none'; // Muninn È nella pergamena: un corvo solo sullo schermo
+}
+
+function chiudiProclama() {
+  const m = document.getElementById('modale-proclama');
+  if (!m || m.classList.contains('nascosto') || m.dataset.inChiusura) return;
+  m.dataset.inChiusura = '1';
+  m.classList.add('consegna'); // il corvo si leva con la risposta presa
+  if (m.dataset.proclamoId) localStorage.setItem('pyxis-proclamo-visto', m.dataset.proclamoId);
+  setTimeout(function () {
+    m.classList.remove('consegna');
+    m.classList.add('nascosto');
+    delete m.dataset.inChiusura;
+    const pet = document.getElementById('corvo-pet');
+    if (pet) pet.style.display = ''; // Muninn torna alla sua passeggiata lungo la notte
+  }, 420);
+}
+
 // ===== SSE (real-time) =====
 function avviaSSE() {
   if (!utente) return;
@@ -1330,6 +1388,12 @@ function avviaSSE() {
     corvoReagisci('occhiata'); // V8.24: una voce nuova — il corvo drizza il becco
     const modale = document.getElementById('modale-piazza');
     if (modale && !modale.classList.contains('nascosto')) apriPiazza();
+  });
+
+  // un proclama è stato affisso: il corvo lo consegna subito, a tutte le anime
+  evtSource.addEventListener('proclama', e => {
+    const d = JSON.parse(e.data);
+    mostraProclama(d);
   });
 
   evtSource.onerror = () => {
