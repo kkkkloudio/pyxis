@@ -132,6 +132,11 @@ if (!colonnePoi.includes('livello')) db.exec('ALTER TABLE poi ADD COLUMN livello
 if (!colonnePoi.includes('custode_nome')) db.exec('ALTER TABLE poi ADD COLUMN custode_nome TEXT');
 if (!colonnePoi.includes('custode_racconto')) db.exec('ALTER TABLE poi ADD COLUMN custode_racconto TEXT');
 
+// La parola di accesso (23/11): le anime nate prima di lei non ce l'hanno.
+// Migrazione dolce come tutte le altre: il DB esistente non si tocca mai.
+const colonneUtenti = db.prepare('PRAGMA table_info(utenti)').all().map(c => c.name);
+if (!colonneUtenti.includes('password')) db.exec('ALTER TABLE utenti ADD COLUMN password TEXT');
+
 // POI reali d\'Italia (luoghi di potere/naturali con leggenda) — Veneto completo,
 // + prima ondata del Nord (Trentino, Friuli, Valle d\'Aosta), + Lombardia completa (V8.20),
 // + il Piemonte completo (V8.22). Si espande regione per regione.
@@ -492,6 +497,22 @@ function scartoStabile(idA, idB) {
   return (parseInt(h.slice(0, 2), 16) / 255) * 50 - 25;
 }
 
+// ============ LA PAROLA DI ACCESSO ============
+// Il login del 23/11: il nome è l'identità, la parola la custode della collezione.
+// Non vive MAI in chiaro nel DB: solo sale + hash scrypt (node:crypto, zero
+// dipendenze, come tutto il backend). Nessuna posizione resta coinvolta:
+// arriva un nome e una parola, torna lo stesso utente di sempre.
+function hashPassword(pw) {
+  const sale = crypto.randomBytes(16).toString('hex');
+  const h = crypto.scryptSync(pw, sale, 32).toString('hex');
+  return sale + ':' + h;
+}
+function verificaPassword(pw, conservata) {
+  if (!conservata || conservata.indexOf(':') === -1) return false;
+  const [sale, h] = conservata.split(':');
+  return crypto.scryptSync(pw, sale, 32).toString('hex') === h;
+}
+
 // ============ HELPERS ============
 function json(res, code, data) {
   res.writeHead(code, {
@@ -568,37 +589,48 @@ const server = http.createServer(async (req, res) => {
   // CORS preflight
   if (req.method === 'OPTIONS') { json(res, 204, {}); return; }
 
-  // ---- POST /api/register ----
+  // ---- POST /api/register ---- (iscrizione O rientro)
+  // Il nome è l'identità dell'anima; la parola d'accesso protegge lei e la
+  // sua collezione di stelle: chi rientra da qualunque telefono ritrova tutto.
+  // Prima anima a presentarsi: nasce con la parola. Anima già esistente con
+  // la parola giusta: rientro. Anima esistente nata PRIMA della parola: il
+  // primo che rientra la rivendica (utenti vecchi: seed e conti di test).
+  // Pietra angolare intatta: qui non passa e non si salva nessuna posizione.
   if (path === '/api/register' && req.method === 'POST') {
     try {
       const body = await readBody(req);
-      const { nome, provincia } = body;
-      const tipo = (typeof body.tipo === 'string' && body.tipo.trim()) ? body.tipo.trim().slice(0, 20) : 'utente';
+      const nome = String(body.nome || '').trim();
+      const provincia = String(body.provincia || '');
+      const password = typeof body.password === 'string' ? body.password : '';
 
       if (!nome || nome.length < 2 || nome.length > 20) return json(res, 400, { error: 'Nome non valido (2-20 caratteri)' });
       if (!provincia) return json(res, 400, { error: 'Provincia mancante' });
+      if (password.length < 4 || password.length > 64) return json(res, 400, { error: 'La parola d\'accesso vuole da 4 a 64 caratteri' });
 
-      const id = crypto.randomUUID();
       const now = new Date().toISOString();
+      const esiste = db.prepare('SELECT id, nome, tipo, provincia, password FROM utenti WHERE nome = ?').get(nome);
 
-      try {
-        db.prepare('INSERT INTO utenti (id, nome, tipo, provincia, creato_il) VALUES (?, ?, ?, ?, ?)')
-          .run(id, nome.trim(), tipo, provincia, now);
-      } catch (e) {
-        if (e.message.includes('UNIQUE')) return json(res, 409, { error: 'Questo nome è già preso' });
-        throw e;
+      if (esiste) {
+        if (!esiste.password) {
+          db.prepare('UPDATE utenti SET password = ?, ultimo_accesso = ? WHERE id = ?')
+            .run(hashPassword(password), now, esiste.id);
+        } else if (!verificaPassword(password, esiste.password)) {
+          return json(res, 403, { error: 'Questo nome appartiene a un\'altra anima: la parola non è quella giusta' });
+        } else {
+          db.prepare('UPDATE utenti SET ultimo_accesso = ? WHERE id = ?').run(now, esiste.id);
+        }
+        db.prepare('INSERT OR REPLACE INTO presenze (utente_id, provincia, online_da) VALUES (?, ?, ?)')
+          .run(esiste.id, esiste.provincia, now);
+        return json(res, 200, { ok: true, rientro: true, utente: { id: esiste.id, nome: esiste.nome, tipo: esiste.tipo, provincia: esiste.provincia } });
       }
 
-      // Registra presenza online
+      const id = crypto.randomUUID();
+      db.prepare('INSERT INTO utenti (id, nome, tipo, provincia, password, creato_il, ultimo_accesso) VALUES (?, ?, ?, ?, ?, ?, ?)')
+        .run(id, nome, 'utente', provincia, hashPassword(password), now, now);
       db.prepare('INSERT OR REPLACE INTO presenze (utente_id, provincia, online_da) VALUES (?, ?, ?)')
         .run(id, provincia, now);
-
-      broadcast(provincia, 'nuovo-utente', { nome: nome.trim(), tipo, provincia });
-
-      return json(res, 201, {
-        ok: true,
-        utente: { id, nome: nome.trim(), tipo, provincia }
-      });
+      broadcast(provincia, 'nuovo-utente', { nome, tipo: 'utente', provincia });
+      return json(res, 201, { ok: true, utente: { id, nome, tipo: 'utente', provincia } });
     } catch (e) {
       return json(res, 500, { error: e.message });
     }
