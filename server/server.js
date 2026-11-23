@@ -7,10 +7,6 @@
 //        GET /api/poi, GET /api/utenti (debug)
 // - V8.13: LA PIAZZA — le voci di tutte le anime: POST /api/voce, GET /api/voci
 // - V8.14: FEEDBACK — parola ai costruttori: POST /api/feedback (si legge dal DB)
-// - V8.25: IL PROCLAMA DI MUNINN — la piattaforma parla a tutte le anime:
-//        POST /api/proclama (chiave dei costruttori), GET /api/proclama
-//        (l\'ultimo affisso). Consegna: pergamena grande, l\'anima la rilascia
-//        con un tocco. Mai sipari a tempo.
 // - V5: lancette flip — grande=luogo di potere (POI), media=prima anima, piccola=seconda anima
 // - V5: check-in — PIETRA ANGOLARE: mai trattenere, salvare o trasmettere la
 //        posizione dell\'utente. Il confronto GPS avviene SOLO sul telefono:
@@ -62,11 +58,6 @@ const crypto = require('crypto');
 
 const PORT = process.env.PORT || 3000;
 const DB_PATH = require('path').join(__dirname, 'pyxis.db');
-
-// V8.25 — IL PROCLAMA DI MUNINN: la chiave per affiggere un proclama a tutte
-// le anime (i costruttori parlano, il corvo consegna). Cambiabile via env
-// PROCLAMA_KEY; chi non ce l\'ha non parla a tutto il cerchio.
-const CHIAVE_PROCLAMA = process.env.PROCLAMA_KEY || 'muninn-porta-parole';
 
 // ============ DATABASE ============
 const db = new DatabaseSync(DB_PATH);
@@ -125,12 +116,6 @@ db.exec(`
     id TEXT PRIMARY KEY,
     utente_id TEXT NOT NULL,
     nome TEXT NOT NULL,
-    testo TEXT NOT NULL,
-    creata_il TEXT NOT NULL
-  );
-
-  CREATE TABLE IF NOT EXISTS proclami (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
     testo TEXT NOT NULL,
     creata_il TEXT NOT NULL
   );
@@ -561,7 +546,9 @@ function broadcast(provincia, event, data) {
 }
 
 // V8.13 — LA PIAZZA: il cerchio delle voci è di TUTTE le province, non di una sola
+let ultimoMessaggioCorvo = null; // {testo, alle} — l'ultimo avviso del corvo
 function broadcastTutti(event, data) {
+  if (event === 'corvo-messaggio') ultimoMessaggioCorvo = data;
   const msg = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
   for (const c of clients) {
     try { c.res.write(msg); } catch (e) { clients.delete(c); }
@@ -716,32 +703,6 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // ---- GET /api/proclama ---- (V8.25: l'ultimo proclama affitto, null se mai parlato)
-  if (path === '/api/proclama' && req.method === 'GET') {
-    const p = db.prepare('SELECT id, testo, creata_il FROM proclami ORDER BY id DESC LIMIT 1').get();
-    return json(res, 200, { proclama: p || null });
-  }
-
-  // ---- POST /api/proclama ---- (V8.25: la piattaforma parla a tutte le anime:
-  // i costruttori affiggono, Muninn consegna in tempo reale a chi è nel cerchio)
-  if (path === '/api/proclama' && req.method === 'POST') {
-    try {
-      const body = await readBody(req);
-      const { testo, chiave } = body;
-      if (chiave !== CHIAVE_PROCLAMA) return json(res, 403, { error: 'Il corvo affigge solo per i costruttori' });
-      if (!testo || !testo.trim()) return json(res, 400, { error: 'Il proclama è vuoto' });
-      if (testo.trim().length > 500) return json(res, 400, { error: 'Il proclama è troppo lungo (max 500 caratteri)' });
-      const creata_il = new Date().toISOString();
-      const info = db.prepare('INSERT INTO proclami (testo, creata_il) VALUES (?, ?)')
-        .run(testo.trim(), creata_il);
-      const p = { id: Number(info.lastInsertRowid), testo: testo.trim(), creata_il };
-      broadcastTutti('proclama', p); // il corvo parte subito, tutte le province
-      return json(res, 201, { ok: true, proclama: p });
-    } catch (e) {
-      return json(res, 500, { error: e.message });
-    }
-  }
-
   // ---- GET /api/lancette?provincia=X&id=TUO ----
   // Restituisce le 3 lancette: GRANDE=luogo di potere (POI), MEDIA=prima anima, PICCOLA=seconda anima
   if (path === '/api/lancette' && req.method === 'GET') {
@@ -888,6 +849,22 @@ const server = http.createServer(async (req, res) => {
     return json(res, 200, { poi: lista });
   }
 
+  // ---- POST /api/corvo-messaggio ---- (admin: il corvo porta le notizie a tutti)
+  if (path === '/api/corvo-messaggio' && req.method === 'POST') {
+    const auth = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const token = process.env.CORVO_ADMIN_TOKEN || '';
+    if (!token || auth !== token) return json(res, 401, { error: 'non autorizzato' });
+    try {
+      const body = await readBody(req);
+      const testo = String(body.testo || '').trim().slice(0, 300);
+      if (!testo) return json(res, 400, { error: 'testo mancante' });
+      broadcastTutti('corvo-messaggio', { testo, alle: new Date().toISOString() });
+      return json(res, 200, { ok: true, utenti: clients.size });
+    } catch (e) {
+      return json(res, 500, { error: e.message });
+    }
+  }
+
   // ---- GET /api/events?provincia=X&id=TUO ----
   // SSE: stream real-time per la provincia
   if (path === '/api/events' && req.method === 'GET') {
@@ -903,4 +880,64 @@ const server = http.createServer(async (req, res) => {
       'Access-Control-Allow-Headers': 'Content-Type',
     });
     res.write(`event: connesso\ndata: ${JSON.stringify({ provincia, ok: true })}\n\n`);
+    if (ultimoMessaggioCorvo) {  // replay sempre finché esiste un messaggio
+      res.write(`event: corvo-messaggio\ndata: ${JSON.stringify(ultimoMessaggioCorvo)}\n\n`);
+    }
 
+    const client = { res, provincia };
+    clients.add(client);
+
+    // Heartbeat ogni 25s: tiene vivo lo stream E batte il cuore della presenza
+    // (senza questo rintocco, una sessione lunga morirebbe di TTL a 5 minuti)
+    const hb = setInterval(() => {
+      try {
+        res.write(`: ping\n\n`);
+        if (mioId) db.prepare('INSERT OR REPLACE INTO presenze (utente_id, provincia, online_da) VALUES (?, ?, ?)')
+          .run(mioId, provincia, new Date().toISOString());
+      } catch (e) { clearInterval(hb); clients.delete(client); }
+    }, 25000);
+
+    // Registra presenza se id dato
+    if (mioId) {
+      db.prepare('INSERT OR REPLACE INTO presenze (utente_id, provincia, online_da) VALUES (?, ?, ?)')
+        .run(mioId, provincia, new Date().toISOString());
+    }
+
+    req.on('close', () => {
+      clearInterval(hb);
+      clients.delete(client);
+      if (mioId) db.prepare('DELETE FROM presenze WHERE utente_id = ?').run(mioId);
+    });
+
+    return;
+  }
+
+  // ---- GET /api/utenti?provincia=X ---- (debug)
+  if (path === '/api/utenti' && req.method === 'GET') {
+    const provincia = url.searchParams.get('provincia');
+    const lista = provincia
+      ? db.prepare('SELECT id, nome, tipo, provincia, creato_il FROM utenti WHERE provincia = ?').all(provincia)
+      : db.prepare('SELECT id, nome, tipo, provincia, creato_il FROM utenti').all();
+    return json(res, 200, { utenti: lista, totale: lista.length });
+  }
+
+  // ---- Serve file statici dalla cartella parent (il frontend) ----
+  const fs = require('fs');
+  const pathMod = require('path');
+  let filePath = pathMod.join(__dirname, '..', decodeURIComponent(path === '/' ? '/index.html' : path));
+  if (!filePath.startsWith(pathMod.join(__dirname, '..'))) { res.writeHead(403, {'Access-Control-Allow-Origin':'*'}); return res.end('Forbidden'); }
+  fs.readFile(filePath, (err, data) => {
+    if (err) { res.writeHead(404, {'Access-Control-Allow-Origin':'*'}); return res.end('Not found'); }
+    const ext = pathMod.extname(filePath);
+    const mime = { '.html':'text/html; charset=utf-8', '.js':'text/javascript', '.json':'application/json', '.png':'image/png', '.jpg':'image/jpeg', '.css':'text/css', '.svg':'image/svg+xml' }[ext] || 'application/octet-stream';
+    res.writeHead(200, { 'Content-Type': mime, 'Access-Control-Allow-Origin': '*' });
+    res.end(data);
+  });
+});
+
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🧭 Pyxis backend in ascolto su http://localhost:${PORT}`);
+  console.log(`   Database: ${DB_PATH}`);
+  console.log(`   Frontend servito da: ${__dirname}/..`);
+  console.log(`   Pietra angolare: nessuna posizione utente viene mai salvata o trasmessa.`);
+});
