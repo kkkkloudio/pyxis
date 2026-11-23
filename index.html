@@ -332,6 +332,26 @@
     font-family:'Cormorant Garamond', Georgia, serif; font-size:11px;
     color:#8a7a5a; font-style:italic; z-index:10;
   }
+  /* ===== LE PIETRE DI ACCESSO ===== */
+  .campo-pietre { text-align:center; }
+  .sequenza { display:flex; gap:14px; justify-content:center; padding:12px 0 4px; }
+  .pietra-scrigno {
+    width:54px; height:54px; border-radius:50%;
+    background: radial-gradient(circle at 38% 30%, #2a2318, #0d0b07 80%);
+    border:1px solid rgba(184,150,62,.35);
+    color:#e8cd85; font-size:24px; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 4px 14px rgba(0,0,0,.55), inset 0 1px 0 rgba(232,205,133,.15);
+    transition: transform .15s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .pietra-scrigno:hover { transform: translateY(-2px); }
+  .pietra-scrigno[data-elemento="terra"] { border-color:#c9a86a; box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 16px rgba(201,168,106,.35); }
+  .pietra-scrigno[data-elemento="aria"]  { border-color:#8ab0e0; box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 16px rgba(138,176,224,.35); }
+  .pietra-scrigno[data-elemento="fuoco"] { border-color:#d97a5a; box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 16px rgba(217,122,90,.35); }
+  .pietra-scrigno[data-elemento="acqua"] { border-color:#7cc9a2; box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 16px rgba(124,201,162,.35); }
+  .sequenza-letta { text-align:center; color:#e8cd85; letter-spacing:2px; font-size:15px; min-height:22px; opacity:.9; padding:2px 0 6px; }
+  .sub-scrigno { text-align:center; color:#a8a29a; font-size:13px; line-height:1.45; opacity:.85; }
+
   .pyxis-label {
     position:absolute; bottom:8px; left:20px;
     font-family:'Cormorant Garamond', Georgia, serif; font-size:9px;
@@ -640,9 +660,16 @@
             <input type="text" id="nome" placeholder="es. LunaNera" maxlength="20" autocomplete="off">
           </div>
 
-          <div class="campo">
-            <label for="password">Password (min 4 caratteri — la prima volta la scegli, poi è il tuo rientro)</label>
-            <input type="password" id="password" placeholder="••••••" minlength="4" maxlength="64" autocomplete="off">
+          <div class="campo campo-pietre">
+            <label id="password-label">La parola d'accesso · la sequenza degli elementi</label>
+            <div class="sequenza" id="sequenza-elementi" role="group" aria-label="la sequenza degli elementi">
+              <button type="button" class="pietra-scrigno" data-slot="0" aria-label="prima pietra"></button>
+              <button type="button" class="pietra-scrigno" data-slot="1" aria-label="seconda pietra"></button>
+              <button type="button" class="pietra-scrigno" data-slot="2" aria-label="terza pietra"></button>
+              <button type="button" class="pietra-scrigno" data-slot="3" aria-label="quarta pietra"></button>
+            </div>
+            <div id="sequenza-letta" class="sequenza-letta">· · · ·</div>
+            <div id="password-sub" class="sub-scrigno">quattro pietre, un elemento ciascuna: tocca ogni pietra e scegli terra, aria, fuoco o acqua. Le pietre, in quest'ordine, sono la tua parola: la componi la prima volta, la ricomponi uguale per rientrare</div>
           </div>
 
           <div class="campo">
