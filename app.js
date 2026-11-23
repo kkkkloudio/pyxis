@@ -67,11 +67,13 @@ const TESTI = {
   it: {
     subBussola: "la bussola delle presenze",
     entraScrigno: "Entra nello scrigno",
-    subDueCose: "due cose bastano, poi la bussola gira",
     nomeArte: "Nome d\'arte",
     provincia: "Provincia",
     scegli: "— scegli —",
     apriBussola: "Apri la bussola",
+    parolaPietre: "La parola d\'accesso · la sequenza degli elementi",
+    parolaPietreSub: "quattro pietre, un elemento ciascuna: tocca ogni pietra e scegli terra, aria, fuoco o acqua. Le pietre, in quest\'ordine, sono la tua parola: la componi la prima volta, la ricomponi uguale per rientrare",
+    subDueCose: "tre cose bastano, poi la bussola gira",
     privacyIscrizione: "nessuna via da scegliere · nessun nome vero · nessuna email · la posizione non lascia mai il telefono",
     legendaTitolo: "Le tre lancette",
     dettGrande: "luogo di potere più vicino",
@@ -120,11 +122,13 @@ const TESTI = {
   en: {
     subBussola: "the compass of presences",
     entraScrigno: "Enter the casket",
-    subDueCose: "two things are enough, then the compass turns",
     nomeArte: "Artist name",
     provincia: "Province",
     scegli: "— choose —",
     apriBussola: "Open the compass",
+    parolaPietre: "The word of entry · the sequence of elements",
+    parolaPietreSub: "four stones, one element each: tap every stone and pick earth, air, fire or water. The stones, in that order, are your word: compose it the first time, recompose it the same to come back",
+    subDueCose: "three things are enough, then the compass turns",
     privacyIscrizione: "no road to choose · no real name · no email · the position never leaves your phone",
     legendaTitolo: "The three needles",
     dettGrande: "nearest place of power",
@@ -186,6 +190,8 @@ function applicaLingua() {
   set('#schermata-iscrizione .sub', 'subDueCose');
   set('label[for="nome"]', 'nomeArte');
   set('label[for="provincia"]', 'provincia');
+  set('#password-label', 'parolaPietre');
+  set('#password-sub', 'parolaPietreSub');
   const opt = document.querySelector('#provincia option[value=""]');
   if (opt) opt.textContent = t('scegli');
   setId('btn-inizia', 'apriBussola');
@@ -260,14 +266,45 @@ document.addEventListener('DOMContentLoaded', function () {
     select.appendChild(o);
   });
 
+// ===== LE PIETRE DI ACCESSO =====
+// La parola d'accesso è una sequenza di elementi: quattro pietre, un elemento
+// ciascuna (terra, aria, fuoco, acqua, come i cardinali del quadrante).
+// Ogni anima compone la sua formula e la ricompone per rientrare. Al server
+// parte la solita stringa (es. "terra-fuoco-fuoco-acqua"): pietra angolare
+// intatta, mai posizioni.
+const ELEMENTI = ['terra', 'aria', 'fuoco', 'acqua'];
+const SIMBOLI_ELEMENTO = { terra: '🪨', aria: '🌬️', fuoco: '🔥', acqua: '💧' };
+let sequenzaAccesso = [null, null, null, null];
+
+function aggiornaPietre() {
+  document.querySelectorAll('.pietra-scrigno').forEach(btn => {
+    const i = Number(btn.getAttribute('data-slot'));
+    const el = sequenzaAccesso[i];
+    btn.textContent = el ? SIMBOLI_ELEMENTO[el] : '·';
+    if (el) btn.setAttribute('data-elemento', el); else btn.removeAttribute('data-elemento');
+  });
+  const letta = document.getElementById('sequenza-letta');
+  if (letta) letta.textContent = sequenzaAccesso.every(el => el) ? sequenzaAccesso.join(' · ') : '· · · ·';
+}
+
+document.querySelectorAll('.pietra-scrigno').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const i = Number(btn.getAttribute('data-slot'));
+    const attuale = sequenzaAccesso[i];
+    sequenzaAccesso[i] = ELEMENTI[(attuale ? ELEMENTI.indexOf(attuale) + 1 : 0) % 4];
+    aggiornaPietre();
+  });
+});
+aggiornaPietre();
+
   document.getElementById('btn-inizia').addEventListener('click', async function () {
     const nome = document.getElementById('nome').value.trim();
     const provincia = document.getElementById('provincia').value;
-    const password = document.getElementById('password').value;
 
     if (!nome) return alert("Scegli un nome d'arte");
     if (!provincia) return alert('Scegli la provincia');
-    if (password.length < 4) return alert('Scegli la parola d\'accesso: min 4 caratteri. La prima volta la scegli, poi è il tuo rientro');
+    if (sequenzaAccesso.some(el => !el)) return alert('La parola non è completa: tocca le quattro pietre, un elemento per ciascuna. La ricomporrai uguale per rientrare');
+    const password = sequenzaAccesso.join('-');
 
     try {
       const resp = await fetch(API + '/api/register', {
