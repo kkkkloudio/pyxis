@@ -1,4 +1,12 @@
 // Pyxis — Frontend V8.8: la bussola sveglia — l\'ago che indica davvero.
+// V8.33 — LA CARTA RISPONDE QUANDO LA CHIAMI: una volta ripiegata (da sola
+// o al tocco), il pellegrino non rivedeva più il sentiero. Mai più: il
+// bottone "la carta del pellegrino" la srotola di nuovo quando vuole,
+// col sentiero RICALCOLATO da dove si trova ora (rotta vera sul telefono,
+// pietra angolare intatta). La carta richiamata NON si ripiega da sola:
+// si torna alla bussola toccandola, o toccando il bottone che nel
+// frattempo dice "torna alla bussola". (Idea di Carlo, primo giorno
+// in esterna, 24/11.)
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l\'ago grande punta il luogo NEL MONDO REALE:
@@ -96,6 +104,8 @@ const TESTI = {
     captionSveglia: "bussola sveglia: gli aghi puntano davvero — tocca un ago per sapere chi è",
     captionSogna: "l\'ago sta sognando il luogo — sveglialo con 🧭 qui sotto, e punterà davvero",
     cartaVai: "la carta del pellegrino: segui il sentiero fino alla stella · toccala per ripiegarla",
+    cartaTorna: "📜 la carta del pellegrino — il sentiero da dove sei ora",
+    cartaRipiega: "🧭 torna alla bussola",
     tempoPasseggiata: "una passeggiata",
     tempoCammino: "un bel cammino",
     tempoPellegrinaggio: "pellegrinaggio: gran camminata",
@@ -159,6 +169,8 @@ const TESTI = {
     captionSveglia: "compass awake: the needles truly point — tap one to know who it is",
     captionSogna: "the needle is dreaming of the place — wake it with 🧭 below, and it will truly point",
     cartaVai: "the pilgrim chart: follow the trail to the star · tap it to fold it away",
+    cartaTorna: "📜 the pilgrim chart — the trail from where you stand now",
+    cartaRipiega: "🧭 back to the compass",
     tempoPasseggiata: "a stroll",
     tempoCammino: "a fair walk",
     tempoPellegrinaggio: "a pilgrimage: a grand walk",
@@ -246,6 +258,7 @@ function applicaLingua() {
   modale('modale-feedback', 'feedbackTitolo', 'feedbackSub');
   modale('modale-guida', 'guidaTitolo', 'guidaSub');
   setId('btn-affida', 'affida');
+  setId('btn-carta', CARTA.srotolata ? 'cartaRipiega' : 'cartaTorna'); // V8.33: la carta si chiama, e si congeda
   setId('btn-chiudi-posta', 'chiudi');
   setId('btn-chiudi-collezione', 'chiudi');
   setId('btn-voce', 'lasciaVoce');
@@ -387,6 +400,8 @@ aggiornaPietre();
   });
   const btnSveglia = document.getElementById('btn-sveglia');
   if (btnSveglia) btnSveglia.addEventListener('click', svegliaAgo);
+  const btnCarta = document.getElementById('btn-carta'); // V8.33: la carta risponde quando la chiami
+  if (btnCarta) btnCarta.addEventListener('click', chiamaCarta);
 
   // ===== il corvo =====
 
@@ -497,6 +512,7 @@ function aggiornaLancette(l, totale) {
 
   aggiornaVisibilitaAghi();
   aggiornaCaption();
+  aggiornaBottoneCarta(); // V8.33: la carta si chiama solo se c\'è una stella da seguire
 
   const nota = document.querySelector('#schermata-bussola .nota');
   if (nota) nota.textContent = totale + t('notaAscolto');
@@ -760,6 +776,21 @@ async function svegliaAgo() {
 
 const CARTA = { srotolata:false, t1:null, t2:null, td:null, angolo:0, raf:0 };
 
+// V8.33 — il bottone che richiama la carta: visibile solo quando c\'è
+// un luogo di potere da seguire. La pietra angolare non cambia: il bottone
+// non invia niente, srotola solo la pergamena col sentiero già calcolato.
+function aggiornaBottoneCarta() {
+  const btn = document.getElementById('btn-carta');
+  if (btn) btn.hidden = !poiCorrente;
+}
+
+// il richiamo del pellegrino: apre la carta richiamata (che resta aperta
+// finché non è lui a congedarla), o la ripiega se era già srotolata
+function chiamaCarta() {
+  if (CARTA.srotolata) ripiegaCarta();
+  else srotolaCarta(true);
+}
+
 // di quanto girare il sentiero: rotta vera meno dove sei rivolto tu
 function angoloDelSentiero() {
   const A = VIVA.aghi.grande;
@@ -781,7 +812,7 @@ function avviaSequenzaCarta() {
   }, 5000);
 }
 
-function srotolaCarta() {
+function srotolaCarta(manuale) {
   const el = document.getElementById('carta-rotta');
   if (!el || CARTA.srotolata) return;
   const bers = angoloDelSentiero();
@@ -796,7 +827,12 @@ function srotolaCarta() {
   if (cap) cap.textContent = t('cartaVai');
   aggiornaDistanzaCarta();
   CARTA.td = setInterval(aggiornaDistanzaCarta, 1000);
-  CARTA.t2 = setTimeout(ripiegaCarta, 10000);
+  // V8.33: la carta RICHIAMATA resta aperta finché il pellegrino non la
+  // congeda lui — il sentiero lo segue mentre cammina. Solo quella che
+  // arriva da sola dopo la sveglia si richiude dopo dieci secondi.
+  if (!manuale) CARTA.t2 = setTimeout(ripiegaCarta, 10000);
+  const btn = document.getElementById('btn-carta');
+  if (btn) btn.textContent = t('cartaRipiega');
   if (!VIVA.ferma) CARTA.raf = requestAnimationFrame(respiraCarta);
 }
 
@@ -867,6 +903,8 @@ function ripiegaCarta() {
   }
   const wrap = document.querySelector('.bussola-wrap');
   if (wrap) wrap.classList.remove('modo-carta');
+  const btn = document.getElementById('btn-carta');
+  if (btn) btn.textContent = t('cartaTorna'); // V8.33: il bottone torna a chiamare la carta
   aggiornaCaption(); // la bussola torna a dire le sue cose
 }
 
