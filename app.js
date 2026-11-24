@@ -96,6 +96,13 @@ const TESTI = {
     captionSveglia: "bussola sveglia: gli aghi puntano davvero — tocca un ago per sapere chi è",
     captionSogna: "l\'ago sta sognando il luogo — sveglialo con 🧭 qui sotto, e punterà davvero",
     cartaVai: "la carta del pellegrino: segui il sentiero fino alla stella · toccala per ripiegarla",
+    tempoPasseggiata: "una passeggiata",
+    tempoCammino: "un bel cammino",
+    tempoPellegrinaggio: "pellegrinaggio: gran camminata",
+    minCammino: " min",
+    hCammino: " h",
+    kmCorto: " km",
+    mCorto: " m",
     dettoGrande: "il luogo di potere",
     dettoMedia: "l\'anima più vicina",
     dettoPiccola: "la seconda anima",
@@ -152,6 +159,13 @@ const TESTI = {
     captionSveglia: "compass awake: the needles truly point — tap one to know who it is",
     captionSogna: "the needle is dreaming of the place — wake it with 🧭 below, and it will truly point",
     cartaVai: "the pilgrim chart: follow the trail to the star · tap it to fold it away",
+    tempoPasseggiata: "a stroll",
+    tempoCammino: "a fair walk",
+    tempoPellegrinaggio: "a pilgrimage: a grand walk",
+    minCammino: " min",
+    hCammino: " h",
+    kmCorto: " km",
+    mCorto: " m",
     dettoGrande: "the place of power",
     dettoMedia: "the nearest soul",
     dettoPiccola: "the second soul",
@@ -794,17 +808,44 @@ function respiraCarta() {
 }
 
 function aggiornaDistanzaCarta() {
-  const el = document.getElementById('carta-distanza');
-  if (!el || !poiCorrente) return;
-  let testo = '';
+  // la carta dice TRE cose: la distanza che resta (sul cartiglio E lungo il
+  // sentiero, come le vecchie mappe scrivevano i migli sopra le strade), il
+  // tempo del passo (4,5 km all'ora: il passo onesto del pellegrino), e la
+  // sentenza che dice se e' una cosa da fare a piedi o gran camminata.
+  const cart = document.getElementById('carta-distanza');
+  const via = document.getElementById('carta-distanza-via');
+  const sent = document.getElementById('carta-sentenza');
+  if (!cart || !poiCorrente) return;
+  let testo = '', viaT = '', sentenza = '';
   if (BVERA.pos && poiCorrente.lat != null) {
     const d = distanzaMetri(BVERA.pos.lat, BVERA.pos.lon, poiCorrente.lat, poiCorrente.lon);
-    if (d <= RAGGIO_M) testo = t('cerchio');
-    else testo = d >= 1000
-      ? '\u2248 ' + (d / 1000).toFixed(1).replace('.', ',') + t('kmLuogo')
-      : '\u2248 ' + (Math.round(d / 10) * 10) + t('mLuogo');
+    if (d <= RAGGIO_M) {
+      testo = t('cerchio');
+      sentenza = t('tempoPasseggiata');
+    } else {
+      const chilometri = d >= 1000;
+      const distStr = chilometri
+        ? '\u2248 ' + (d / 1000).toFixed(1).replace('.', ',') + t('kmLuogo')
+        : '\u2248 ' + (Math.round(d / 10) * 10) + t('mLuogo');
+      viaT = chilometri
+        ? '\u2248 ' + (d / 1000).toFixed(d >= 10000 ? 0 : 1).replace('.', ',') + t('kmCorto')
+        : '\u2248 ' + (Math.round(d / 10) * 10) + t('mCorto');
+      const min = d / 75; // 4,5 km/h: il passo onesto di chi va a piedi
+      let tempo;
+      if (min < 60) tempo = '~' + (Math.round(min / 5) * 5) + t('minCammino');
+      else {
+        const h = Math.floor(min / 60);
+        const m = Math.round((min - h * 60) / 5) * 5;
+        tempo = '~' + h + t('hCammino') + (m ? ' ' + m + t('minCammino') : '');
+      }
+      sentenza = d <= 1500 ? t('tempoPasseggiata')
+        : (d <= 5000 ? t('tempoCammino') : t('tempoPellegrinaggio'));
+      testo = distStr + ' \u00b7 ' + tempo;
+    }
   }
-  el.textContent = testo;
+  cart.textContent = testo;
+  if (via) via.textContent = viaT;
+  if (sent) sent.textContent = sentenza;
 }
 
 function ripiegaCarta() {
@@ -874,6 +915,8 @@ function disegnaCarta() {
     + '<g transform="translate(157,163) rotate(-16)"><ellipse rx="3.2" ry="5.6" fill="none" stroke="' + INK + '" stroke-width="1.3"/></g>'
     // il sentiero punteggiato, come sulle carte dei viandti
     + '<path d="M150 164 C 122 142, 186 118, 160 96 C 140 80, 118 78, 126 63 C 131 53, 143 51, 150 46" fill="none" stroke="' + INK + '" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.5 6" opacity=".9"/>'
+    // e accanto al sentiero, inclinato come un appunto del cartografo: la distanza
+    + '<text id="carta-distanza-via" transform="translate(183,121) rotate(-37)" font-family="IM Fell English, Georgia, serif" font-size="10.5" font-style="italic" fill="' + INK2 + '" opacity=".85"> </text>'
     // la stella del luogo
     + '<path d="M150 27 L152.8 36.5 L162 40 L152.8 43.5 L150 53 L147.2 43.5 L138 40 L147.2 36.5 Z" fill="#c9962f" stroke="' + INK + '" stroke-width="1"/>'
     + '<path d="M150 21 L150 26 M171 40 L164 40 M129 40 L136 40 M158 31 L161 25 M142 31 L139 25" stroke="#b8862b" stroke-width="1" opacity=".55"/>'
@@ -902,11 +945,12 @@ function disegnaCarta() {
     + '<path d="M14 2 q 4 -3 8 0" fill="none" stroke="' + INK2 + '" stroke-width=".9" opacity=".6"/>'
     + '</g>'
     + '</g>'
-    // ===== IL CARTIGLIO: nome del luogo e distanza che resta =====
-    + '<rect x="86" y="224" width="128" height="42" rx="9" fill="#f4e7c2" stroke="#8a6a44" stroke-width="1.2" opacity=".94"/>'
-    + '<text id="carta-nome" x="150" y="241" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-size="12.5" fill="#3a2810" letter-spacing=".4">' + nome + '</text>'
-    + '<path d="M120 246 C 133 249.5, 167 249.5, 180 246" stroke="#8a6a44" stroke-width="1" fill="none" opacity=".65"/>'
-    + '<text id="carta-distanza" x="150" y="259" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-size="11.5" font-style="italic" fill="' + INK2 + '"> </text>'
+    // ===== IL CARTIGLIO: nome del luogo, la distanza che resta, il tempo del passo =====
+    + '<rect x="76" y="218" width="148" height="52" rx="9" fill="#f4e7c2" stroke="#8a6a44" stroke-width="1.2" opacity=".94"/>'
+    + '<text id="carta-nome" x="150" y="233" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-size="12.5" fill="#3a2810" letter-spacing=".4">' + nome + '</text>'
+    + '<path d="M116 238 C 131 241.5, 169 241.5, 184 238" stroke="#8a6a44" stroke-width="1" fill="none" opacity=".65"/>'
+    + '<text id="carta-distanza" x="150" y="250" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-size="12" fill="#3a2810"> </text>'
+    + '<text id="carta-sentenza" x="150" y="262" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-size="10.5" font-style="italic" fill="' + INK2 + '"> </text>'
     + '</g></svg>';
 }
 
