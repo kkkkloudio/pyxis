@@ -1,5 +1,8 @@
-// Pyxis offline fallback v3 — senza backend: pagina mistica, sempre.
-const CACHE = 'pyxis-offline-v5';
+// Pyxis offline fallback v4 — il vento prima, la memoria poi.
+// V8.26: NETWORK-FIRST. Prima si chiede al server (così ogni aggiornamento
+// arriva davvero), e solo se la rete manca si pesca dalla memoria. Così il
+// telefono smette di vivere di ricordi vecchi mentre il mondo è già andato avanti.
+const CACHE = 'pyxis-offline-v6';
 const OFFLINE_PAGE = '/offline.html';
 
 self.addEventListener('install', (e) => {
@@ -10,7 +13,7 @@ self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys()
       .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
-      .then(() => clients.claim())
+      .then(() => self.clients.claim())
   );
 });
 
@@ -26,13 +29,13 @@ self.addEventListener('fetch', (e) => {
   }
   if (e.request.method === 'GET' && !isApi) {
     e.respondWith(
-      caches.match(e.request).then((hit) => hit || fetch(e.request).then((res) => {
+      fetch(e.request).then((res) => {
         if (res.ok && res.type === 'basic') {
           const clone = res.clone();
           caches.open(CACHE).then((c) => c.put(e.request, clone));
         }
         return res;
-      }))
+      }).catch(() => caches.match(e.request).then((hit) => hit || caches.match(OFFLINE_PAGE)))
     );
     return;
   }
