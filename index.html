@@ -359,11 +359,17 @@
   .sequenza { display:flex; gap:14px; justify-content:center; padding:12px 0 4px; }
   .pietra-scrigno {
     width:54px; height:54px; border-radius:50%;
-    background: radial-gradient(circle at 38% 30%, #2a2318, #0d0b07 80%);
+    /* V8.30 — anche prima del tocco la pietra mostra i QUATTRO ELEMENTI:
+       quattro faccette scure (terra/aria/fuoco/acqua), come un sasso
+       che li contiene tutti e aspetta di sceglierne uno */
+    background:
+      radial-gradient(circle at 38% 28%, rgba(255,246,220,.13), transparent 52%),
+      conic-gradient(from 45deg,
+        #52422a 0 25%, #2c3c58 25% 50%, #59302a 50% 75%, #26503e 75% 100%);
     border:1px solid rgba(184,150,62,.45);
     color:#e8cd85; font-size:24px; line-height:1;
     cursor:pointer; display:flex; align-items:center; justify-content:center;
-    box-shadow: 0 4px 14px rgba(0,0,0,.55), inset 0 1px 0 rgba(232,205,133,.15);
+    box-shadow: 0 4px 14px rgba(0,0,0,.55), inset 0 -3px 6px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,246,220,.14);
     transition: transform .15s ease, border-color .2s ease, box-shadow .2s ease, background .25s ease;
   }
   .pietra-scrigno:hover { transform: translateY(-2px); }
