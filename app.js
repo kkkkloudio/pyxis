@@ -307,7 +307,7 @@ const GLIFI = {
   aria: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#1c3050" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 10 L16 24 L24.5 10 Z"/><path d="M12 15.5 L20 15.5"/></svg>',
   fuoco: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#4a1408" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 24 L16 10 L24.5 24 Z"/></svg>',
   acqua: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#0e3a2c" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 10 L16 24 L24.5 10 Z"/></svg>',
-  vuota: '<svg viewBox="0 0 32 32" width="14" height="14" fill="none" stroke="rgba(240,224,170,.55)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 9.5 C16.9 13 18 14.1 21.5 15 C18 15.9 16.9 17 16 20.5 C15.1 17 14 15.9 10.5 15 C14 14.1 15.1 13 16 9.5 Z"/></svg>'
+  vuota: '<svg viewBox="0 0 32 32" width="14" height="14" fill="none" stroke="rgba(26,17,8,.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 9.5 C16.9 13 18 14.1 21.5 15 C18 15.9 16.9 17 16 20.5 C15.1 17 14 15.9 10.5 15 C14 14.1 15.1 13 16 9.5 Z"/></svg>'
 };
 let sequenzaAccesso = [null, null, null, null];
 
