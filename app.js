@@ -7,6 +7,14 @@
 // si torna alla bussola toccandola, o toccando il bottone che nel
 // frattempo dice "torna alla bussola". (Idea di Carlo, primo giorno
 // in esterna, 24/11.)
+// V8.34 — LA PORTA SI TROVA DA SOLA: allo scrigno non serve più scorrere le
+// 107 porte. Le sagome delle province (stivale.js) vivono dentro il telefono:
+// il bottone "la bussola trova la porta" legge il GPS QUI, confronta il punto
+// con le sagome QUI, e la porta trovata viene solo PRESENTATA nella lista:
+// l'utente conferma o cambia, esattamente come prima. Pietra angolare intatta:
+// la posizione non esce dal telefono, al server parte solo la porta dichiarata.
+// (Idea di Carlo, 24/11 sera: se la bussola sa indicare il luogo, sa anche
+// dire in quale provincia ti trovi.)
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l\'ago grande punta il luogo NEL MONDO REALE:
@@ -106,6 +114,9 @@ const TESTI = {
     cartaVai: "la carta del pellegrino: segui il sentiero fino alla stella · toccala per ripiegarla",
     cartaTorna: "📜 la carta del pellegrino — il sentiero da dove sei ora",
     cartaRipiega: "🧭 torna alla bussola",
+    trovaPorta: "🧭 la bussola trova la porta",
+    portaTrovata: "sussurra la bussola: {p} — conferma la porta, o cambiala",
+    portaMuta: "la bussola non sente il cielo: scegli la porta a mano",
     tempoPasseggiata: "una passeggiata",
     tempoCammino: "un bel cammino",
     tempoPellegrinaggio: "pellegrinaggio: gran camminata",
@@ -171,6 +182,9 @@ const TESTI = {
     cartaVai: "the pilgrim chart: follow the trail to the star · tap it to fold it away",
     cartaTorna: "📜 the pilgrim chart — the trail from where you stand now",
     cartaRipiega: "🧭 back to the compass",
+    trovaPorta: "🧭 let the compass find the gate",
+    portaTrovata: "the compass whispers: {p} — confirm the gate, or change it",
+    portaMuta: "the compass cannot hear the sky: pick the gate by hand",
     tempoPasseggiata: "a stroll",
     tempoCammino: "a fair walk",
     tempoPellegrinaggio: "a pilgrimage: a grand walk",
@@ -259,6 +273,8 @@ function applicaLingua() {
   modale('modale-guida', 'guidaTitolo', 'guidaSub');
   setId('btn-affida', 'affida');
   setId('btn-carta', CARTA.srotolata ? 'cartaRipiega' : 'cartaTorna'); // V8.33: la carta si chiama, e si congeda
+  setId('btn-trova', 'trovaPorta'); // V8.34: la porta si trova da sola
+  if (typeof ultimaPortaTrovata === 'string' && ultimaPortaTrovata) aggiornaSussurro('trovata', ultimaPortaTrovata);
   setId('btn-chiudi-posta', 'chiudi');
   setId('btn-chiudi-collezione', 'chiudi');
   setId('btn-voce', 'lasciaVoce');
@@ -402,6 +418,11 @@ aggiornaPietre();
   if (btnSveglia) btnSveglia.addEventListener('click', svegliaAgo);
   const btnCarta = document.getElementById('btn-carta'); // V8.33: la carta risponde quando la chiami
   if (btnCarta) btnCarta.addEventListener('click', chiamaCarta);
+  const btnTrova = document.getElementById('btn-trova'); // V8.34: la porta si trova da sola
+  if (btnTrova) {
+    if (!navigator.geolocation) btnTrova.hidden = true; // senza cielo, niente richiamo
+    else btnTrova.addEventListener('click', localizzami);
+  }
 
   // ===== il corvo =====
 
@@ -913,6 +934,68 @@ function chiudiCartaAlTocco() {
   const el = document.getElementById('carta-rotta');
   if (el) el.removeEventListener('click', chiudiCartaAlTocco);
   ripiegaCarta();
+}
+
+// ===== V8.34 — LA PORTA SI TROVA DA SOLA =====
+// Le sagome delle 107 province (stivale.js) sono dentro il telefono. Il GPS
+// si legge QUI, il punto viene confrontato con le sagome QUI: della posizione
+// non resta niente e non parte niente. Trovare la porta non è dichiararla:
+// il nome viene solo presentato nella lista, l'utente conferma come sempre.
+function dentroSagoma(flat, lat, lon) {
+  let dentro = false;
+  for (let i = 0; i + 3 < flat.length; i += 2) {
+    const x1 = flat[i], y1 = flat[i + 1], x2 = flat[i + 2], y2 = flat[i + 3];
+    if ((y1 > lat) !== (y2 > lat)) {
+      const incrocia = x1 + (lat - y1) * (x2 - x1) / (y2 - y1);
+      if (lon < incrocia) dentro = !dentro;
+    }
+  }
+  return dentro;
+}
+
+function trovaProvincia(lat, lon) {
+  if (typeof STIVALE === 'undefined' || !STIVALE) return null;
+  for (const nome in STIVALE) {
+    const sagome = STIVALE[nome], b = sagome[0];
+    if (lon < b[0] || lon > b[2] || lat < b[1] || lat > b[3]) continue;
+    for (let i = 1; i < sagome.length; i++) {
+      if (dentroSagoma(sagome[i], lat, lon)) return nome;
+    }
+  }
+  return null;
+}
+
+// l'unica cosa che ricorda il ritrovamento è il NOME della porta: mai coordinate
+let ultimaPortaTrovata = null;
+
+function aggiornaSussurro(stato, porta) {
+  const s = document.getElementById('porta-sussurro');
+  if (!s) return;
+  if (stato === 'trovata') s.textContent = t('portaTrovata').replace('{p}', porta);
+  else if (stato === 'muta') s.textContent = t('portaMuta');
+  else s.textContent = '';
+}
+
+function localizzami() {
+  const btn = document.getElementById('btn-trova');
+  if (!btn) return;
+  if (!navigator.geolocation) { btn.hidden = true; return; }
+  btn.disabled = true;
+  aggiornaSussurro('', null); // si riparte col pulito mentre il cielo ascolta
+  navigator.geolocation.getCurrentPosition(function (pos) {
+    // la posizione VIVE in questa funzione e muore qui: pietra angolare
+    const porta = trovaProvincia(pos.coords.latitude, pos.coords.longitude);
+    btn.disabled = false;
+    if (!porta) { aggiornaSussurro('muta', null); return; }
+    const sel = document.getElementById('provincia');
+    if (sel) sel.value = porta;   // presente, non imposta: chi vuole un'altra porta la scegli
+    ultimaPortaTrovata = porta;
+    aggiornaSussurro('trovata', porta);
+  }, function () {
+    // niente cielo o permesso negato: si torna alla mano, come sempre
+    btn.disabled = false;
+    aggiornaSussurro('muta', null);
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
 }
 
 // la pergamena: tutta incisione, niente foto. Il sentiero sta nel gruppo

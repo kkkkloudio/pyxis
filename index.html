@@ -294,6 +294,22 @@
   .btn-carta:hover { background:rgba(184,150,62,.18); }
   .btn-carta[hidden] { display:none !important; }
   @media (pointer:coarse) { .btn-carta:not([hidden]) { display:inline-block; } }
+  /* V8.34 — la porta si trova da sola: il richiamo sullo scrigno */
+  .btn-trova {
+    display:inline-block; margin-top:8px; cursor:pointer; text-align:center;
+    background:rgba(184,150,62,.10); border:1px solid #b8963e; border-radius:18px;
+    padding:10px 20px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:14px;
+    color:#e8cd85;
+    transition:.15s;
+  }
+  .btn-trova:hover { background:rgba(184,150,62,.18); }
+  .btn-trova[hidden] { display:none !important; }
+  .btn-trova:disabled { opacity:.55; cursor:wait; }
+  .porta-sussurro {
+    text-align:center; margin-top:8px; font-style:italic; font-size:13px;
+    color:#a8a29a; min-height:18px; line-height:1.4;
+  }
 
   /* ===== LEGENDA: cartiglio di pergamena ===== */
   .legenda {
@@ -727,6 +743,8 @@
             <select id="provincia">
               <option value="">— scegli —</option>
             </select>
+            <button type="button" class="btn-trova" id="btn-trova">🧭 la bussola trova la porta</button>
+            <div class="porta-sussurro" id="porta-sussurro"></div>
           </div>
 
           <button class="btn-inizia" id="btn-inizia">Apri la bussola</button>
@@ -850,6 +868,7 @@
   </div>
 </div>
 
+<script src="stivale.js"></script>
 <script src="app.js"></script>
 <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");</script>
 </body>
