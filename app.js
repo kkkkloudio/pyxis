@@ -1282,3 +1282,416 @@ async function apriPiazza() {
 function disegnaVoci(voci) {
   const lista = document.getElementById('piazza-lista');
   lista.innerHTML = '';
+  if (!voci.length) {
+    lista.innerHTML = '<div class="lettera-ricevuta"><div class="testo">Nessuna voce, per ora. La piazza attende la prima.</div></div>';
+    return;
+  }
+  for (const v of voci) {
+    const el = document.createElement('div');
+    el.className = 'lettera-ricevuta';
+    el.innerHTML = '<div class="da">📣 ' + escapeHtml(v.nome) + '</div>' +
+                   '<div class="testo">' + escapeHtml(v.testo) + '</div>';
+    lista.appendChild(el);
+  }
+}
+
+async function inviaVoce() {
+  const area = document.getElementById('piazza-testo');
+  const testo = area.value.trim();
+  if (!testo) return;
+  try {
+    const resp = await fetch(API + '/api/voce', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ utente_id: utente.id, testo })
+    });
+    if (!resp.ok) {
+      const d = await resp.json().catch(() => ({}));
+      alert(d.error || 'La voce si è persa nel vento');
+      return;
+    }
+    area.value = '';
+    apriPiazza(); // la piazza si rinnova davanti agli occhi
+  } catch (e) {
+    alert('La piazza non risponde (server non raggiungibile): ' + e.message);
+  }
+}
+
+// ===== FEEDBACK (V8.14): parola ai costruttori =====
+function apriFeedback() {
+  document.getElementById('feedback-testo').value = '';
+  document.getElementById('modale-feedback').classList.remove('nascosto');
+}
+
+async function inviaFeedback() {
+  const area = document.getElementById('feedback-testo');
+  const testo = area.value.trim();
+  if (!testo) return;
+  try {
+    const resp = await fetch(API + '/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ utente_id: utente.id, testo })
+    });
+    if (!resp.ok) {
+      const d = await resp.json().catch(() => ({}));
+      alert(d.error || 'Il corvo non è riuscito a partire');
+      return;
+    }
+    area.value = '';
+    chiudiModale('modale-feedback');
+    corvoReagisci('partenza'); // V8.24: verso i costruttori, col becco pieno
+    const toast = document.createElement('div');
+    toast.className = 'toast-veloce';
+    toast.textContent = '🐦‍⬛ Il corvo ha preso il tuo messaggio. Grazie, anima.';
+    document.querySelector('.screen').appendChild(toast);
+    setTimeout(() => toast.classList.add('spegni'), 4500);
+    setTimeout(() => toast.remove(), 5100);
+  } catch (e) {
+    alert('Il corvo non trova la via (server non raggiungibile): ' + e.message);
+  }
+}
+
+// ===== LA GUIDA (V8.15): i primi passi =====
+const GUIDA_STEP_IT = [
+  { titolo: 'Benvenuta, anima', testo: 'Questa è la bussola. L\'ago grande punta il luogo più vicino a te. Toccalo: ti dice chi punta e dove.' },
+  { titolo: 'Sveglia l\'ago', testo: 'Con il bottone 🧭 l\'ago si sveglia e punta la direzione VERA nel mondo: girati finché la punta rossa entra nella porta in alto. Quella punta rossa è un granato: la gemma della lancetta, la sola che ti guida. Poi cammina: sotto vedi quanto manca.' },
+  { titolo: 'La stella', testo: 'Quando sei vicino al luogo, il bottone ✨ si accende: tocca e raccogli la stella. La tua posizione resta sul telefono, non esce mai.' },
+  { titolo: 'Il corvo', testo: 'In basso cammina un corvo: toccalo e ti parla. A volte porta messaggi da chi sta dietro a questo progetto. Ora il viaggio è tuo.' }
+];
+let guidaIndice = 0;
+
+function apriGuida() {
+  guidaIndice = 0;
+  disegnaGuida();
+  document.getElementById('modale-guida').classList.remove('nascosto');
+}
+
+function disegnaGuida() {
+  const passi = GUIDA_STEP();
+  const s = passi[guidaIndice];
+  document.getElementById('guida-titolo').textContent = (guidaIndice + 1) + ' · ' + s.titolo;
+  document.getElementById('guida-testo').textContent = s.testo;
+  document.getElementById('btn-guida-avanti').textContent = guidaIndice === passi.length - 1 ? t('entraCerchio') : t('avanti');
+  const punti = document.getElementById('guida-punti');
+  punti.innerHTML = '';
+  passi.forEach((_, i) => {
+    const p = document.createElement('span');
+    p.className = 'punto' + (i === guidaIndice ? ' acceso' : '');
+    punti.appendChild(p);
+  });
+}
+
+const GUIDA_STEP_EN = [
+  { titolo: 'Welcome, soul', testo: 'This is the compass. The big needle points to the nearest place. Tap it: it tells you what it points at and where.' },
+  { titolo: 'Wake the needle', testo: 'With the 🧭 button the needle wakes and points the REAL direction in the world: turn until the red tip enters the door at the top. That red tip is a garnet: the gem of the needle, the only one that guides you. Then walk: below you see how far is left.' },
+  { titolo: 'The star', testo: 'When you are near the place, the ✨ button lights up: tap and collect the star. Your location stays on the phone, it never leaves.' },
+  { titolo: 'The raven', testo: 'At the bottom a raven walks: tap it and it talks to you. Sometimes it brings messages from who is behind this project. Now the journey is yours.' }
+];
+function GUIDA_STEP() { return LINGUA.corrente === 'en' ? GUIDA_STEP_EN : GUIDA_STEP_IT; }
+
+function avantiGuida() {
+  // V8.19: bug della guida — GUIDA_STEP è una funzione da V8.17: .length era 0
+  // e la guida si chiudeva al primo "Avanti", senza mai mostrare i passi 2-5.
+  if (guidaIndice < GUIDA_STEP().length - 1) {
+    guidaIndice++;
+    disegnaGuida();
+  } else {
+    localStorage.setItem('pyxis-guida', 'vista');
+    chiudiModale('modale-guida');
+  }
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ===== V8.24 — IL CORVO DI PYXIS: l’abitante della notte =====
+// Non è un’animazione: è un inquilino. Cammina lungo il bordo basso della notte,
+// becca, saltella, ogni tanto traversa lo schermo in volo. Quando una lettera
+// parte è lui a portarla via; quando ne arriva una, plana. Toccalo: risponde
+// a modo suo. Chi ha chiesto meno movimento al telefono lo trova appollaiato
+// e fermo — ma parla comunque, con garbo. Nessun dato, nessuna posizione:
+// solo piume, inchiostro e un filo di lore.
+
+const CORVO_SVG = '<svg viewBox="0 0 120 84" class="corvo-svg" aria-hidden="true">'
+  + '<defs><radialGradient id="corvo-aura" cx="50%" cy="45%" r="60%"><stop offset="0%" stop-color="#e8cd85" stop-opacity=".28"/><stop offset="55%" stop-color="#8a6a3a" stop-opacity=".10"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient></defs>'
+  + '<ellipse class="corvo-aura" cx="60" cy="40" rx="56" ry="40" fill="url(#corvo-aura)"/>'
+  + '<g class="zampe"><path d="M56 62 L56 76 M56 76 L50 81 M56 76 L61 81 M65 62 L65 76 M65 76 L60 81 M65 76 L70 81" stroke="#8a7248" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>'
+  + '<g class="corvo-corpo">'
+  + '<g class="corvo-testa">'
+  + '<path class="corvo-sagoma" d="M88 20 C83 10, 69 6, 58 11 C51 14, 50 21, 51 25 L18 39 C12 41.5, 12 45, 18 47 L51 53 C50 60, 57 66, 68 65.5 C81 65, 86 53, 88 39 C89.5 28, 90 24, 88 20 Z" fill="#14100d" stroke="#000" stroke-width="1.4"/>'
+  + '<path d="M51 26 L26 37 M51 33 L28 42 M52 40 L32 46 M54 47 L38 51" stroke="#2b241b" stroke-width="1.1" fill="none" stroke-linecap="round"/>'
+  + '<path d="M54 30 C60 34, 64 40, 65 47 M50 24 C58 28, 63 35, 64 43" stroke="#1d1812" stroke-width="1" fill="none"/>'
+  + '<path class="corvo-becco" d="M87 19 C94 20, 101 24, 106 30 C100 31.5, 91 30, 85 26 Z" fill="#c9a45c" stroke="#6a5535" stroke-width="1"/>'
+  + '<path d="M87 19 C94 20, 101 24, 106 30" stroke="#e8cd85" stroke-width=".8" fill="none" opacity=".7"/>'
+  + '<circle class="corvo-occhio" cx="76" cy="21" r="3.2" fill="#e8cd85"/>'
+  + '<circle cx="77" cy="20" r="1.2" fill="#fff"/>'
+  + '<circle cx="76" cy="21" r="5.2" fill="none" stroke="#e8cd85" stroke-width=".6" opacity=".35"/>'
+  + '</g>'
+  + '<path class="ala ala-l" d="M58 26 C44 30, 37 44, 42 53 C54 50, 62 39, 63 29 Z" fill="#1f1913" stroke="#000" stroke-width="1"/>'
+  + '<path d="M46 36 C51 39, 56 44, 59 50 M43 42 C48 45, 53 49, 57 53" stroke="#14100d" stroke-width="1" fill="none" stroke-linecap="round"/>'
+  + '<path class="ala ala-r" d="M60 24 C70 18, 80 18, 87 24 C80 26, 70 28, 62 29 Z" fill="#241d15" stroke="#000" stroke-width=".8"/>'
+  + '</g></svg>';
+
+const CORVO = {
+  el:null, svg:null,
+  x:24, dir:1, dirVista:0, alt:0,
+  stato:'fermo', durata:0, inStatoDa:0,   // fermo | cammina | becca | salto | volo | partito | posa
+  tPrec:null, prossimaMossa:2,
+  voloDa:0, voloA:0, voloDur:1.6,
+  frasiViste:0, attivo:false
+};
+
+function avviaCorvo() {
+  if (CORVO.attivo) return;
+  const screen = document.querySelector('.screen');
+  if (!screen || !utente) return;
+  CORVO.attivo = true;
+  CORVO.el = document.createElement('div');
+  CORVO.el.className = 'corvo-pet';
+  CORVO.el.id = 'corvo-pet';
+  CORVO.el.title = 'Muninn, il corvo di Pyxis';
+  CORVO.el.setAttribute('role', 'button');
+  CORVO.el.setAttribute('aria-label', 'Muninn, il corvo di Pyxis');
+  CORVO.el.tabIndex = 0;
+  CORVO.el.innerHTML = CORVO_SVG;
+  screen.appendChild(CORVO.el);
+  CORVO.svg = CORVO.el.querySelector('.corvo-svg');
+  CORVO.el.addEventListener('click', toccoCorvo);
+  CORVO.el.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toccoCorvo(); }
+  });
+  CORVO.x = 24 + Math.random() * 120;
+  const calma = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (calma) {
+    CORVO.stato = 'posa';   // chi ha chiesto calma: appollaiato accanto alla firma
+    CORVO.el.style.left = 'auto';
+    CORVO.el.style.right = '14px';
+    CORVO.el.style.bottom = '30px';
+    return;
+  }
+  CORVO.stato = 'cammina';
+  CORVO.el.classList.add('cammina');
+  CORVO.prossimaMossa = performance.now() / 1000 + 2 + Math.random() * 2;
+  requestAnimationFrame(loopCorvo);
+}
+
+function limitiCorvo() {
+  const w = CORVO.el.parentElement.clientWidth;
+  return { min: 6, max: Math.max(60, w - 46) };
+}
+
+function entraStato(stato, durata) {
+  CORVO.stato = stato;
+  CORVO.durata = durata || 0;
+  CORVO.inStatoDa = 0;
+  const el = CORVO.el;
+  el.classList.remove('cammina', 'becca');
+  el.classList.toggle('vola', stato === 'volo' || stato === 'partito');
+  if (stato === 'cammina') el.classList.add('cammina');
+  if (stato === 'becca') el.classList.add('becca');
+  if (stato === 'volo') {
+    const lim = limitiCorvo();
+    CORVO.voloDa = CORVO.x;
+    CORVO.dir = -CORVO.dir;                 // traversata: si cambia sponda
+    CORVO.voloA = CORVO.dir === 1 ? lim.max - 8 : lim.min + 8;
+    if (Math.abs(CORVO.voloA - CORVO.voloDa) < 100) CORVO.voloA = CORVO.dir === 1 ? lim.min + 8 : lim.max - 8;
+    CORVO.voloDur = 1.3 + Math.random() * 0.9;
+  }
+}
+
+function loopCorvo(nowMs) {
+  const t = nowMs / 1000;
+  const dt = Math.min((t - (CORVO.tPrec ?? t)) || 0.016, 0.05);
+  CORVO.tPrec = t;
+  CORVO.inStatoDa += dt;
+
+  if (CORVO.stato === 'cammina') {
+    CORVO.x += CORVO.dir * 24 * dt;
+    const lim = limitiCorvo();
+    if (CORVO.x >= lim.max) { CORVO.dir = -1; }
+    if (CORVO.x <= lim.min) { CORVO.dir = 1; }
+    if (t >= CORVO.prossimaMossa) {
+      const dadi = Math.random();
+      if (dadi < 0.32) entraStato('fermo', 1.5 + Math.random() * 3);
+      else if (dadi < 0.58) entraStato('becca', 0.9);
+      else if (dadi < 0.72) entraStato('salto', 0.46);
+      else if (dadi < 0.86) entraStato('volo', 0);
+      else CORVO.prossimaMossa = t + 2 + Math.random() * 4;
+    }
+  } else if (CORVO.stato === 'fermo' || CORVO.stato === 'becca' || CORVO.stato === 'salto') {
+    if (CORVO.inStatoDa >= CORVO.durata) {
+      entraStato('cammina', 0);
+      CORVO.prossimaMossa = t + 2 + Math.random() * 5;
+    }
+  } else if (CORVO.stato === 'volo') {
+    const q = Math.min(CORVO.inStatoDa / CORVO.voloDur, 1);
+    CORVO.x = CORVO.voloDa + (CORVO.voloA - CORVO.voloDa) * q;
+    CORVO.alt = Math.sin(q * Math.PI) * -70;   // l’arco pigro di chi plana
+    if (q >= 1) { CORVO.alt = 0; entraStato('fermo', 1 + Math.random() * 2); }
+  }
+  // partito e posa: nessun passo — le transizioni CSS fanno il viaggio
+
+  if (CORVO.stato !== 'partito') {
+    CORVO.el.style.transform = 'translate(' + CORVO.x.toFixed(1) + 'px,' + CORVO.alt.toFixed(1) + 'px)';
+  }
+  if (CORVO.dir !== CORVO.dirVista) {
+    CORVO.dirVista = CORVO.dir;
+    CORVO.svg.style.transform = 'scaleX(' + CORVO.dir + ')';
+  }
+  requestAnimationFrame(loopCorvo);
+}
+
+function corvoParte() {
+  const el = CORVO.el;
+  entraStato('partito', 0);
+  CORVO.dir = 1;
+  CORVO.dirVista = 0;    // si gira verso il cielo prima di salire
+  el.style.transition = 'transform 1.2s ease-in, opacity 1.2s ease-in';
+  el.style.opacity = '0';
+  el.style.transform = 'translate(' + Math.min(CORVO.x + 150, 999) + 'px,-320px)';
+  setTimeout(corvoTorna, 3400);
+}
+
+function corvoTorna() {
+  const el = CORVO.el;
+  if (!CORVO.attivo || CORVO.stato !== 'partito') return;
+  const lim = limitiCorvo();
+  CORVO.x = lim.min + 4;
+  el.style.transition = 'none';
+  el.style.transform = 'translate(' + CORVO.x + 'px,-320px)';
+  void el.offsetWidth;   // respiro: il volo di ritorno parte da fermo, ma da lassù
+  el.style.transition = 'transform 1.5s ease-out, opacity .6s ease-out';
+  el.style.opacity = '1';
+  el.style.transform = 'translate(' + CORVO.x + 'px,0px)';
+  setTimeout(function () {
+    el.style.transition = '';
+    CORVO.alt = 0;
+    entraStato('cammina', 0);
+    CORVO.prossimaMossa = performance.now() / 1000 + 3 + Math.random() * 4;
+  }, 1600);
+}
+
+// gli eventi parlano al corvo: cosa fa quando il mondo si muove
+function corvoReagisci(cosa) {
+  if (!CORVO.attivo) return;
+  if (CORVO.stato === 'posa' || CORVO.stato === 'partito') return; // appollaiato o già in viaggio
+  if (cosa === 'partenza') { corvoParte(); return; }
+  if ((cosa === 'arrivo' || cosa === 'festa') && CORVO.stato !== 'volo') { entraStato('volo', 0); return; }
+  if (cosa === 'occhiata') {
+    CORVO.el.classList.add('becca');
+    setTimeout(function () { if (CORVO.el) CORVO.el.classList.remove('becca'); }, 650);
+    return;
+  }
+}
+
+function toccoCorvo() {
+  if (CORVO.stato === 'partito') return;   // è in cielo: non si disturbano i voli di servizio
+  const frasi = [t('corvoFrase1'), t('corvoFrase2'), t('corvoFrase3'), t('corvoFrase4')];
+  const frase = frasi[CORVO.frasiViste % frasi.length];
+  CORVO.frasiViste++;
+  const vecchia = CORVO.el.querySelector('.corvo-bolla');
+  if (vecchia) vecchia.remove();
+  const bolla = document.createElement('div');
+  bolla.className = 'corvo-bolla';
+  bolla.textContent = frase;
+  CORVO.el.appendChild(bolla);
+  setTimeout(function () { if (bolla.parentNode) bolla.remove(); }, 7000);
+  if (CORVO.stato === 'cammina' || CORVO.stato === 'fermo') {
+    CORVO.el.classList.add('salta');
+    setTimeout(function () { if (CORVO.el) CORVO.el.classList.remove('salta'); }, 450);
+  }
+}
+
+// ===== SSE (real-time) =====
+// toast: chiudi al click (delegato, vale per tutti i toast-corvo)
+document.addEventListener('click', (e) => {
+  const t = e.target.closest && e.target.closest('.toast-corvo');
+  if (t && !t.classList.contains('spegni')) {
+    t.classList.add('spegni');
+    setTimeout(() => t.remove(), 450);
+  }
+});
+
+function avviaSSE() {
+  if (!utente) return;
+  if (evtSource) evtSource.close();
+
+  evtSource = new EventSource(API + '/api/events?provincia=' + encodeURIComponent(utente.provincia) + '&id=' + utente.id);
+
+  evtSource.addEventListener('connesso', e => {
+    console.log('SSE connesso:', JSON.parse(e.data));
+  });
+
+  // V8.25: il corvo porta le notizie di chi gestisce Pyxis a TUTTI gli utenti
+  evtSource.addEventListener('corvo-messaggio', e => {
+    const d = JSON.parse(e.data);
+    if (typeof corvoParte === 'function') corvoParte();   // il corvo spicca il volo
+    // bolla con la notizia quando torna
+    setTimeout(() => {
+      if (!CORVO.el) return;
+      const vecchia = CORVO.el.querySelector('.corvo-bolla');
+      if (vecchia) vecchia.remove();
+      const bolla = document.createElement('div');
+      bolla.className = 'corvo-bolla';
+      bolla.textContent = '🐦‍⬛ ' + d.testo;
+      CORVO.el.appendChild(bolla);
+      setTimeout(() => { if (bolla.parentNode) bolla.remove(); }, 7000);
+    }, 3600);
+    // messaggio del corvo: resta finché non lo tocchi (niente auto-chiusura)
+    document.querySelectorAll('.toast-corvo[data-msg="1"]').forEach(t => t.remove());
+    const toast = document.createElement('div');
+    toast.className = 'toast-corvo';
+    toast.setAttribute('data-msg', '1');
+    toast.innerHTML = '<div class="toast-corpo">🐦‍⬛ ' + d.testo.replace(/</g, '&lt;') + '<small>tocca per la bussola</small></div>';
+    toast.addEventListener('click', () => { toast.classList.add('spegni'); setTimeout(() => toast.remove(), 380); });
+    document.body.appendChild(toast);
+  });
+
+  evtSource.addEventListener('nuovo-utente', e => {
+    const d = JSON.parse(e.data);
+    console.log('Nuovo utente:', d);
+    caricaLancette();
+  });
+
+  // una stella si è posata: qualcuno in provincia ha raggiunto un luogo
+  evtSource.addEventListener('poi-visitato', e => {
+    const d = JSON.parse(e.data);
+    if (d.da === utente.nome) return; // la mia stella l\'ho già vista
+    const toast = document.createElement('div');
+    toast.className = 'toast-veloce';
+    toast.textContent = '⭐ ' + d.da + ' ha raccolto una stella: ' + d.poi;
+    corvoReagisci('occhiata'); // V8.24: una stella altrove — il corvo annusa l\'aria
+    document.querySelector('.screen').appendChild(toast);
+    setTimeout(() => toast.classList.add('spegni'), 5000);
+    setTimeout(() => toast.remove(), 5600);
+  });
+
+  // un corvo è planato: lettera in arrivo
+  evtSource.addEventListener('lettera', e => {
+    const d = JSON.parse(e.data);
+    if (d.destinatario_id !== utente.id) return;
+    corvoReagisci('arrivo'); // V8.24: il corvo traversa rapido — qualcosa è giunto
+    const toast = document.createElement('div');
+    toast.className = 'toast-veloce';
+    toast.textContent = '🐦‍⬛ Un corvo è planato: lettera da ' + d.da;
+    toast.addEventListener('click', () => toast.remove());
+    document.querySelector('.screen').appendChild(toast);
+    setTimeout(() => toast.classList.add('spegni'), 5000);
+    setTimeout(() => toast.remove(), 5600);
+  });
+
+  // una voce nuova è arrivata in piazza (da qualunque provincia)
+  evtSource.addEventListener('voce', e => {
+    corvoReagisci('occhiata'); // V8.24: una voce nuova — il corvo drizza il becco
+    const modale = document.getElementById('modale-piazza');
+    if (modale && !modale.classList.contains('nascosto')) apriPiazza();
+  });
+
+  evtSource.onerror = () => {
+    console.log('SSE disconnesso, riconnetto...');
+  };
+}
