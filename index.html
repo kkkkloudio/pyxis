@@ -364,19 +364,22 @@
     color:#e8cd85; font-size:24px; line-height:1;
     cursor:pointer; display:flex; align-items:center; justify-content:center;
     box-shadow: 0 4px 14px rgba(0,0,0,.55), inset 0 1px 0 rgba(232,205,133,.15);
-    transition: transform .15s ease, border-color .2s ease, box-shadow .2s ease;
+    transition: transform .15s ease, border-color .2s ease, box-shadow .2s ease, background .25s ease;
   }
   .pietra-scrigno:hover { transform: translateY(-2px); }
   .pietra-scrigno svg { display:block; }
   .pietra-scrigno:active { transform: translateY(0) scale(.96); }
-  .pietra-scrigno[data-elemento="terra"] { border-color:#c9a86a; background: radial-gradient(circle at 38% 30%, rgba(201,168,106,.24), #0d0b07 82%); box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 18px rgba(201,168,106,.42); }
-  .pietra-scrigno[data-elemento="terra"] svg { filter: drop-shadow(0 0 5px rgba(201,168,106,.55)); }
-  .pietra-scrigno[data-elemento="aria"]  { border-color:#8ab0e0; background: radial-gradient(circle at 38% 30%, rgba(138,176,224,.24), #0d0b07 82%); box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 18px rgba(138,176,224,.42); }
-  .pietra-scrigno[data-elemento="aria"] svg { filter: drop-shadow(0 0 5px rgba(138,176,224,.55)); }
-  .pietra-scrigno[data-elemento="fuoco"] { border-color:#d97a5a; background: radial-gradient(circle at 38% 30%, rgba(217,122,90,.24), #0d0b07 82%); box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 18px rgba(217,122,90,.42); }
-  .pietra-scrigno[data-elemento="fuoco"] svg { filter: drop-shadow(0 0 5px rgba(217,122,90,.55)); }
-  .pietra-scrigno[data-elemento="acqua"] { border-color:#7cc9a2; background: radial-gradient(circle at 38% 30%, rgba(124,201,162,.24), #0d0b07 82%); box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 18px rgba(124,201,162,.42); }
-  .pietra-scrigno[data-elemento="acqua"] svg { filter: drop-shadow(0 0 5px rgba(124,201,162,.55)); }
+  /* V8.29 — LE PIETRE VESTONO GLI ELEMENTI: non più sassi neri con un alone,
+     ma minerali colorati (terra dorata, aria celeste, brace, acqua verde),
+     come le gemme in punta agli aghi. Il glifo si incide a inchiostro scuro. */
+  .pietra-scrigno[data-elemento="terra"] { border-color:#3a2c16; background: radial-gradient(circle at 38% 30%, #efe0b4, #c9a86a 52%, #6a4c20 100%); box-shadow:0 4px 14px rgba(0,0,0,.55), inset 0 2px 3px rgba(255,246,220,.45), inset 0 -3px 6px rgba(46,30,10,.5), 0 0 16px rgba(201,168,106,.5); }
+  .pietra-scrigno[data-elemento="terra"] svg { filter: drop-shadow(0 1px 1px rgba(40,26,8,.6)); }
+  .pietra-scrigno[data-elemento="aria"]  { border-color:#26344e; background: radial-gradient(circle at 38% 30%, #e3edfa, #8ab0e0 52%, #2c3e58 100%); box-shadow:0 4px 14px rgba(0,0,0,.55), inset 0 2px 3px rgba(240,248,255,.5), inset 0 -3px 6px rgba(24,36,56,.5), 0 0 16px rgba(138,176,224,.5); }
+  .pietra-scrigno[data-elemento="aria"] svg { filter: drop-shadow(0 1px 1px rgba(20,32,52,.6)); }
+  .pietra-scrigno[data-elemento="fuoco"] { border-color:#48160a; background: radial-gradient(circle at 38% 30%, #fadfca, #d97a5a 52%, #6a1e0e 100%); box-shadow:0 4px 14px rgba(0,0,0,.55), inset 0 2px 3px rgba(255,238,220,.4), inset 0 -3px 6px rgba(58,16,6,.55), 0 0 16px rgba(217,122,90,.5); }
+  .pietra-scrigno[data-elemento="fuoco"] svg { filter: drop-shadow(0 1px 1px rgba(52,14,4,.6)); }
+  .pietra-scrigno[data-elemento="acqua"] { border-color:#123c2e; background: radial-gradient(circle at 38% 30%, #d8f6e8, #7cc9a2 52%, #1c5040 100%); box-shadow:0 4px 14px rgba(0,0,0,.55), inset 0 2px 3px rgba(235,255,246,.45), inset 0 -3px 6px rgba(14,46,36,.5), 0 0 16px rgba(124,201,162,.5); }
+  .pietra-scrigno[data-elemento="acqua"] svg { filter: drop-shadow(0 1px 1px rgba(10,42,32,.6)); }
   .sequenza-letta { text-align:center; color:#e8cd85; letter-spacing:2px; font-size:15px; min-height:22px; opacity:.9; padding:2px 0 6px; }
   .sub-scrigno { text-align:center; color:#a8a29a; font-size:13px; line-height:1.45; opacity:.85; }
 
