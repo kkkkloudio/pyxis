@@ -217,6 +217,28 @@
     filter:drop-shadow(0 0 6px rgba(232,205,133,.6));
     z-index:12; pointer-events:none;
   }
+
+  /* ===== V8.28 — LA CARTA DEL PELLEGRINO ===== */
+  #carta-rotta {
+    position:absolute; inset:0; z-index:14;
+    border-radius:50%; overflow:hidden; cursor:pointer;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:opacity .8s ease, visibility 0s linear .8s;
+  }
+  #carta-rotta.srotolata {
+    opacity:1; visibility:visible; pointer-events:auto;
+    transition:opacity .8s ease;
+  }
+  #carta-rotta svg.carta { display:block; width:100%; height:100%; transform-origin:50% 50%; animation:carta-si-srotola 1s ease; }
+  @keyframes carta-si-srotola { from { transform:scale(.93) rotate(-3deg); } to { transform:scale(1) rotate(0deg); } }
+  .bussola-wrap.modo-carta .lancetta,
+  .bussola-wrap.modo-carta .perno,
+  .bussola-wrap.modo-carta .porta,
+  .bussola-wrap.modo-carta .fiammella { opacity:0; }
+  .lancetta, .perno, .porta, .fiammella { transition:opacity .55s ease; }
+  @media (prefers-reduced-motion: reduce) {
+    #carta-rotta svg.carta { animation:none; }
+  }
   .caption-bussola {
     margin-top:12px; min-height:18px; text-align:center;
     font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:13px;
@@ -705,6 +727,7 @@
           <div class="lancetta grande" data-tipo="grande"><div class="ago ago-grande"></div><div class="gemma gemma-grande"></div></div>
           <div class="perno"></div>
           <div class="porta"></div>
+          <div id="carta-rotta" aria-hidden="true"></div>
         </div>
 
         <div class="caption-bussola" id="caption-bussola">tocca un ago per sapere chi punta</div>

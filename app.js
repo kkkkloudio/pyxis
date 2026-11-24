@@ -38,6 +38,11 @@
 // Il suo nome è Muninn, memoria di Odino — quello che Odino temeva perdesse
 // la strada: per questo ciò che il nostro porta non si perde mai, e torna
 // sempre alla fine di ogni viaggio.
+// V8.28 — LA CARTA DEL PELLEGRINO: cinque secondi dopo la sveglia, gli aghi
+// lasciano il quadrante a una vecchia carta disegnata che mostra il sentiero
+// fino alla stella del luogo. Dieci secondi di carta, poi la notte riprende
+// gli aghi. La rotta resta quella VERA calcolata sul telefono: la carta è
+// solo il modo antico di raccontarla. (Idea di Carlo, 24/11.)
 
 const PROVINCE = [
   "Agrigento","Alessandria","Ancona","Aosta","Arezzo","Ascoli Piceno","Asti","Avellino",
@@ -90,6 +95,7 @@ const TESTI = {
     captionTocca: "tocca un ago per sapere chi punta",
     captionSveglia: "bussola sveglia: gli aghi puntano davvero — tocca un ago per sapere chi è",
     captionSogna: "l\'ago sta sognando il luogo — sveglialo con 🧭 qui sotto, e punterà davvero",
+    cartaVai: "la carta del pellegrino: segui il sentiero fino alla stella · toccala per ripiegarla",
     dettoGrande: "il luogo di potere",
     dettoMedia: "l\'anima più vicina",
     dettoPiccola: "la seconda anima",
@@ -145,6 +151,7 @@ const TESTI = {
     captionTocca: "tap a needle to know who it points at",
     captionSveglia: "compass awake: the needles truly point — tap one to know who it is",
     captionSogna: "the needle is dreaming of the place — wake it with 🧭 below, and it will truly point",
+    cartaVai: "the pilgrim chart: follow the trail to the star · tap it to fold it away",
     dettoGrande: "the place of power",
     dettoMedia: "the nearest soul",
     dettoPiccola: "the second soul",
@@ -717,9 +724,190 @@ async function svegliaAgo() {
     btn.classList.add('viva');
     btn.textContent = t('svegliaViva');
     aggiornaCaption();
+    avviaSequenzaCarta(); // V8.28: la carte attende il suo momento: 5 secondi di ago, poi il sentiero
   } catch (e) {
     alert('Questo scrigno non ha l\'ago magnetico: ' + e.message);
   }
+}
+
+// ===== V8.28 — LA CARTA DEL PELLEGRINO =====
+// Cinque secondi dopo la sveglia, dal quadrante spariscono gli aghi e si
+// srotola una vecchia carta: il sentiero che resta, fino alla stella del
+// luogo. Dieci secondi, poi la carta si ripiega e la bussola torna viva.
+// E solo disegno su pergamena: la rotta è quella VERA, calcolata sul
+// telefono (pietra angolare intatta, non parte niente), ruotata come
+// l'ago la punterebbe. Toccarla la ripiega prima del tempo.
+
+const CARTA = { srotolata:false, t1:null, t2:null, td:null, angolo:0, raf:0 };
+
+// di quanto girare il sentiero: rotta vera meno dove sei rivolto tu
+function angoloDelSentiero() {
+  const A = VIVA.aghi.grande;
+  let rotta = (A && A.bersaglio != null) ? A.bersaglio : null;
+  if (rotta == null && BVERA.pos && poiCorrente && poiCorrente.lat != null) {
+    rotta = rottaVera(BVERA.pos.lat, BVERA.pos.lon, poiCorrente.lat, poiCorrente.lon);
+  }
+  if (rotta == null) return null;
+  const nord = BVERA.heading != null ? BVERA.heading : BVERA.corso;
+  return nord == null ? rotta : ((rotta - nord + 720) % 360);
+}
+
+function avviaSequenzaCarta() {
+  if (CARTA.t1) return; // una sola carta per sveglia
+  CARTA.t1 = setTimeout(function () {
+    CARTA.t1 = null;
+    if (!BVERA.attiva || !poiCorrente) return; // niente stella, niente sentiero
+    srotolaCarta();
+  }, 5000);
+}
+
+function srotolaCarta() {
+  const el = document.getElementById('carta-rotta');
+  if (!el || CARTA.srotolata) return;
+  const bers = angoloDelSentiero();
+  CARTA.angolo = bers != null ? bers : 0;
+  CARTA.srotolata = true;
+  el.innerHTML = disegnaCarta();
+  el.classList.add('srotolata');
+  el.addEventListener('click', chiudiCartaAlTocco); // V8.28: il tocco dell'anima la ripiega quando vuole
+  const wrap = document.querySelector('.bussola-wrap');
+  if (wrap) wrap.classList.add('modo-carta');
+  const cap = document.getElementById('caption-bussola');
+  if (cap) cap.textContent = t('cartaVai');
+  aggiornaDistanzaCarta();
+  CARTA.td = setInterval(aggiornaDistanzaCarta, 1000);
+  CARTA.t2 = setTimeout(ripiegaCarta, 10000);
+  if (!VIVA.ferma) CARTA.raf = requestAnimationFrame(respiraCarta);
+}
+
+// la carta respira col mondo: se ti giri, il sentiero ti segue
+function respiraCarta() {
+  if (!CARTA.srotolata) return;
+  const bers = angoloDelSentiero();
+  if (bers != null) {
+    let d = ((bers - CARTA.angolo + 540) % 360) - 180;
+    CARTA.angolo += d * 0.22;
+    const filo = document.getElementById('carta-filo');
+    if (filo) filo.setAttribute('transform', 'rotate(' + CARTA.angolo.toFixed(2) + ' 150 150)');
+  }
+  CARTA.raf = requestAnimationFrame(respiraCarta);
+}
+
+function aggiornaDistanzaCarta() {
+  const el = document.getElementById('carta-distanza');
+  if (!el || !poiCorrente) return;
+  let testo = '';
+  if (BVERA.pos && poiCorrente.lat != null) {
+    const d = distanzaMetri(BVERA.pos.lat, BVERA.pos.lon, poiCorrente.lat, poiCorrente.lon);
+    if (d <= RAGGIO_M) testo = t('cerchio');
+    else testo = d >= 1000
+      ? '\u2248 ' + (d / 1000).toFixed(1).replace('.', ',') + t('kmLuogo')
+      : '\u2248 ' + (Math.round(d / 10) * 10) + t('mLuogo');
+  }
+  el.textContent = testo;
+}
+
+function ripiegaCarta() {
+  if (!CARTA.srotolata) return;
+  CARTA.srotolata = false;
+  clearTimeout(CARTA.t2); CARTA.t2 = null;
+  clearInterval(CARTA.td); CARTA.td = null;
+  cancelAnimationFrame(CARTA.raf); CARTA.raf = 0;
+  const el = document.getElementById('carta-rotta');
+  if (el) {
+    el.classList.remove('srotolata');
+    el.removeEventListener('click', chiudiCartaAlTocco);
+  }
+  const wrap = document.querySelector('.bussola-wrap');
+  if (wrap) wrap.classList.remove('modo-carta');
+  aggiornaCaption(); // la bussola torna a dire le sue cose
+}
+
+// il tocco dell'anima congeda la carta quando vuole
+function chiudiCartaAlTocco() {
+  const el = document.getElementById('carta-rotta');
+  if (el) el.removeEventListener('click', chiudiCartaAlTocco);
+  ripiegaCarta();
+}
+
+// la pergamena: tutta incisione, niente foto. Il sentiero sta nel gruppo
+// #carta-filo (parte dritto verso l'alto e ruota verso la rotta vera);
+// nome e distanza restano fissi, ben leggibili nel cartiglio in basso.
+function disegnaCarta() {
+  let nome = poiCorrente ? String(poiCorrente.nome).replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+  if (nome.length > 26) nome = nome.slice(0, 25) + '…';
+  const a0 = CARTA.angolo.toFixed(1);
+  const INK = '#55341c';
+  const INK2 = '#6b4a2a';
+  return '<svg class="carta" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">'
+    + '<defs>'
+    + '<clipPath id="carta-clip"><circle cx="150" cy="150" r="126.3"/></clipPath>'
+    + '<radialGradient id="carta-perga" cx="46%" cy="38%" r="78%">'
+    + '<stop offset="0" stop-color="#f4e7c2"/><stop offset=".62" stop-color="#e9d5a8"/><stop offset="1" stop-color="#cbaa74"/>'
+    + '</radialGradient>'
+    + '</defs>'
+    + '<g clip-path="url(#carta-clip)">'
+    + '<rect x="0" y="0" width="300" height="300" fill="url(#carta-perga)"/>'
+    // il-grano della pergamena: lievi macchie del tempo
+    + '<ellipse cx="96" cy="216" rx="66" ry="44" fill="#5a3c1a" opacity=".06"/>'
+    + '<ellipse cx="218" cy="84" rx="50" ry="36" fill="#6b4a20" opacity=".07"/>'
+    + '<ellipse cx="240" cy="218" rx="38" ry="28" fill="#4a3014" opacity=".05"/>'
+    + '<circle cx="150" cy="150" r="121" fill="none" stroke="#8a6a44" stroke-width="1" opacity=".5"/>'
+    + '<circle cx="150" cy="150" r="117.5" fill="none" stroke="#8a6a44" stroke-width=".7" stroke-dasharray="1.5 4" opacity=".45"/>'
+    // onde da cartografia antica, in basso
+    + '<path d="M40 268 q 8 -5 16 0 t 16 0 t 16 0" fill="none" stroke="' + INK2 + '" stroke-width="1" opacity=".3"/>'
+    + '<path d="M176 282 q 8 -5 16 0 t 16 0 t 16 0" fill="none" stroke="' + INK2 + '" stroke-width="1" opacity=".25"/>'
+    + '<path d="M210 44 q 7 -4 14 0 t 14 0" fill="none" stroke="' + INK2 + '" stroke-width="1" opacity=".3"/>'
+    // il volto del vento, che soffia dal bordo
+    + '<g transform="translate(78,76)" opacity=".5">'
+    + '<circle r="11" fill="none" stroke="' + INK2 + '" stroke-width="1.2"/>'
+    + '<circle cx="-3.5" cy="-2.5" r="1.3" fill="' + INK2 + '"/>'
+    + '<circle cx="3.5" cy="-2.5" r="1.3" fill="' + INK2 + '"/>'
+    + '<path d="M-3.5 4 C -1 6.2, 1 6.2, 3.5 4" fill="none" stroke="' + INK2 + '" stroke-width="1.1"/>'
+    + '<path d="M13 2 C 18 1, 20 -4, 16 -7 C 19 -6, 21 -1, 18 3 C 17 6, 13 7, 10.5 5.5" fill="none" stroke="' + INK2 + '" stroke-width="1" opacity=".8"/>'
+    + '</g>'
+    // ===== IL FILO: il sentiero, disegnato verso l'alto, ruotato sulla rotta vera =====
+    + '<g id="carta-filo" transform="rotate(' + a0 + ' 150 150)">'
+    // impronte del pellegrino al centro
+    + '<circle cx="150" cy="161" r="13" fill="none" stroke="' + INK2 + '" stroke-width=".8" stroke-dasharray="1.5 3.5" opacity=".5"/>'
+    + '<g transform="translate(142.5,156) rotate(22)"><ellipse rx="3.2" ry="5.6" fill="none" stroke="' + INK + '" stroke-width="1.3"/></g>'
+    + '<g transform="translate(157,163) rotate(-16)"><ellipse rx="3.2" ry="5.6" fill="none" stroke="' + INK + '" stroke-width="1.3"/></g>'
+    // il sentiero punteggiato, come sulle carte dei viandti
+    + '<path d="M150 164 C 122 142, 186 118, 160 96 C 140 80, 118 78, 126 63 C 131 53, 143 51, 150 46" fill="none" stroke="' + INK + '" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.5 6" opacity=".9"/>'
+    // la stella del luogo
+    + '<path d="M150 27 L152.8 36.5 L162 40 L152.8 43.5 L150 53 L147.2 43.5 L138 40 L147.2 36.5 Z" fill="#c9962f" stroke="' + INK + '" stroke-width="1"/>'
+    + '<path d="M150 21 L150 26 M171 40 L164 40 M129 40 L136 40 M158 31 L161 25 M142 31 L139 25" stroke="#b8862b" stroke-width="1" opacity=".55"/>'
+    // alberi in stile xilografia
+    + '<g transform="translate(101,124)" opacity=".8">'
+    + '<path d="M0 9 L0 0" stroke="' + INK2 + '" stroke-width="1.6"/>'
+    + '<circle cx="-5" cy="-5" r="5.5" fill="#8a6a34" stroke="' + INK2 + '" stroke-width="1" opacity=".5"/>'
+    + '<circle cx="3" cy="-8" r="6.5" fill="#8a6a34" stroke="' + INK2 + '" stroke-width="1" opacity=".5"/>'
+    + '<circle cx="1" cy="-1" r="6" fill="#8a6a34" stroke="' + INK2 + '" stroke-width="1" opacity=".5"/>'
+    + '</g>'
+    + '<g transform="translate(199,142)" opacity=".7">'
+    + '<path d="M0 8 L0 0" stroke="' + INK2 + '" stroke-width="1.4"/>'
+    + '<circle cx="-4" cy="-4" r="4.5" fill="#8a6a34" stroke="' + INK2 + '" stroke-width=".9" opacity=".5"/>'
+    + '<circle cx="3" cy="-6" r="5" fill="#8a6a34" stroke="' + INK2 + '" stroke-width=".9" opacity=".5"/>'
+    + '</g>'
+    // un sasso lungo la via
+    + '<path d="M198 106 L202 97 L209 95 L215 100 L214 106 Z" fill="#7d5a30" stroke="' + INK2 + '" stroke-width=".8" opacity=".55"/>'
+    // il fiume col ponticello
+    + '<path d="M56 197 C 76 192, 96 202, 116 197 C 136 192, 156 202, 176 197 C 196 192, 216 202, 236 197" fill="none" stroke="#5d6b4a" stroke-width="1.3" opacity=".55"/>'
+    + '<path d="M56 202 C 76 197, 96 207, 116 202 C 136 197, 156 207, 176 202 C 196 197, 216 207, 236 202" fill="none" stroke="#5d6b4a" stroke-width="1" opacity=".4"/>'
+    + '<path d="M106 204 L110 194 M118 204 L114 194 M105 197 L119 197" stroke="' + INK2 + '" stroke-width="1.2" opacity=".7"/>'
+    // il serpentello degli abissi
+    + '<g transform="translate(214,232)" opacity=".5">'
+    + '<path d="M-10 2 C -6 -6, 6 -7, 7 0 C 8 6, 0 8, -2 4" fill="none" stroke="' + INK2 + '" stroke-width="1.6"/>'
+    + '<circle cx="7.2" cy="-1" r="1.8" fill="' + INK2 + '"/>'
+    + '<path d="M14 2 q 4 -3 8 0" fill="none" stroke="' + INK2 + '" stroke-width=".9" opacity=".6"/>'
+    + '</g>'
+    + '</g>'
+    // ===== IL CARTIGLIO: nome del luogo e distanza che resta =====
+    + '<rect x="86" y="224" width="128" height="42" rx="9" fill="#f4e7c2" stroke="#8a6a44" stroke-width="1.2" opacity=".94"/>'
+    + '<text id="carta-nome" x="150" y="241" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-size="12.5" fill="#3a2810" letter-spacing=".4">' + nome + '</text>'
+    + '<path d="M120 246 C 133 249.5, 167 249.5, 180 246" stroke="#8a6a44" stroke-width="1" fill="none" opacity=".65"/>'
+    + '<text id="carta-distanza" x="150" y="259" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-size="11.5" font-style="italic" fill="' + INK2 + '"> </text>'
+    + '</g></svg>';
 }
 
 // ===== IL CHECK-IN: "Il luogo è raggiunto" =====
