@@ -273,15 +273,16 @@ document.addEventListener('DOMContentLoaded', function () {
 // parte la solita stringa (es. "terra-fuoco-fuoco-acqua"): pietra angolare
 // intatta, mai posizioni.
 const ELEMENTI = ['terra', 'aria', 'fuoco', 'acqua'];
-// V8.26: le pietre non sono più emoji ma incisioni: quattro glifi disegnati,
-// luminosi sulla pietra nera, ciascuno del colore del suo elemento.
-// (Per i telefoni che mostrano le emoji come sagome nere sul fondo notturno.)
+// V8.27: i simboli alchemici classici degli elementi. I triangoli che
+// l'alchimia ha sempre usato: fuoco punta in alto, acqua in basso, aria e
+// terra portano la linea che li distingue (aria in alto, terra in basso).
+// Incisi con tratto pieno e luminoso, ciascuno nel colore del suo elemento.
 const GLIFI = {
-  terra: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#c9a86a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18.5 L8.5 9 L12 14.5 L14.5 11.5 L21 18.5 Z"/></svg>',
-  aria: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#8ab0e0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5 h9.5 a2.6 2.6 0 1 0 -2.6 -2.6"/><path d="M4 13 h13.5 a3 3 0 1 1 -3 3"/><path d="M4 17.5 h6.5"/></svg>',
-  fuoco: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#d97a5a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8 C15.2 6.6 17.4 9.4 17.4 13.2 A5.4 5.4 0 0 1 6.6 13.2 C6.6 9.4 8.8 6.6 12 2.8 Z"/><path d="M12 9.5 C13.6 11.6 14.4 12.4 14.4 14 A2.4 2.4 0 0 1 9.6 14 C9.6 12.4 10.4 11.6 12 9.5 Z"/></svg>',
-  acqua: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#7cc9a2" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5 C6 6.8 9 6.8 12 9.5 C15 12.2 18 12.2 21 9.5"/><path d="M3 15 C6 12.3 9 12.3 12 15 C15 17.7 18 17.7 21 15"/></svg>',
-  vuota: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="rgba(232,205,133,.45)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5 L16 12 L12 17.5 L8 12 Z"/></svg>'
+  terra: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#ddc081" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 24 L16 10 L24.5 24 Z"/><path d="M12 19.5 L20 19.5"/></svg>',
+  aria: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#a9c9f2" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 10 L16 24 L24.5 10 Z"/><path d="M12 15.5 L20 15.5"/></svg>',
+  fuoco: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#f5a17c" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 24 L16 10 L24.5 24 Z"/></svg>',
+  acqua: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#93e6c4" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 10 L16 24 L24.5 10 Z"/></svg>',
+  vuota: '<svg viewBox="0 0 32 32" width="14" height="14" fill="none" stroke="rgba(232,205,133,.38)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 9.5 C16.9 13 18 14.1 21.5 15 C18 15.9 16.9 17 16 20.5 C15.1 17 14 15.9 10.5 15 C14 14.1 15.1 13 16 9.5 Z"/></svg>'
 };
 let sequenzaAccesso = [null, null, null, null];
 
