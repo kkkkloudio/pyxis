@@ -281,6 +281,19 @@
   .btn-sveglia.viva { color:#9fe8c0; border-color:#2e9e6b; background:transparent; animation:none; }
   @media (pointer:coarse) { .btn-sveglia { display:inline-block; } }
   @media (prefers-reduced-motion: reduce) { .btn-sveglia { animation:none; } }
+  /* V8.33 — la carta risponde quando la chiami: stessa voce della sveglia,
+     ma senza pulsazione: è un richiamo, non un allarme */
+  .btn-carta {
+    display:none; margin-top:8px; cursor:pointer;
+    background:rgba(184,150,62,.10); border:1px solid #b8963e; border-radius:18px;
+    padding:10px 20px;
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; font-size:14px;
+    color:#e8cd85;
+    transition:.15s;
+  }
+  .btn-carta:hover { background:rgba(184,150,62,.18); }
+  .btn-carta[hidden] { display:none !important; }
+  @media (pointer:coarse) { .btn-carta:not([hidden]) { display:inline-block; } }
 
   /* ===== LEGENDA: cartiglio di pergamena ===== */
   .legenda {
@@ -742,6 +755,7 @@
         <div class="caption-bussola" id="caption-bussola">tocca un ago per sapere chi punta</div>
         <div class="distanza-luogo" id="distanza-luogo"></div>
         <button class="btn-sveglia" id="btn-sveglia">🧭 Sveglia l'ago — la bussola vera</button>
+        <button class="btn-carta" id="btn-carta" hidden>📜 la carta del pellegrino</button>
 
         <div class="legenda">
           <div class="legenda-titolo">Le tre lancette</div>
