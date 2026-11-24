@@ -338,7 +338,7 @@
   .pietra-scrigno {
     width:54px; height:54px; border-radius:50%;
     background: radial-gradient(circle at 38% 30%, #2a2318, #0d0b07 80%);
-    border:1px solid rgba(184,150,62,.35);
+    border:1px solid rgba(184,150,62,.45);
     color:#e8cd85; font-size:24px; line-height:1;
     cursor:pointer; display:flex; align-items:center; justify-content:center;
     box-shadow: 0 4px 14px rgba(0,0,0,.55), inset 0 1px 0 rgba(232,205,133,.15);
@@ -347,10 +347,14 @@
   .pietra-scrigno:hover { transform: translateY(-2px); }
   .pietra-scrigno svg { display:block; }
   .pietra-scrigno:active { transform: translateY(0) scale(.96); }
-  .pietra-scrigno[data-elemento="terra"] { border-color:#c9a86a; box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 16px rgba(201,168,106,.35); }
-  .pietra-scrigno[data-elemento="aria"]  { border-color:#8ab0e0; box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 16px rgba(138,176,224,.35); }
-  .pietra-scrigno[data-elemento="fuoco"] { border-color:#d97a5a; box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 16px rgba(217,122,90,.35); }
-  .pietra-scrigno[data-elemento="acqua"] { border-color:#7cc9a2; box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 16px rgba(124,201,162,.35); }
+  .pietra-scrigno[data-elemento="terra"] { border-color:#c9a86a; background: radial-gradient(circle at 38% 30%, rgba(201,168,106,.24), #0d0b07 82%); box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 18px rgba(201,168,106,.42); }
+  .pietra-scrigno[data-elemento="terra"] svg { filter: drop-shadow(0 0 5px rgba(201,168,106,.55)); }
+  .pietra-scrigno[data-elemento="aria"]  { border-color:#8ab0e0; background: radial-gradient(circle at 38% 30%, rgba(138,176,224,.24), #0d0b07 82%); box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 18px rgba(138,176,224,.42); }
+  .pietra-scrigno[data-elemento="aria"] svg { filter: drop-shadow(0 0 5px rgba(138,176,224,.55)); }
+  .pietra-scrigno[data-elemento="fuoco"] { border-color:#d97a5a; background: radial-gradient(circle at 38% 30%, rgba(217,122,90,.24), #0d0b07 82%); box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 18px rgba(217,122,90,.42); }
+  .pietra-scrigno[data-elemento="fuoco"] svg { filter: drop-shadow(0 0 5px rgba(217,122,90,.55)); }
+  .pietra-scrigno[data-elemento="acqua"] { border-color:#7cc9a2; background: radial-gradient(circle at 38% 30%, rgba(124,201,162,.24), #0d0b07 82%); box-shadow:0 4px 14px rgba(0,0,0,.55), 0 0 18px rgba(124,201,162,.42); }
+  .pietra-scrigno[data-elemento="acqua"] svg { filter: drop-shadow(0 0 5px rgba(124,201,162,.55)); }
   .sequenza-letta { text-align:center; color:#e8cd85; letter-spacing:2px; font-size:15px; min-height:22px; opacity:.9; padding:2px 0 6px; }
   .sub-scrigno { text-align:center; color:#a8a29a; font-size:13px; line-height:1.45; opacity:.85; }
 
