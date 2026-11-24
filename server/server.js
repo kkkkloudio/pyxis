@@ -51,6 +51,12 @@
 // - V8.23: le stanze di Liguria e Emilia-Romagna — 26 nuovi POI (13 province,
 //        2 ciascuna): 95 luoghi in tutto. Il Nord d\'Italia è completo. Il seed
 //        resta idempotente: INSERT OR IGNORE, id mai toccati.
+// - V8.32: IL VIANDANTE SI MUOVE — al rientro, la provincia scelta nel form
+//        AGGIORNA quella dell\'account. Prima il rientro la ignorava e il
+//        server ridava sempre la vecchia: un anima in viaggio restava
+//        appesa alla provincia di nascita e la bussola puntava i luoghi
+//        di là (Carlo a Modena vedeva ancora la Rotonda di Rovigo).
+//        Nessuna posizione Coinvolta: resta una porta dichiarata, come sempre.
 
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
@@ -619,9 +625,19 @@ const server = http.createServer(async (req, res) => {
         } else {
           db.prepare('UPDATE utenti SET ultimo_accesso = ? WHERE id = ?').run(now, esiste.id);
         }
+        // V8.32 — IL VIANDANTE SI MUOVE (bug di Carlo, 24/11): al rientro la
+        // provincia scelta nel form diventa la porta dell\'account. Prima era
+        // ignorata: chi si spostava restava legato alla provincia vecchia e
+        // la bussola gli mostrava ancora i luoghi di là.
+        const portaVecchia = esiste.provincia;
+        if (provincia && provincia !== portaVecchia) {
+          db.prepare('UPDATE utenti SET provincia = ? WHERE id = ?').run(provincia, esiste.id);
+          broadcast(provincia, 'nuovo-utente', { nome: esiste.nome, tipo: esiste.tipo, provincia });
+        }
+        const portaFinale = provincia || portaVecchia;
         db.prepare('INSERT OR REPLACE INTO presenze (utente_id, provincia, online_da) VALUES (?, ?, ?)')
-          .run(esiste.id, esiste.provincia, now);
-        return json(res, 200, { ok: true, rientro: true, utente: { id: esiste.id, nome: esiste.nome, tipo: esiste.tipo, provincia: esiste.provincia } });
+          .run(esiste.id, portaFinale, now);
+        return json(res, 200, { ok: true, rientro: true, utente: { id: esiste.id, nome: esiste.nome, tipo: esiste.tipo, provincia: portaFinale } });
       }
 
       const id = crypto.randomUUID();
