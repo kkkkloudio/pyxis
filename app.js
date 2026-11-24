@@ -15,6 +15,12 @@
 // la posizione non esce dal telefono, al server parte solo la porta dichiarata.
 // (Idea di Carlo, 24/11 sera: se la bussola sa indicare il luogo, sa anche
 // dire in quale provincia ti trovi.)
+// V8.35 — PAROLA SEMPLICE: Carlo ha ragione: "segui il granato" per strada
+// è arabico per chi entra la prima volta, e nessuno spiega cosa sia. Via
+// dai testi operativi: si dice "lancetta grande", come la legenda. Il granato
+// resta UNA volta sola, e spiegato: è la gemma rossa della lancetta grande,
+// e lo dice la guida al secondo passo, dove c'è il contesto per capirlo.
+// (E si aggiustano due "titulo" inglesi rimasti orfani.)
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l\'ago grande punta il luogo NEL MONDO REALE:
@@ -107,7 +113,7 @@ const TESTI = {
     guida: "❔ i primi passi",
     uscita: "lascia lo scrigno",
     sveglia: "🧭 Sveglia l\'ago — la bussola vera",
-    svegliaViva: "🧭 l\'ago è sveglio — gira finché il granato entra nella porta, poi cammina",
+    svegliaViva: "🧭 l\'ago è sveglio — gira finché la lancetta grande entra nella porta, poi cammina",
     captionTocca: "tocca un ago per sapere chi punta",
     captionSveglia: "bussola sveglia: gli aghi puntano davvero — tocca un ago per sapere chi è",
     captionSogna: "l\'ago sta sognando il luogo — sveglialo con 🧭 qui sotto, e punterà davvero",
@@ -129,8 +135,8 @@ const TESTI = {
     dettoPiccola: "la seconda anima",
     portaCaption: " — girati finché l\'ago entra nella porta",
     cerchio: "sei nel cerchio del luogo — la stella può posarsi",
-    kmLuogo: " km al luogo · segui il granato",
-    mLuogo: " m al luogo · segui il granato",
+    kmLuogo: " km al luogo · segui la lancetta grande",
+    mLuogo: " m al luogo · segui la lancetta grande",
     notaAscolto: " anime in ascolto · la posizione resta sul telefono · solo la bussola sa",
     guidaTitolo: "I primi passi",
     guidaSub: "come si cammina in questo mondo",
@@ -175,7 +181,7 @@ const TESTI = {
     guida: "❔ first steps",
     uscita: "leave the casket",
     sveglia: "🧭 Wake the needle — the true compass",
-    svegliaViva: "🧭 the needle is awake — turn until the garnet enters the door, then walk",
+    svegliaViva: "🧭 the needle is awake — turn until the big needle enters the door, then walk",
     captionTocca: "tap a needle to know who it points at",
     captionSveglia: "compass awake: the needles truly point — tap one to know who it is",
     captionSogna: "the needle is dreaming of the place — wake it with 🧭 below, and it will truly point",
@@ -197,8 +203,8 @@ const TESTI = {
     dettoPiccola: "the second soul",
     portaCaption: " — turn until the needle enters the door",
     cerchio: "you are inside the place\'s circle — the star can settle",
-    kmLuogo: " km to the place · follow the garnet",
-    mLuogo: " m to the place · follow the garnet",
+    kmLuogo: " km to the place · follow the big needle",
+    mLuogo: " m to the place · follow the big needle",
     notaAscolto: " souls listening · the position stays on the phone · only the compass knows",
     guidaTitolo: "First steps",
     guidaSub: "how to walk in this world",
@@ -1125,7 +1131,7 @@ function checkIn() {
     if (d > RAGGIO_M) {
       btn.disabled = false;
       btn.textContent = etichetta;
-      alert('Il luogo di potere non ti sente ancora: sei lontano. Segui il granato della lancetta grande.');
+      alert('Il luogo di potere non ti sente ancora: sei lontano. Segui la lancetta grande.');
       return;
     }
 
@@ -1343,7 +1349,7 @@ async function inviaFeedback() {
 // ===== LA GUIDA (V8.15): i primi passi =====
 const GUIDA_STEP_IT = [
   { titolo: 'Benvenuta, anima', testo: 'Questa è la bussola. L\'ago grande punta il luogo più vicino a te. Toccalo: ti dice chi punta e dove.' },
-  { titolo: 'Sveglia l\'ago', testo: 'Con il bottone 🧭 l\'ago si sveglia e punta la direzione VERA nel mondo: girati finché la punta rossa entra nella porta in alto. Poi cammina: sotto vedi quanto manca.' },
+  { titolo: 'Sveglia l\'ago', testo: 'Con il bottone 🧭 l\'ago si sveglia e punta la direzione VERA nel mondo: girati finché la punta rossa entra nella porta in alto. Quella punta rossa è un granato: la gemma della lancetta grande, la sola che ti guida. Poi cammina: sotto vedi quanto manca.' },
   { titolo: 'La stella', testo: 'Quando sei vicino al luogo, il bottone ✨ si accende: tocca e raccogli la stella. La tua posizione resta sul telefono, non esce mai.' },
   { titolo: 'Il corvo', testo: 'In basso cammina un corvo: toccalo e ti parla. A volte porta messaggi da chi sta dietro a questo progetto. Ora il viaggio è tuo.' }
 ];
@@ -1372,9 +1378,9 @@ function disegnaGuida() {
 
 const GUIDA_STEP_EN = [
   { titolo: 'Welcome, soul', testo: 'This is the compass. The big needle points to the nearest place. Tap it: it tells you what it points at and where.' },
-  { titolo: 'Wake the needle', testo: 'With the 🧭 button the needle wakes and points the REAL direction in the world: turn until the red tip enters the door at the top. Then walk: below you see how far is left.' },
-  { titulo: 'The star', testo: 'When you are near the place, the ✨ button lights up: tap and collect the star. Your location stays on the phone, it never leaves.' },
-  { titulo: 'The raven', testo: 'At the bottom a raven walks: tap it and it talks to you. Sometimes it brings messages from who is behind this project. Now the journey is yours.' }
+  { titolo: 'Wake the needle', testo: 'With the 🧭 button the needle wakes and points the REAL direction in the world: turn until the red tip enters the door at the top. That red tip is a garnet: the gem of the big needle, the only one that guides you. Then walk: below you see how far is left.' },
+  { titolo: 'The star', testo: 'When you are near the place, the ✨ button lights up: tap and collect the star. Your location stays on the phone, it never leaves.' },
+  { titolo: 'The raven', testo: 'At the bottom a raven walks: tap it and it talks to you. Sometimes it brings messages from who is behind this project. Now the journey is yours.' }
 ];
 function GUIDA_STEP() { return LINGUA.corrente === 'en' ? GUIDA_STEP_EN : GUIDA_STEP_IT; }
 
