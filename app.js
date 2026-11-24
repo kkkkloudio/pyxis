@@ -273,14 +273,25 @@ document.addEventListener('DOMContentLoaded', function () {
 // parte la solita stringa (es. "terra-fuoco-fuoco-acqua"): pietra angolare
 // intatta, mai posizioni.
 const ELEMENTI = ['terra', 'aria', 'fuoco', 'acqua'];
-const SIMBOLI_ELEMENTO = { terra: '🪨', aria: '🌬️', fuoco: '🔥', acqua: '💧' };
+// V8.26: le pietre non sono più emoji ma incisioni: quattro glifi disegnati,
+// luminosi sulla pietra nera, ciascuno del colore del suo elemento.
+// (Per i telefoni che mostrano le emoji come sagome nere sul fondo notturno.)
+const GLIFI = {
+  terra: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#c9a86a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18.5 L8.5 9 L12 14.5 L14.5 11.5 L21 18.5 Z"/></svg>',
+  aria: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#8ab0e0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5 h9.5 a2.6 2.6 0 1 0 -2.6 -2.6"/><path d="M4 13 h13.5 a3 3 0 1 1 -3 3"/><path d="M4 17.5 h6.5"/></svg>',
+  fuoco: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#d97a5a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8 C15.2 6.6 17.4 9.4 17.4 13.2 A5.4 5.4 0 0 1 6.6 13.2 C6.6 9.4 8.8 6.6 12 2.8 Z"/><path d="M12 9.5 C13.6 11.6 14.4 12.4 14.4 14 A2.4 2.4 0 0 1 9.6 14 C9.6 12.4 10.4 11.6 12 9.5 Z"/></svg>',
+  acqua: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#7cc9a2" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5 C6 6.8 9 6.8 12 9.5 C15 12.2 18 12.2 21 9.5"/><path d="M3 15 C6 12.3 9 12.3 12 15 C15 17.7 18 17.7 21 15"/></svg>',
+  vuota: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="rgba(232,205,133,.45)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5 L16 12 L12 17.5 L8 12 Z"/></svg>'
+};
 let sequenzaAccesso = [null, null, null, null];
 
 function aggiornaPietre() {
   document.querySelectorAll('.pietra-scrigno').forEach(btn => {
     const i = Number(btn.getAttribute('data-slot'));
     const el = sequenzaAccesso[i];
-    btn.textContent = el ? SIMBOLI_ELEMENTO[el] : '·';
+    btn.innerHTML = el ? GLIFI[el] : GLIFI.vuota;
+    const posizione = ['prima', 'seconda', 'terza', 'quarta'][i] || 'pietra';
+    btn.setAttribute('aria-label', el ? (posizione + ' pietra: ' + el) : (posizione + ' pietra, non ancora scelta'));
     if (el) btn.setAttribute('data-elemento', el); else btn.removeAttribute('data-elemento');
   });
   const letta = document.getElementById('sequenza-letta');
