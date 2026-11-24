@@ -294,15 +294,19 @@ document.addEventListener('DOMContentLoaded', function () {
 // parte la solita stringa (es. "terra-fuoco-fuoco-acqua"): pietra angolare
 // intatta, mai posizioni.
 const ELEMENTI = ['terra', 'aria', 'fuoco', 'acqua'];
+// V8.29 — il sistema dei quattro colori: ogni elemento veste la sua tinta,
+// sulla pietra e nella sequenza letta sotto (toni scuri: si legge sulla pergamena).
+const COLORI_ELEMENTO = { terra:'#7a5a24', aria:'#2c5078', fuoco:'#a83c1c', acqua:'#1a6a4e' };
 // V8.27: i simboli alchemici classici degli elementi. I triangoli che
 // l'alchimia ha sempre usato: fuoco punta in alto, acqua in basso, aria e
 // terra portano la linea che li distingue (aria in alto, terra in basso).
-// Incisi con tratto pieno e luminoso, ciascuno nel colore del suo elemento.
+// V8.29: le pietre ora VESTONO il colore del loro elemento (CSS in index.html),
+// quindi i glifi si incidono a inchiostro scuro, come su una gemma vera.
 const GLIFI = {
-  terra: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#ddc081" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 24 L16 10 L24.5 24 Z"/><path d="M12 19.5 L20 19.5"/></svg>',
-  aria: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#a9c9f2" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 10 L16 24 L24.5 10 Z"/><path d="M12 15.5 L20 15.5"/></svg>',
-  fuoco: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#f5a17c" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 24 L16 10 L24.5 24 Z"/></svg>',
-  acqua: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#93e6c4" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 10 L16 24 L24.5 10 Z"/></svg>',
+  terra: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#3a2c10" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 24 L16 10 L24.5 24 Z"/><path d="M12 19.5 L20 19.5"/></svg>',
+  aria: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#1c3050" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 10 L16 24 L24.5 10 Z"/><path d="M12 15.5 L20 15.5"/></svg>',
+  fuoco: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#4a1408" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 24 L16 10 L24.5 24 Z"/></svg>',
+  acqua: '<svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="#0e3a2c" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 10 L16 24 L24.5 10 Z"/></svg>',
   vuota: '<svg viewBox="0 0 32 32" width="14" height="14" fill="none" stroke="rgba(232,205,133,.38)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 9.5 C16.9 13 18 14.1 21.5 15 C18 15.9 16.9 17 16 20.5 C15.1 17 14 15.9 10.5 15 C14 14.1 15.1 13 16 9.5 Z"/></svg>'
 };
 let sequenzaAccesso = [null, null, null, null];
@@ -317,7 +321,9 @@ function aggiornaPietre() {
     if (el) btn.setAttribute('data-elemento', el); else btn.removeAttribute('data-elemento');
   });
   const letta = document.getElementById('sequenza-letta');
-  if (letta) letta.textContent = sequenzaAccesso.every(el => el) ? sequenzaAccesso.join(' · ') : '· · · ·';
+  if (letta) letta.innerHTML = sequenzaAccesso.every(el => el)
+    ? sequenzaAccesso.map(el => '<span style="color:' + COLORI_ELEMENTO[el] + '">' + el + '</span>').join(' · ')
+    : '· · · ·';
 }
 
 document.querySelectorAll('.pietra-scrigno').forEach(btn => {
