@@ -48,6 +48,22 @@
 // sono nascoste: il titolo mentiva alla vista. Ora dice solo "La lancetta"
 // ("The needle" in inglese), coerente col canone di V8.36: la lancetta
 // è una. (Segnalazione di Carlo, 25/11 sera.)
+// V8.40 — LA FIAMMELLA HA UNA FACCIA: terzo giorno dal campo, Carlo davanti
+// alla Tana con lo screenshot in mano: "non capisco l'utilità dei due
+// bottoni, non succede niente se li clicco, la scritta è troppo piccola,
+// la pietra raccolta è troppo piccola, e un POI di livello due merita
+// almeno un disegno". Risposta in cinque punti: (1) "ricevi la parola"
+// ora CONGEDA davvero l'anima: un'ultima parola del custode, il respiro
+// del racconto che si rinnova, e solo dopo la modale si richiude da sola;
+// (2) "chiedi ancora alla fiammella" fa VEDERE il cambio di parola: il
+// racconto si rinnova e la veglia si ravviva, come una candela che prende
+// fiato; (3) il racconto cresce a 17px, 19px sul telefono (e cresce il
+// titolo della collana sotto la legenda); (4) il custode di livello 2 si
+// mostra con LA VEGLIA DIPINTA: una candela disegnata a mano, con l'aura
+// della STESSA TINTA della pietra del luogo incastonata sulla cornice;
+// (5) le pietre della collana crescono: gemma vera con castone d'ottone,
+// e se un giorno saranno decine il cerchio le stringe da solo. (Carlo,
+// 25/11 notte, secondo giro dopo la collana.)
 
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
@@ -501,8 +517,9 @@ aggiornaPietre();
     chiudiModale('modale-guida');
   });
   document.getElementById('btn-lingua').addEventListener('click', cambiaLingua);
-  // V8.21 — il custode congeda l\'anima quando la parola è ricevuta
-  document.getElementById('btn-custode-via').addEventListener('click', () => chiudiModale('modale-custode'));
+  // V8.21/V8.40 — il custode congeda l\'anima quando la parola è ricevuta:
+  // un congedo VERO, con l\'ultima parola e il respiro del racconto.
+  document.getElementById('btn-custode-via').addEventListener('click', riceviLaParola);
 });
 
 function mostraBussola() {
@@ -1400,7 +1417,16 @@ function mostraStella(nomePoi, stelle, custode, poiId) {
 function mostraCustode(custode, nomePoi, poiId) {
   document.getElementById('custode-nome').textContent = custode.nome;
   document.getElementById('custode-luogo').textContent = 'il custode di ' + nomePoi;
-  document.getElementById('custode-racconto').textContent = custode.racconto || '';
+  // V8.40 — LA VEGLIA DIPINTA: l'aura della candela prende la TINTA DELLA
+  // PIETRA di questo luogo (stessa gemma della cornice, stesso colore qui),
+  // e la parola arriva col suo respiro: il racconto si rinnova ogni volta
+  // che lo spirito parla.
+  const auraVeglia = document.getElementById('veglia-aura');
+  if (auraVeglia) auraVeglia.setAttribute('fill', colorePietra(poiId || custode.nome));
+  const racVeglia = document.getElementById('custode-racconto');
+  racVeglia.textContent = custode.racconto || '';
+  racVeglia.classList.remove('rinnova'); void racVeglia.offsetWidth; racVeglia.classList.add('rinnova');
+  congedoInCorso = false; // il congedo di prima non conta: si torna ad ascoltare
   const m = document.getElementById('modale-custode');
   if (!m) return;
   // V8.21, secondo giro — LA FIAMMELLA RISPONDE: il custode è ricontattabile.
@@ -1417,12 +1443,21 @@ function mostraCustode(custode, nomePoi, poiId) {
   }
   btnAncora.style.display = (custode.totale && custode.totale > 1) ? '' : 'none';
   btnAncora.onclick = function () {
+    if (congedoInCorso) return; // il custode sta congedando: nessuna nuova parola
     btnAncora.disabled = true;
     fetch(API + '/api/custode?poi_id=' + encodeURIComponent(poiId) + '&utente_id=' + encodeURIComponent(utente.id))
       .then(r => r.json())
       .then(d => {
         btnAncora.disabled = false;
-        if (d.ok && d.custode) { document.getElementById('custode-racconto').textContent = d.custode.racconto || ''; }
+        if (d.ok && d.custode) {
+          // V8.40: il cambio di parola si VEDE, non solo si legge: il racconto
+          // si rinnova con il suo respiro e la veglia si ravviva, come una
+          // candela che prende fiato prima di parlare ancora.
+          const rac = document.getElementById('custode-racconto');
+          rac.textContent = d.custode.racconto || '';
+          rac.classList.remove('rinnova'); void rac.offsetWidth; rac.classList.add('rinnova');
+          ravvivaVeglia();
+        }
         else { alert(d.error || 'La fiammella esita: riprova.'); }
       })
       .catch(e => {
@@ -1431,6 +1466,38 @@ function mostraCustode(custode, nomePoi, poiId) {
       });
   };
   m.classList.remove('nascosto');
+}
+
+// V8.40 — la candela prende fiato: un piccolo ravvivarsi quando la fiammella
+// risponde con una parola nuova. Solo decoro: chi viaggia col movimento
+// ridotto non perde una sillaba (la parola arriva uguale, l'animazione tace).
+function ravvivaVeglia() {
+  const v = document.getElementById('custode-veglia');
+  if (!v) return;
+  v.classList.remove('veglia-si-ravviva');
+  void v.getBoundingClientRect();
+  v.classList.add('veglia-si-ravviva');
+}
+
+// V8.40 — RICEVI LA PAROLA, davvero. Prima il bottone chiudeva la modale e
+// basta, e a Carlo sembrava spento ("non succede niente se li clicco").
+// Ora il custode CONGEDA l'anima: un'ultima parola, il respiro del racconto,
+// la veglia che si ravviva, e solo dopo la modale si richiude da sola.
+let congedoInCorso = false;
+function riceviLaParola() {
+  if (congedoInCorso) return;
+  congedoInCorso = true;
+  const rac = document.getElementById('custode-racconto');
+  rac.textContent = "La parola è tua, anima: nessuno te la può togliere. Va' ora, che la bussola conosce già la prossima strada.";
+  rac.classList.remove('rinnova'); void rac.offsetWidth; rac.classList.add('rinnova');
+  ravvivaVeglia();
+  const bottone = document.getElementById('btn-custode-via');
+  bottone.disabled = true;
+  setTimeout(function () {
+    chiudiModale('modale-custode');
+    bottone.disabled = false;
+    congedoInCorso = false;
+  }, 1900);
 }
 
 // ===== LA COLLANA SUL QUADRANTE (idea di Carlo, 25/11) =====
@@ -1491,8 +1558,16 @@ function disegnaCollana(nuovaPietra) {
     const glu = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     glu.setAttribute('transform', 'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')');
     if (S.poi_id === nuovaPietra) glu.setAttribute('class', 'nasce');
-    glu.innerHTML = '<circle r="4.4" fill="' + colorePietra(S.poi_id || S.nome) + '" stroke="#241708" stroke-width="1.1" />' +
-                    '<circle r="1.5" cx="-1.1" cy="-1.3" fill="rgba(255,246,220,.6)" />';
+    // V8.40 — PIETRE PIU' GRANDI (Carlo: "la pietra raccolta è troppo
+    // piccola"): gemma vera con castone d'ottone attorno. Se un giorno le
+    // pietre saranno decine, il cerchio le stringe da solo: mai gemme
+    // incollate l'una all'altra, a nessun livello della collana.
+    const passo = 2 * Math.PI * 138.2 / Math.max(N, 1);
+    const rGem = Math.min(5.6, passo * 0.4);
+    const lume = Math.max(1.4, rGem * 0.32);
+    glu.innerHTML = '<circle r="' + (rGem + 1.9).toFixed(1) + '" fill="none" stroke="#c9a44a" stroke-width="1" opacity=".9" />' +
+                    '<circle r="' + rGem.toFixed(1) + '" fill="' + colorePietra(S.poi_id || S.nome) + '" stroke="#241708" stroke-width="1.1" />' +
+                    '<circle r="' + lume.toFixed(1) + '" cx="-' + (rGem * 0.27).toFixed(1) + '" cy="-' + (rGem * 0.31).toFixed(1) + '" fill="rgba(255,246,220,.65)" />';
     g.appendChild(glu);
   }
   aggiornaLivelloCollana();
@@ -1972,3 +2047,4 @@ function avviaSSE() {
     console.log('SSE disconnesso, riconnetto...');
   };
 }
+
