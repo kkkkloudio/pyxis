@@ -159,8 +159,8 @@ const TESTI = {
     hCammino: " h",
     kmCorto: " km",
     mCorto: " m",
-
-    oltreLembo: "il sentiero esce dalla pergamena: oltre il lembo, comanda la lancetta",    dettoGrande: "il luogo di potere",
+    oltreLembo: "il sentiero esce dalla pergamena: oltre il lembo, comanda la lancetta",
+    dettoGrande: "il luogo di potere",
     dettoMedia: "l\'anima più vicina",
     dettoPiccola: "la seconda anima",
     portaCaption: " — girati finché l\'ago entra nella porta",
@@ -229,8 +229,8 @@ const TESTI = {
     hCammino: " h",
     kmCorto: " km",
     mCorto: " m",
-
-    oltreLembo: "the trail leaves the parchment: past the edge, the needle commands",    dettoGrande: "the place of power",
+    oltreLembo: "the trail leaves the parchment: past the edge, the needle commands",
+    dettoGrande: "the place of power",
     dettoMedia: "the nearest soul",
     dettoPiccola: "the second soul",
     portaCaption: " — turn until the needle enters the door",
