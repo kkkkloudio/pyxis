@@ -329,7 +329,7 @@
      sotto la legenda, cresce col numero di gemme raccolte */
   .collana-livello {
     font-family:'Cormorant Garamond', Georgia, serif; font-style:italic;
-    font-size:13px; color:#8a6428; text-align:center;
+    font-size:15px; color:#8a6428; text-align:center;
     margin:-2px 0 8px;
   }
   #collana-gemme .nasce { animation: gemma-nasce 1.1s ease-out both; }
@@ -678,17 +678,24 @@
   }
 
   /* ===== V8.21 — IL CUSTODE DEL LUOGO ===== */
-  .custode-fuoco {
-    text-align:center; font-size:30px; margin-bottom:6px;
-    filter:drop-shadow(0 0 14px rgba(232,205,133,.5));
-    animation: alito-custode 3.2s ease-in-out infinite;
+  #custode-ritratto {
+    margin-bottom:10px; border-radius:8px;
+    box-shadow:0 0 0 3px rgba(20,16,10,.35), 0 6px 18px rgba(0,0,0,.45);
   }
+  #custode-ritratto svg { width:100%; height:auto; display:block; border-radius:8px; }
+  #custode-ritratto .fiamma-custode { animation: alito-custode 3.2s ease-in-out infinite; }
   @keyframes alito-custode { 0%,100% { opacity:.7; } 50% { opacity:1; } }
-  @media (prefers-reduced-motion: reduce) { .custode-fuoco { animation:none; } }
+  @media (prefers-reduced-motion: reduce) { #custode-ritratto .fiamma-custode { animation:none; } .custode-racconto.rinnova { animation:none; } }
   .custode-racconto {
     font-family:'Cormorant Garamond', Georgia, serif; font-style:italic;
-    font-size:15px; color:#221a10; line-height:1.55;
-    overflow-y:auto; margin-bottom:14px; min-height:110px;
+    font-size:19px; color:#221a10; line-height:1.62;
+    overflow-y:auto; margin-bottom:10px; min-height:128px;
+  }
+  .custode-racconto.rinnova { animation: parola-nuova .7s ease both; }
+  @keyframes parola-nuova { from { opacity:0; } to { opacity:1; } }
+  .custode-parole {
+    font-family:'Cormorant Garamond', Georgia, serif; font-style:italic;
+    font-size:14px; color:#5a4530; text-align:center; margin-bottom:12px;
   }
   #modale-custode .modale-box { animation: srotola .8s ease both; }
   #modale-custode .modale-box h3 { color:#5c1414; }
@@ -707,6 +714,9 @@
     .modale-box { max-width:100%; width:100%; max-height:80vh; overflow-y:auto; padding:26px 22px; font-size:17px; }
     .modale-box h3 { font-size:24px; }
     .modale-box .sub { font-size:15px; }
+    .custode-racconto { font-size:21px; }   /* V8.41: la parola del custode si legge, sul telefono vero */
+    .custode-parole { font-size:16px; }
+    .collana-livello { font-size:17px; }    /* e il titolo dell'anima respira */
   }
   /* telefoni più generosi: la bussola respira ancora di più */
   @media (max-width:600px) and (min-width:420px) { .bussola-wrap { --k:1.42; } }
@@ -866,11 +876,12 @@
 
     <div class="modale nascosto" id="modale-custode">
       <div class="modale-box">
-        <div class="custode-fuoco">🕯️</div>
+        <div id="custode-ritratto" aria-hidden="true"></div>
         <h3 id="custode-nome">…</h3>
         <div class="sub" id="custode-luogo">il custode del luogo</div>
         <div class="custode-racconto" id="custode-racconto"></div>
-        <button class="btn-modale" id="btn-custode-via">Ricevi la parola</button>
+        <div class="custode-parole" id="custode-parole"></div>
+        <button class="btn-modale" id="btn-custode-via">Riprendi il cammino</button>
       </div>
     </div>
 
