@@ -159,7 +159,8 @@ const TESTI = {
     hCammino: " h",
     kmCorto: " km",
     mCorto: " m",
-    dettoGrande: "il luogo di potere",
+
+    oltreLembo: "il sentiero esce dalla pergamena: oltre il lembo, comanda la lancetta",    dettoGrande: "il luogo di potere",
     dettoMedia: "l\'anima più vicina",
     dettoPiccola: "la seconda anima",
     portaCaption: " — girati finché l\'ago entra nella porta",
@@ -228,7 +229,8 @@ const TESTI = {
     hCammino: " h",
     kmCorto: " km",
     mCorto: " m",
-    dettoGrande: "the place of power",
+
+    oltreLembo: "the trail leaves the parchment: past the edge, the needle commands",    dettoGrande: "the place of power",
     dettoMedia: "the nearest soul",
     dettoPiccola: "the second soul",
     portaCaption: " — turn until the needle enters the door",
@@ -951,37 +953,56 @@ function respiraCarta() {
 function aggiornaDistanzaCarta() {
   // la carta dice TRE cose: la distanza che resta (sul cartiglio E lungo il
   // sentiero, come le vecchie mappe scrivevano i migli sopra le strade), il
-  // tempo del passo (4,5 km all'ora: il passo onesto del pellegrino), e la
+  // tempo del passo (4,5 km/h: il passo onesto del pellegrino), e la
   // sentenza che dice se e' una cosa da fare a piedi o gran camminata.
-  const cart = document.getElementById('carta-distanza');
-  const via = document.getElementById('carta-distanza-via');
-  const sent = document.getElementById('carta-sentenza');
+  // V8.40: dice pure QUARTA cosa: oltre il lembo della pergamena, il sentiero
+  // esce e comanda la lancetta (lo dice il cartiglio, poi guida la lancetta).
+  let cart = document.getElementById("carta-distanza");
+  let via = document.getElementById("carta-distanza-via");
+  let sent = document.getElementById("carta-sentenza");
   if (!cart || !poiCorrente) return;
-  let testo = '', viaT = '', sentenza = '';
+  let testo = "", viaT = "", sentenza = "";
   if (BVERA.pos && poiCorrente.lat != null) {
     const d = distanzaMetri(BVERA.pos.lat, BVERA.pos.lon, poiCorrente.lat, poiCorrente.lon);
+    // V8.40: il sentiero e' disegnato in SCALA REALE: se il passo cambia il
+    // mondo di un quarto (o l'anima entra nel cerchio del luogo), la pergamena
+    // RIDISEGNA il cammino al volo, perche' la carta dica sempre il vero.
+    const ridisegna = (CARTA.dDis == null) ||
+      ((d <= RAGGIO_M) !== (CARTA.dDis <= RAGGIO_M)) ||
+      Math.abs(d - CARTA.dDis) > Math.max(40, CARTA.dDis * 0.25);
+    if (ridisegna) {
+      const lembo = document.getElementById("carta-rotta");
+      if (lembo) {
+        lembo.innerHTML = disegnaCarta();
+        cart = document.getElementById("carta-distanza");
+        via = document.getElementById("carta-distanza-via");
+        sent = document.getElementById("carta-sentenza");
+      }
+    }
     if (d <= RAGGIO_M) {
-      testo = t('cerchio');
-      sentenza = t('tempoPasseggiata');
+      testo = t("cerchio");
+      sentenza = t("tempoPasseggiata");
     } else {
       const chilometri = d >= 1000;
       const distStr = chilometri
-        ? '\u2248 ' + (d / 1000).toFixed(1).replace('.', ',') + t('kmLuogo')
-        : '\u2248 ' + (Math.round(d / 10) * 10) + t('mLuogo');
+        ? "≈ " + (d / 1000).toFixed(1).replace(".", ",") + t("kmLuogo")
+        : "≈ " + (Math.round(d / 10) * 10) + t("mLuogo");
       viaT = chilometri
-        ? '\u2248 ' + (d / 1000).toFixed(d >= 10000 ? 0 : 1).replace('.', ',') + t('kmCorto')
-        : '\u2248 ' + (Math.round(d / 10) * 10) + t('mCorto');
+        ? "≈ " + (d / 1000).toFixed(d >= 10000 ? 0 : 1).replace(".", ",") + t("kmCorto")
+        : "≈ " + (Math.round(d / 10) * 10) + t("mCorto");
       const min = d / 75; // 4,5 km/h: il passo onesto di chi va a piedi
       let tempo;
-      if (min < 60) tempo = '~' + (Math.round(min / 5) * 5) + t('minCammino');
+      if (min < 60) tempo = "~" + (Math.round(min / 5) * 5) + t("minCammino");
       else {
         const h = Math.floor(min / 60);
         const m = Math.round((min - h * 60) / 5) * 5;
-        tempo = '~' + h + t('hCammino') + (m ? ' ' + m + t('minCammino') : '');
+        tempo = "~" + h + t("hCammino") + (m ? " " + m + t("minCammino") : "");
       }
-      sentenza = d <= 1500 ? t('tempoPasseggiata')
-        : (d <= 5000 ? t('tempoCammino') : t('tempoPellegrinaggio'));
-      testo = distStr + ' \u00b7 ' + tempo;
+      sentenza = d <= 1500 ? t("tempoPasseggiata")
+        : (d <= 5000 ? t("tempoCammino") : t("tempoPellegrinaggio"));
+      // V8.40: oltre il paio di chilometri che la pergamena sa mostrare, il
+      // sentiero esce dal lembo: lo dice il cartiglio, poi comanda la lancetta
+      testo = distStr + " · " + tempo + (d > VEDI_M ? " · " + t("oltreLembo") : "");
     }
   }
   cart.textContent = testo;
@@ -1087,15 +1108,123 @@ function localizzami() {
   }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
 }
 
+// ===== V8.40 — LA CARTA DICE IL VERO (idea di Carlo, 25/11) =====
+// Il sentiero non e' piu' la scenografia uguale per tutti: ora rappresenta
+// il cammino VERO, semplificato all'osso. Lunghezza in SCALA REALE dal
+// passo alla stella, serpeggi lievi che cambiano per ogni luogo (la FORMA
+// del cammino, non la mappa delle strade: le strade vere costerebbero la
+// posizione a un motore di routing, e la pietra angolare non si tocca), e i
+// punti di riferimento VERI del luogo incisi accanto alla stella, perche'
+// chi cammina sappia orientarsi. La pergamena mostra al piu' un paio di
+// chilometri (VEDI_M): oltre il lembo, il cartiglio lo dice e comanda la
+// lancetta. Sei nel cerchio? Il viandante e' gia' accanto alla stella:
+// sei giunto. Tutto calcolato sul telefono: la posizione non parte mai.
+
+// il paio di chilometri che la pergamena mostra prima che il sentiero
+// esca dal lembo; oltre, parla la lancetta
+const VEDI_M = 2000;
+// la scala della pergamena: quanto sentiero per metro di mondo
+const PX_M = 110 / VEDI_M;
+
+// i segni VERI dei luoghi: dati PUBBLICI del luogo (un fiume, un parco),
+// tenuti qui da chi costruisce, MAI dell'anima che cammina. ang = gradi
+// dal nord (0 sopra la stella), m = metri dalla stella, in scala. Chi ne
+// aggiunge, prima verifica sul posto o sulle mappe: il canone lo impone.
+const SEGNALI = {
+  "poi-ro-rotonda": [ { tipo: "acqua", nome: "l'Adigetto", ang: 250, m: 250 } ],
+  "poi-ve-poveglia": [ { tipo: "acqua", nome: "la laguna", ang: 135, m: 600 } ],
+  "poi-to-mole": [ { tipo: "acqua", nome: "il Po", ang: 100, m: 800 } ]
+};
+
+// ogni luogo serpeggia a modo suo: un'impronta fissa, che non cambia mai
+function improntaDelLuogo(id) {
+  let h = 0;
+  const s = String(id || "luogo");
+  for (let i = 0; i < s.length; i++) { h = ((h * 31) + s.charCodeAt(i)) >>> 0; }
+  return h;
+}
+
 // la pergamena: tutta incisione, niente foto. Il sentiero sta nel gruppo
 // #carta-filo (parte dritto verso l'alto e ruota verso la rotta vera);
 // nome e distanza restano fissi, ben leggibili nel cartiglio in basso.
+// V8.40: il sentiero ha la LUNGHEZZA VERA del cammino che resta.
 function disegnaCarta() {
-  let nome = poiCorrente ? String(poiCorrente.nome).replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
-  if (nome.length > 26) nome = nome.slice(0, 25) + '…';
+  let nome = poiCorrente ? String(poiCorrente.nome).replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
+  if (nome.length > 26) nome = nome.slice(0, 25) + "…";
   const a0 = CARTA.angolo.toFixed(1);
-  const INK = '#55341c';
-  const INK2 = '#6b4a2a';
+  const INK = "#55341c";
+  const INK2 = "#6b4a2a";
+
+  // il mondo, letto solo qui nel telefono (pietra angolare: non parte mai)
+  let dM = null;
+  if (BVERA.pos && poiCorrente && poiCorrente.lat != null && poiCorrente.lon != null) {
+    dM = distanzaMetri(BVERA.pos.lat, BVERA.pos.lon, poiCorrente.lat, poiCorrente.lon);
+  }
+  CARTA.dDis = dM; // l'ultima distanza che ha disegnato il sentiero
+  const giunto = dM != null && dM <= RAGGIO_M;
+
+  // quanto sentiero: SCALA REALE dal passo alla stella
+  let L2;
+  if (dM == null) L2 = 108;   // cielo muto: sentiero pieno, muto di numeri
+  else if (giunto) L2 = 26;   // sei giunto: la stella sta accanto al passo
+  else L2 = Math.max(18, Math.min(dM, VEDI_M) * PX_M);
+  const Sy = 158 - L2; // dove sta la stella nel filo
+
+  // il serpeggio del cammino: cambia per ogni luogo, finisce alla stella
+  const h = improntaDelLuogo(poiCorrente ? poiCorrente.id : null);
+  const amp = (0.06 + (h % 13) / 100) * L2;
+  const fasi = 2 + (h % 3);
+  const sfas = (h % 7) * 0.8;
+  let sentiero = "M150 158";
+  for (let k = 1; k <= 12; k++) {
+    const tt = k / 12;
+    const x = 150 + amp * Math.sin(tt * Math.PI * fasi + sfas) * Math.sin(Math.PI * tt);
+    sentiero += " L" + x.toFixed(1) + " " + (158 - L2 * tt).toFixed(1);
+  }
+
+  // i segni veri del luogo, incisi intorno alla stella (in scala)
+  let segni = "";
+  if (poiCorrente && SEGNALI[poiCorrente.id]) {
+    SEGNALI[poiCorrente.id].forEach(function (s) {
+      const rad = s.ang * Math.PI / 180;
+      const sx = 150 + Math.sin(rad) * s.m * PX_M;
+      const sy = Sy - Math.cos(rad) * s.m * PX_M;
+      if (Math.hypot(sx - 150, sy - 150) > 106) return; // oltre il lembo non si incide
+      const nomeSegno = String(s.nome || "").replace(/</g, "&lt;");
+      let glifo = "";
+      if (s.tipo === "acqua") {
+        glifo = '<path d="M-21 0 q 7 -4 14 0 t 14 0" fill="none" stroke="#5d6b4a" stroke-width="1.3"/>'
+          + '<path d="M-19 5 q 7 -4 14 0 t 12 0" fill="none" stroke="#5d6b4a" stroke-width="1" opacity=".6"/>'
+          + '<text x="2" y="-8" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-size="9.5" font-style="italic" fill="' + INK2 + '">' + nomeSegno + '</text>';
+      } else if (s.tipo === "parco") {
+        glifo = '<path d="M-4 8 L-4 0" stroke="' + INK2 + '" stroke-width="1.4"/>'
+          + '<circle cx="-6" cy="-4" r="4.6" fill="#8a6a34" stroke="' + INK2 + '" stroke-width="1" opacity=".5"/>'
+          + '<circle cx="1" cy="-7" r="5.4" fill="#8a6a34" stroke="' + INK2 + '" stroke-width="1" opacity=".5"/>'
+          + '<path d="M7 7 L7 0" stroke="' + INK2 + '" stroke-width="1.4"/>'
+          + '<circle cx="5" cy="-3" r="4.2" fill="#8a6a34" stroke="' + INK2 + '" stroke-width=".9" opacity=".5"/>'
+          + '<text x="2" y="-14" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-size="9.5" font-style="italic" fill="' + INK2 + '">' + nomeSegno + '</text>';
+      } else return;
+      segni += '<g transform="translate(' + sx.toFixed(1) + ',' + sy.toFixed(1) + ')" opacity=".7">' + glifo + '</g>';
+    });
+  }
+
+  // le impronte: al varco, o gia' accanto alla stella di chi e' giunto
+  const impronte = giunto
+    ? '<g transform="translate(171,' + (Sy + 9).toFixed(1) + ')">'
+      + '<circle r="12" fill="none" stroke="' + INK2 + '" stroke-width=".8" stroke-dasharray="1.5 3.5" opacity=".5"/>'
+      + '<g transform="translate(-6.5,-4) rotate(20)"><ellipse rx="3" ry="5.2" fill="none" stroke="' + INK + '" stroke-width="1.2"/></g>'
+      + '</g>'
+    : '<g transform="translate(150,158)">'
+      + '<circle r="13" fill="none" stroke="' + INK2 + '" stroke-width=".8" stroke-dasharray="1.5 3.5" opacity=".5"/>'
+      + '<g transform="translate(-7.5,-2) rotate(22)"><ellipse rx="3.2" ry="5.6" fill="none" stroke="' + INK + '" stroke-width="1.3"/></g>'
+      + '<g transform="translate(7,5) rotate(-16)"><ellipse rx="3.2" ry="5.6" fill="none" stroke="' + INK + '" stroke-width="1.3"/></g>'
+      + '</g>';
+
+  // l'appunto del cartografo accanto al sentiero: la distanza che resta
+  const viaPos = (dM == null || giunto)
+    ? "translate(150,140) rotate(-37)"
+    : "translate(" + (150 + 26 + amp).toFixed(1) + "," + (158 - L2 * 0.55).toFixed(1) + ") rotate(-37)";
+
   return '<svg class="carta" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">'
     + '<defs>'
     + '<clipPath id="carta-clip"><circle cx="150" cy="150" r="126.3"/></clipPath>'
@@ -1111,7 +1240,7 @@ function disegnaCarta() {
     + '<ellipse cx="240" cy="218" rx="38" ry="28" fill="#4a3014" opacity=".05"/>'
     + '<circle cx="150" cy="150" r="121" fill="none" stroke="#8a6a44" stroke-width="1" opacity=".5"/>'
     + '<circle cx="150" cy="150" r="117.5" fill="none" stroke="#8a6a44" stroke-width=".7" stroke-dasharray="1.5 4" opacity=".45"/>'
-    // onde da cartografia antica, in basso
+    // onde da cartografia antica ai lembi del mondo conosciuto
     + '<path d="M40 268 q 8 -5 16 0 t 16 0 t 16 0" fill="none" stroke="' + INK2 + '" stroke-width="1" opacity=".3"/>'
     + '<path d="M176 282 q 8 -5 16 0 t 16 0 t 16 0" fill="none" stroke="' + INK2 + '" stroke-width="1" opacity=".25"/>'
     + '<path d="M210 44 q 7 -4 14 0 t 14 0" fill="none" stroke="' + INK2 + '" stroke-width="1" opacity=".3"/>'
@@ -1123,43 +1252,20 @@ function disegnaCarta() {
     + '<path d="M-3.5 4 C -1 6.2, 1 6.2, 3.5 4" fill="none" stroke="' + INK2 + '" stroke-width="1.1"/>'
     + '<path d="M13 2 C 18 1, 20 -4, 16 -7 C 19 -6, 21 -1, 18 3 C 17 6, 13 7, 10.5 5.5" fill="none" stroke="' + INK2 + '" stroke-width="1" opacity=".8"/>'
     + '</g>'
-    // ===== IL FILO: il sentiero, disegnato verso l'alto, ruotato sulla rotta vera =====
+    // ===== IL FILO: il cammino VERO in scala, che ruota col mondo =====
     + '<g id="carta-filo" transform="rotate(' + a0 + ' 150 150)">'
-    // impronte del pellegrino al centro
-    + '<circle cx="150" cy="161" r="13" fill="none" stroke="' + INK2 + '" stroke-width=".8" stroke-dasharray="1.5 3.5" opacity=".5"/>'
-    + '<g transform="translate(142.5,156) rotate(22)"><ellipse rx="3.2" ry="5.6" fill="none" stroke="' + INK + '" stroke-width="1.3"/></g>'
-    + '<g transform="translate(157,163) rotate(-16)"><ellipse rx="3.2" ry="5.6" fill="none" stroke="' + INK + '" stroke-width="1.3"/></g>'
-    // il sentiero punteggiato, come sulle carte dei viandti
-    + '<path d="M150 164 C 122 142, 186 118, 160 96 C 140 80, 118 78, 126 63 C 131 53, 143 51, 150 46" fill="none" stroke="' + INK + '" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.5 6" opacity=".9"/>'
+    + impronte
+    // il sentiero della lunghezza vera: serpeggi del luogo, fino alla stella
+    + '<path d="' + sentiero + '" fill="none" stroke="' + INK + '" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.5 6" opacity=".9"/>'
     // e accanto al sentiero, inclinato come un appunto del cartografo: la distanza
-    + '<text id="carta-distanza-via" transform="translate(183,121) rotate(-37)" font-family="IM Fell English, Georgia, serif" font-size="10.5" font-style="italic" fill="' + INK2 + '" opacity=".85"> </text>'
-    // la stella del luogo
+    + '<text id="carta-distanza-via" transform="' + viaPos + '" font-family="IM Fell English, Georgia, serif" font-size="10.5" font-style="italic" fill="' + INK2 + '" opacity=".85"> </text>'
+    // la stella del luogo, in fondo al cammino vero
+    + '<g transform="translate(0,' + (Sy - 27).toFixed(1) + ')">'
     + '<path d="M150 27 L152.8 36.5 L162 40 L152.8 43.5 L150 53 L147.2 43.5 L138 40 L147.2 36.5 Z" fill="#c9962f" stroke="' + INK + '" stroke-width="1"/>'
     + '<path d="M150 21 L150 26 M171 40 L164 40 M129 40 L136 40 M158 31 L161 25 M142 31 L139 25" stroke="#b8862b" stroke-width="1" opacity=".55"/>'
-    // alberi in stile xilografia
-    + '<g transform="translate(101,124)" opacity=".8">'
-    + '<path d="M0 9 L0 0" stroke="' + INK2 + '" stroke-width="1.6"/>'
-    + '<circle cx="-5" cy="-5" r="5.5" fill="#8a6a34" stroke="' + INK2 + '" stroke-width="1" opacity=".5"/>'
-    + '<circle cx="3" cy="-8" r="6.5" fill="#8a6a34" stroke="' + INK2 + '" stroke-width="1" opacity=".5"/>'
-    + '<circle cx="1" cy="-1" r="6" fill="#8a6a34" stroke="' + INK2 + '" stroke-width="1" opacity=".5"/>'
     + '</g>'
-    + '<g transform="translate(199,142)" opacity=".7">'
-    + '<path d="M0 8 L0 0" stroke="' + INK2 + '" stroke-width="1.4"/>'
-    + '<circle cx="-4" cy="-4" r="4.5" fill="#8a6a34" stroke="' + INK2 + '" stroke-width=".9" opacity=".5"/>'
-    + '<circle cx="3" cy="-6" r="5" fill="#8a6a34" stroke="' + INK2 + '" stroke-width=".9" opacity=".5"/>'
-    + '</g>'
-    // un sasso lungo la via
-    + '<path d="M198 106 L202 97 L209 95 L215 100 L214 106 Z" fill="#7d5a30" stroke="' + INK2 + '" stroke-width=".8" opacity=".55"/>'
-    // il fiume col ponticello
-    + '<path d="M56 197 C 76 192, 96 202, 116 197 C 136 192, 156 202, 176 197 C 196 192, 216 202, 236 197" fill="none" stroke="#5d6b4a" stroke-width="1.3" opacity=".55"/>'
-    + '<path d="M56 202 C 76 197, 96 207, 116 202 C 136 197, 156 207, 176 202 C 196 197, 216 207, 236 202" fill="none" stroke="#5d6b4a" stroke-width="1" opacity=".4"/>'
-    + '<path d="M106 204 L110 194 M118 204 L114 194 M105 197 L119 197" stroke="' + INK2 + '" stroke-width="1.2" opacity=".7"/>'
-    // il serpentello degli abissi
-    + '<g transform="translate(214,232)" opacity=".5">'
-    + '<path d="M-10 2 C -6 -6, 6 -7, 7 0 C 8 6, 0 8, -2 4" fill="none" stroke="' + INK2 + '" stroke-width="1.6"/>'
-    + '<circle cx="7.2" cy="-1" r="1.8" fill="' + INK2 + '"/>'
-    + '<path d="M14 2 q 4 -3 8 0" fill="none" stroke="' + INK2 + '" stroke-width=".9" opacity=".6"/>'
-    + '</g>'
+    // i segni veri del luogo: fiumi, parchi, quel che c'e' davvero
+    + segni
     + '</g>'
     // ===== IL CARTIGLIO: nome del luogo, la distanza che resta, il tempo del passo =====
     + '<rect x="76" y="218" width="148" height="52" rx="9" fill="#f4e7c2" stroke="#8a6a44" stroke-width="1.2" opacity=".94"/>'
