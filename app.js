@@ -43,6 +43,11 @@
 // se il telefono stesso dichiara un'incertezza oltre 10 km, la porta non si
 // propone e non si cambia, e il sussurro lo dice chiaro. L'incertezza è
 // coords.accuracy, vive solo sul telefono come tutto il resto.
+// V8.39 — UNA LANCETTA SOLA: il titolo della legenda diceva "Le tre
+// lancette" e nella home se ne vede una sola da quando le anime vicine
+// sono nascoste: il titolo mentiva alla vista. Ora dice solo "La lancetta"
+// ("The needle" in inglese), coerente col canone di V8.36: la lancetta
+// è una. (Segnalazione di Carlo, 25/11 sera.)
 
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
@@ -125,7 +130,7 @@ const TESTI = {
     parolaPietreSub: "quattro pietre, un elemento ciascuna: tocca ogni pietra e scegli terra, aria, fuoco o acqua. Le pietre, in quest\'ordine, sono la tua parola: la componi la prima volta, la ricomponi uguale per rientrare",
     subDueCose: "tre cose bastano, poi la bussola gira",
     privacyIscrizione: "nessuna via da scegliere · nessun nome vero · nessuna email · la posizione non lascia mai il telefono",
-    legendaTitolo: "Le tre lancette",
+    legendaTitolo: "La lancetta",
     dettGrande: "luogo di potere più vicino",
     dettMedia: "anima più vicina",
     dettPiccola: "seconda anima",
@@ -194,7 +199,7 @@ const TESTI = {
     parolaPietreSub: "four stones, one element each: tap every stone and pick earth, air, fire or water. The stones, in that order, are your word: compose it the first time, recompose it the same to come back",
     subDueCose: "three things are enough, then the compass turns",
     privacyIscrizione: "no road to choose · no real name · no email · the position never leaves your phone",
-    legendaTitolo: "The three needles",
+    legendaTitolo: "The needle",
     dettGrande: "nearest place of power",
     dettMedia: "nearest soul",
     dettPiccola: "second soul",
