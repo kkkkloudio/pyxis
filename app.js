@@ -26,6 +26,13 @@
 // la lancetta è una sola per chi cammina. Via dai testi operativi IT e EN
 // (sveglia, distanza, avviso lontano, collezione vuota) e dalla guida, dove
 // la gemma è della lancetta, punto. (24/11 notte, terzo giro di parola.)
+// V8.37 — LA PORTA TI SEGUE: secondo giorno in esterna, Carlo e ad Altedo
+// e la bussola lo vede ancora a Rovigo. Chi viaggia non deve ricordarsi la
+// porta: se il telefono capisce in quale provincia si trova, la porta si
+// aggiorna da sola (posizione solo sul telefono, come sempre). La parola
+// d'accesso ora resta nello scrigno anche dopo il riavvio (pyxis-seq),
+// altrimenti il rientro silenzioso non riconosceva l'anima.
+
 
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
@@ -405,6 +412,7 @@ aggiornaPietre();
 
       utente = data.utente;
       localStorage.setItem('pyxis-utente', JSON.stringify(utente));
+      localStorage.setItem('pyxis-seq', JSON.stringify(sequenzaAccesso)); // V8.37: la parola resta nello scrigno, per chi rientra
       mostraBussola();
       avviaSSE();
       caricaLancette();
@@ -467,6 +475,44 @@ function mostraBussola() {
   avviaBussolaViva(); // gli aghi prendono vita appena lo scrigno si apre
   avviaCorvo();        // V8.24: e il corvo prende a passeggiare lungo la notte
   if (!localStorage.getItem('pyxis-guida')) apriGuida(); // V8.15: la prima volta, l\'anima viene accompagnata
+  autoPorta(); // V8.37: chi viaggia ritrova la porta, senza chiedere
+}
+
+// ===== V8.37 — LA PORTA TI SEGUE =====
+// Idea nata sul campo con Hermes (versione sperimentale sul mini PC, poi
+// sistemata qui): quando l'anima e dentro e il telefono capisce di essere
+// in un'altra provincia, la porta si aggiorna da sola via /api/register.
+// Il buco della versione sperimentale: la parola veniva ricomposta dalle
+// pietre in memoria, che dopo il riavvio della pagina sono vuote
+// (null-null-null-null): il server rifiutava in silenzio e l'anima restava
+// alla porta vecchia. Qui la parola viene dallo scrigno (pyxis-seq), e senza
+// parola valida non si tocca niente. Pietra angolare intatta: la posizione
+// vive solo nel telefono e muore qui; al server parte solo il NOME della porta.
+function autoPorta() {
+  if (!navigator.geolocation || !utente) return;
+  let seq = null;
+  try { seq = JSON.parse(localStorage.getItem('pyxis-seq') || 'null'); } catch (e) { seq = null; }
+  if (window.__seqAccesso && window.__seqAccesso.every(function (el) { return el; })) seq = window.__seqAccesso;
+  if (!seq || !Array.isArray(seq) || seq.length !== 4 || seq.some(function (el) { return !el; })) return; // senza parola non si cambia porta
+  const password = seq.join('-');
+  navigator.geolocation.getCurrentPosition(function (pos) {
+    const porta = trovaProvincia(pos.coords.latitude, pos.coords.longitude);
+    if (!porta || porta === utente.provincia) return;
+    fetch(API + '/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome: utente.nome, provincia: porta, password: password })
+    }).then(function (r) { return r.json(); }).then(function (data) {
+      if (!data || !data.utente) return; // il server ha detto no: si resta alla porta attuale, in silenzio
+      utente = data.utente;
+      localStorage.setItem('pyxis-utente', JSON.stringify(utente));
+      const sotto = document.getElementById('sottotitolo-utente');
+      if (sotto) sotto.textContent = utente.nome + ' · ' + utente.provincia;
+      if (evtSource) { evtSource.close(); evtSource = null; } // il cerchio d'ascolto segue la porta nuova
+      avviaSSE();
+      caricaLancette();
+    }).catch(function () {});
+  }, function () {}, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
 }
 
 async function caricaLancette() {
