@@ -178,6 +178,14 @@ const TESTI = {
     lasciaVoce: "📣 Lascia la voce",
     collezioneTitolo: "La collezione",
     collezioneSub: "le stelle raccolte sui luoghi di potere",
+    // LA COLLANA SUL QUADRANTE: il titolo dell'anima cresce con le pietre raccolte
+    livelloNuovaAnima: "nuova anima",
+    livelloCercatrice: "cercatrice di luoghi",
+    livelloPellegrina: "pellegrina",
+    livelloViandante: "viandante dei sentieri",
+    livelloCustode: "custode dei sentieri",
+    contaPietra: "pietra sulla cornice",
+    contaPietre: "pietre sulla cornice",
     piazzaTitolo: "La piazza",
     piazzaSub: "le voci lasciate da tutte le anime",
     feedbackTitolo: "Parola ai costruttori",
@@ -248,6 +256,14 @@ const TESTI = {
     lasciaVoce: "📣 Leave a voice",
     collezioneTitolo: "The collection",
     collezioneSub: "the stars gathered at places of power",
+    // THE NECKLACE ON THE DIAL: the soul's title grows with the gathered stones
+    livelloNuovaAnima: "a new soul",
+    livelloCercatrice: "a seeker of places",
+    livelloPellegrina: "a pilgrim",
+    livelloViandante: "a wanderer of paths",
+    livelloCustode: "keeper of the paths",
+    contaPietra: "stone on the rim",
+    contaPietre: "stones on the rim",
     piazzaTitolo: "The square",
     piazzaSub: "voices left by all souls",
     feedbackTitolo: "Word to the makers",
@@ -284,6 +300,7 @@ function applicaLingua() {
 
   // legenda
   set('.legenda-titolo', 'legendaTitolo');
+  if (typeof aggiornaLivelloCollana === 'function') aggiornaLivelloCollana();
   set('.legenda-item[data-tipo="grande"] .dett', 'dettGrande');
   set('.legenda-item[data-tipo="media"] .dett', 'dettMedia');
   set('.legenda-item[data-tipo="piccola"] .dett', 'dettPiccola');
@@ -435,6 +452,7 @@ aggiornaPietre();
       mostraBussola();
       avviaSSE();
       caricaLancette();
+      caricaCollana();
     } catch (e) {
       alert('Backend non raggiungibile: ' + e.message);
     }
@@ -444,6 +462,7 @@ aggiornaPietre();
     mostraBussola();
     avviaSSE();
     caricaLancette();
+    caricaCollana();
   }
 
   // ===== V8.8 — tocca l\'ago per sapere chi punta =====
@@ -1343,6 +1362,7 @@ function checkIn() {
           return;
         }
         mostraStella(data.nome, data.stelle, data.custode, poiCorrente.id);
+        caricaCollana(poiCorrente.id); // la pietra si incastona ora
       })
       .catch(e => {
         btn.disabled = false;
@@ -1411,6 +1431,80 @@ function mostraCustode(custode, nomePoi, poiId) {
       });
   };
   m.classList.remove('nascosto');
+}
+
+// ===== LA COLLANA SUL QUADRANTE (idea di Carlo, 25/11) =====
+// Ogni luogo raggiunto incastona una pietra nella cornice della bussola:
+// una gemma per luogo, colore fisso e deterministico (improntaDelLuogo),
+// sempre lo stesso per tutti: la gemma di un luogo e' la sua, non nostra.
+// Il giro delle pietre parte dal nord e procede per ordine di raccolta.
+// Il titolo dell'anima cresce col numero di pietre. In un secondo tempo le
+// pietre si spenderanno (Carlo): parcheggiato, prima nasce la vetrina.
+// Pietra angolare intatta: si disegnano solo i luoghi gia' visitati,
+// nessuna posizione entra o esce dal telefono.
+const COLLANA = { gemme: [] };
+
+function titoloCollana(n) {
+  if (n >= 20) return t('livelloCustode');
+  if (n >= 10) return t('livelloViandante');
+  if (n >= 5) return t('livelloPellegrina');
+  if (n >= 1) return t('livelloCercatrice');
+  return t('livelloNuovaAnima');
+}
+
+// il colore della pietra di un luogo: deterministico, dall'id del POI
+function colorePietra(poiId) {
+  const h = improntaDelLuogo(poiId);
+  return 'hsl(' + (h % 360) + ', 62%, ' + (42 + (h % 15)) + '%)';
+}
+
+async function caricaCollana(nuovaPietra) {
+  if (!utente) return;
+  try {
+    const resp = await fetch(API + '/api/collezione?id=' + encodeURIComponent(utente.id));
+    const data = await resp.json();
+    COLLANA.gemme = (data.stelle || []).slice().sort(function (a, b) {
+      return String(a.visitato_il || '').localeCompare(String(b.visitato_il || ''));
+    });
+    disegnaCollana(nuovaPietra);
+  } catch (e) {
+    console.error('Errore collana:', e);
+  }
+}
+
+function disegnaCollana(nuovaPietra) {
+  const svg = document.querySelector('.bussola-wrap svg.quadrante');
+  if (!svg) return;
+  let g = document.getElementById('collana-gemme');
+  if (!g) {
+    g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('id', 'collana-gemme');
+    svg.appendChild(g);
+  }
+  g.innerHTML = '';
+  const N = COLLANA.gemme.length;
+  for (let i = 0; i < N; i++) {
+    const S = COLLANA.gemme[i];
+    const ang = (-90 + i * 360 / N) * Math.PI / 180;
+    const x = 150 + Math.cos(ang) * 138.2;
+    const y = 150 + Math.sin(ang) * 138.2;
+    const glu = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    glu.setAttribute('transform', 'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')');
+    if (S.poi_id === nuovaPietra) glu.setAttribute('class', 'nasce');
+    glu.innerHTML = '<circle r="4.4" fill="' + colorePietra(S.poi_id || S.nome) + '" stroke="#241708" stroke-width="1.1" />' +
+                    '<circle r="1.5" cx="-1.1" cy="-1.3" fill="rgba(255,246,220,.6)" />';
+    g.appendChild(glu);
+  }
+  aggiornaLivelloCollana();
+}
+
+// il titolo dell'anima sotto la legenda: cresce col numero di pietre
+function aggiornaLivelloCollana() {
+  const el = document.getElementById('collana-livello');
+  if (!el) return;
+  const n = COLLANA.gemme.length;
+  const conteggio = n === 1 ? t('contaPietra') : t('contaPietre');
+  el.textContent = titoloCollana(n) + ' · ' + n + ' ' + conteggio;
 }
 
 // ===== LA COLLEZIONE =====
