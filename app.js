@@ -49,6 +49,20 @@
 // ("The needle" in inglese), coerente col canone di V8.36: la lancetta
 // è una. (Segnalazione di Carlo, 25/11 sera.)
 
+// V8.41 — IL CUSTODE SI MOSTRA (25/11, seconda notte): guardata dal telefono,
+// la fiammella aveva tre difetti e Carlo li ha visti in un colpo solo: le
+// pietre sulla cornice erano bruscolini, il racconto era in corpo mosca, e al
+// posto del volto c'era un'emoji. E i due bottoni non dicevano la verità:
+// "Ricevi la parola" era il congedo travestito (adesso si chiama "Riprendi
+// il cammino" e fa quello che dice), e la fiammella diceva parole nuove che
+// l'occhio non vedeva cambiare: ora la parola nuova ENTRA nel foglio
+// (rinnova), e sotto il racconto è scritto quante parole il custode
+// custodisce. Le pietre crescono (raggio 7), il racconto respira (19px, 21
+// sul telefono), il titolo dell'anima pure, e ogni custode ha il suo
+// RITRATTO inciso dal nome: luna, stelle, pini e fiammella nella notte blu
+// e oro di Pyxis. Stesso spirito, stessa incisione, per tutte le anime.
+// (Idea di Carlo, 25/11 notte.)
+
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l\'ago grande punta il luogo NEL MONDO REALE:
@@ -1397,22 +1411,74 @@ function mostraStella(nomePoi, stelle, custode, poiId) {
 // del posto: narra la leggenda in prima persona. Testo statico che arriva col
 // check-in dal server: nessuna posizione, nessun dato nuovo, solo la voce
 // antica che ti sei guadagnato posando la stella.
+// V8.41 — IL RITRATTO DEL CUSTODE: ogni custode ha il suo volto inciso, e il
+// volto nasce dal suo nome (improntaDelLuogo): stesso spirito, stessa
+// incisione, per tutte le anime, come il colore delle pietre. Notte blu e
+// oro di Pyxis: luna, stelle, pini del margine e la fiammella che parla.
+function ritrattoCustode(nomeCustode) {
+  const s = improntaDelLuogo(String(nomeCustode || 'spirito'));
+  let stelle = '';
+  for (let k = 0; k < 7; k++) {
+    const sx = 14 + ((s * 7 + k * 61) % 272);
+    const sy = 10 + ((s + k * 23) % 38);
+    stelle += '<circle cx="' + sx + '" cy="' + sy + '" r="' + (k % 3 === 0 ? 1.5 : 1) + '" fill="#e8cd85" opacity=".85"/>';
+  }
+  const lunaX = 88 + (s % 6) * 12;
+  const luna = '<path d="M' + lunaX + ' 30 A14,14 0 1,0 ' + lunaX + ' 58 A18,18 0 0,1 ' + lunaX + ' 30 Z" fill="#e8cd85" opacity=".92"/>';
+  const collina = '<path d="M0,112 Q75,100 150,108 T300,104 L300,140 L0,140 Z" fill="#0a0e18"/>';
+  let pini = '';
+  const nPini = 4 + (s % 3);
+  for (let i = 0; i < nPini; i++) {
+    const px = Math.round(10 + ((s * 13 + i * 47) % 280));
+    const ph = 14 + ((s + i * 31) % 15);
+    pini += '<polygon points="' + px + ',' + (112 - ph) + ' ' + (px - ph * 0.38).toFixed(1) + ',112 ' + (px + ph * 0.38).toFixed(1) + ',112" fill="#060911"/>';
+  }
+  // la fiammella in primo piano: è lei che parla, quando l'anima chiede ancora
+  const fx = Math.round(228 + (s % 3) * 12);
+  const fiamma = '<g class="fiamma-custode">' +
+    '<circle cx="' + fx + '" cy="102" r="22" fill="rgba(232,205,133,.16)"/>' +
+    '<path d="M' + fx + ',92 C' + (fx - 8) + ',100 ' + (fx - 6) + ',109 ' + fx + ',116 C' + (fx + 6) + ',109 ' + (fx + 8) + ',100 ' + fx + ',92 Z" fill="#e8cd85"/>' +
+    '<path d="M' + fx + ',100 C' + (fx - 3.5) + ',105 ' + (fx - 2.5) + ',111 ' + fx + ',116 C' + (fx + 2.5) + ',111 ' + (fx + 3.5) + ',105 ' + fx + ',100 Z" fill="#fff6dc" opacity=".9"/>' +
+    '</g>';
+  const cornice = '<rect x="4" y="4" width="292" height="132" rx="6" fill="none" stroke="#8a6a3a" stroke-width="1.6"/>' +
+    '<rect x="9" y="9" width="282" height="122" rx="4" fill="none" stroke="#b8963e" stroke-width=".8" opacity=".55"/>';
+  const cielo = '<defs><linearGradient id="notte-ritratto" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#141c33"/><stop offset=".6" stop-color="#0d1222"/><stop offset="1" stop-color="#090c15"/>' +
+    '</linearGradient></defs>' +
+    '<rect x="0" y="0" width="300" height="140" rx="8" fill="url(#notte-ritratto)"/>';
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 140" preserveAspectRatio="xMidYMid meet" role="img">' +
+    cielo + stelle + luna + collina + pini + fiamma + cornice + '</svg>';
+}
+
 function mostraCustode(custode, nomePoi, poiId) {
   document.getElementById('custode-nome').textContent = custode.nome;
   document.getElementById('custode-luogo').textContent = 'il custode di ' + nomePoi;
   document.getElementById('custode-racconto').textContent = custode.racconto || '';
+  // V8.41: il volto del custode, inciso dal suo nome (stessa incisione per tutti)
+  const ritratto = document.getElementById('custode-ritratto');
+  if (ritratto) ritratto.innerHTML = ritrattoCustode(custode.nome);
   const m = document.getElementById('modale-custode');
   if (!m) return;
   // V8.21, secondo giro — LA FIAMMELLA RISPONDE: il custode è ricontattabile.
   // Se ha più di un racconto, l\'anima può chiedere ancora da qui, senza
   // rifare il giro del mondo: il bottone nasce al volo nella modale.
   const box = m.querySelector('.modale-box');
+  // V8.41: l'utilità della fiammella, detta chiara sotto il racconto
+  const parole = document.getElementById('custode-parole');
+  if (parole) {
+    const tot = custode.totale || 1;
+    parole.textContent = tot === 2 ? 'il custode custodisce due parole' : tot === 3 ? 'il custode custodisce tre parole' : 'il custode custodisce ' + tot + ' parole';
+    parole.style.display = tot > 1 ? '' : 'none';
+  }
+  // V8.41: il congedo ha smesso i panni del "ricevi" e fa quello che dice
+  const btnVia = document.getElementById('btn-custode-via');
+  if (btnVia) btnVia.textContent = 'Riprendi il cammino';
   let btnAncora = document.getElementById('custode-ancora');
   if (!btnAncora) {
     btnAncora = document.createElement('button');
     btnAncora.id = 'custode-ancora';
     btnAncora.className = 'btn-modale fantasma';
-    btnAncora.textContent = '🕯️ Chiedi ancora alla fiammella';
+    btnAncora.textContent = '🕯️ Un\'altra parola';
     box.insertBefore(btnAncora, document.getElementById('btn-custode-via'));
   }
   btnAncora.style.display = (custode.totale && custode.totale > 1) ? '' : 'none';
@@ -1422,7 +1488,14 @@ function mostraCustode(custode, nomePoi, poiId) {
       .then(r => r.json())
       .then(d => {
         btnAncora.disabled = false;
-        if (d.ok && d.custode) { document.getElementById('custode-racconto').textContent = d.custode.racconto || ''; }
+        if (d.ok && d.custode) {
+          // V8.41: la parola nuova ENTRA nel foglio, così l'occhio se ne accorge
+          const rac = document.getElementById('custode-racconto');
+          rac.classList.remove('rinnova');
+          rac.textContent = d.custode.racconto || '';
+          void rac.offsetWidth;   // respiro: l'animazione riparte davvero
+          rac.classList.add('rinnova');
+        }
         else { alert(d.error || 'La fiammella esita: riprova.'); }
       })
       .catch(e => {
@@ -1491,8 +1564,8 @@ function disegnaCollana(nuovaPietra) {
     const glu = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     glu.setAttribute('transform', 'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')');
     if (S.poi_id === nuovaPietra) glu.setAttribute('class', 'nasce');
-    glu.innerHTML = '<circle r="4.4" fill="' + colorePietra(S.poi_id || S.nome) + '" stroke="#241708" stroke-width="1.1" />' +
-                    '<circle r="1.5" cx="-1.1" cy="-1.3" fill="rgba(255,246,220,.6)" />';
+    glu.innerHTML = '<circle r="7" fill="' + colorePietra(S.poi_id || S.nome) + '" stroke="#241708" stroke-width="1.4" />' +
+                    '<circle r="2.3" cx="-1.6" cy="-1.9" fill="rgba(255,246,220,.65)" />';
     g.appendChild(glu);
   }
   aggiornaLivelloCollana();
