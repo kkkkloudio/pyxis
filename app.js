@@ -72,6 +72,16 @@
 // custode custodisce tre parole" resta, perché dice all'anima che vale la
 // pena tornare. (Idea di Carlo, 25/11 notte.)
 
+// V8.43 — LE PIETRE FANNO MAGIA + IL GRADO È MASCHILE (25/11, quarto giro):
+// Carlo: le pietre eran troppo piccole e per niente magiche, e il grado
+// "cercatrice di luoghi" non va bene al femminile: per l'utente si usano
+// sempre termini neutri o maschili, grammatica italiana. Le gemme crescono
+// (raggio 8.6) e prendono alone tenue, riflesso interno, lume e scintilla,
+// con un velo d'oro CSS intorno al gruppo: pietre incastonate, non puntini.
+// I titoli 1-4 e 5-9 diventano "cercatore di luoghi" e "pellegrino".
+// "Nuova anima" resta: l'anima è la parola del gioco per tutti, maschi
+// e femmine. (Idea di Carlo, 25/11 notte, quarto giro.)
+
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l\'ago grande punta il luogo NEL MONDO REALE:
@@ -203,8 +213,8 @@ const TESTI = {
     collezioneSub: "le stelle raccolte sui luoghi di potere",
     // LA COLLANA SUL QUADRANTE: il titolo dell'anima cresce con le pietre raccolte
     livelloNuovaAnima: "nuova anima",
-    livelloCercatrice: "cercatrice di luoghi",
-    livelloPellegrina: "pellegrina",
+    livelloCercatrice: "cercatore di luoghi",
+    livelloPellegrina: "pellegrino",
     livelloViandante: "viandante dei sentieri",
     livelloCustode: "custode dei sentieri",
     contaPietra: "pietra sulla cornice",
@@ -1541,8 +1551,11 @@ function disegnaCollana(nuovaPietra) {
     const glu = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     glu.setAttribute('transform', 'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')');
     if (S.poi_id === nuovaPietra) glu.setAttribute('class', 'nasce');
-    glu.innerHTML = '<circle r="7" fill="' + colorePietra(S.poi_id || S.nome) + '" stroke="#241708" stroke-width="1.4" />' +
-                    '<circle r="2.3" cx="-1.6" cy="-1.9" fill="rgba(255,246,220,.65)" />';
+    glu.innerHTML = '<circle r="14" fill="' + colorePietra(S.poi_id || S.nome) + '" opacity=".16" />' +
+                    '<circle r="8.6" fill="' + colorePietra(S.poi_id || S.nome) + '" stroke="#241708" stroke-width="1.4" />' +
+                    '<circle r="5.8" fill="none" stroke="rgba(255,246,220,.4)" stroke-width="1" />' +
+                    '<circle r="2.6" cx="-2.2" cy="-2.6" fill="rgba(255,252,235,.85)" />' +
+                    '<circle r=".9" cx="2.6" cy="2.8" fill="rgba(255,252,235,.5)" />';
     g.appendChild(glu);
   }
   aggiornaLivelloCollana();
