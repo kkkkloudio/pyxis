@@ -63,6 +63,15 @@
 // e oro di Pyxis. Stesso spirito, stessa incisione, per tutte le anime.
 // (Idea di Carlo, 25/11 notte.)
 
+// V8.42 — UNA PAROLA ALLA VOLTA (25/11, terzo giro): Carlo ha chiesto di
+// togliere il bottone "Un'altra parola" dalla modale della fiammella: la
+// parola si guadagna col ritorno, non col bottone. Il racconto ruota al
+// prossimo check-in (ascolti 1-2-3-1, il SERVER tiene il conto): prima si
+// torna, poi lo spirito parla. Con il bottone se ne va anche l'animazione
+// "rinnova" (e il suo CSS): era la sua sola via d'ingresso. La riga "il
+// custode custodisce tre parole" resta, perché dice all'anima che vale la
+// pena tornare. (Idea di Carlo, 25/11 notte.)
+
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l\'ago grande punta il luogo NEL MONDO REALE:
@@ -1459,10 +1468,8 @@ function mostraCustode(custode, nomePoi, poiId) {
   if (ritratto) ritratto.innerHTML = ritrattoCustode(custode.nome);
   const m = document.getElementById('modale-custode');
   if (!m) return;
-  // V8.21, secondo giro — LA FIAMMELLA RISPONDE: il custode è ricontattabile.
-  // Se ha più di un racconto, l\'anima può chiedere ancora da qui, senza
-  // rifare il giro del mondo: il bottone nasce al volo nella modale.
-  const box = m.querySelector('.modale-box');
+  // V8.42: la fiammella non si interroga più dalla modale: la parola nuova
+  // arriva al prossimo check-in, la rotazione la custodisce il server.
   // V8.41: l'utilità della fiammella, detta chiara sotto il racconto
   const parole = document.getElementById('custode-parole');
   if (parole) {
@@ -1473,36 +1480,6 @@ function mostraCustode(custode, nomePoi, poiId) {
   // V8.41: il congedo ha smesso i panni del "ricevi" e fa quello che dice
   const btnVia = document.getElementById('btn-custode-via');
   if (btnVia) btnVia.textContent = 'Riprendi il cammino';
-  let btnAncora = document.getElementById('custode-ancora');
-  if (!btnAncora) {
-    btnAncora = document.createElement('button');
-    btnAncora.id = 'custode-ancora';
-    btnAncora.className = 'btn-modale fantasma';
-    btnAncora.textContent = '🕯️ Un\'altra parola';
-    box.insertBefore(btnAncora, document.getElementById('btn-custode-via'));
-  }
-  btnAncora.style.display = (custode.totale && custode.totale > 1) ? '' : 'none';
-  btnAncora.onclick = function () {
-    btnAncora.disabled = true;
-    fetch(API + '/api/custode?poi_id=' + encodeURIComponent(poiId) + '&utente_id=' + encodeURIComponent(utente.id))
-      .then(r => r.json())
-      .then(d => {
-        btnAncora.disabled = false;
-        if (d.ok && d.custode) {
-          // V8.41: la parola nuova ENTRA nel foglio, così l'occhio se ne accorge
-          const rac = document.getElementById('custode-racconto');
-          rac.classList.remove('rinnova');
-          rac.textContent = d.custode.racconto || '';
-          void rac.offsetWidth;   // respiro: l'animazione riparte davvero
-          rac.classList.add('rinnova');
-        }
-        else { alert(d.error || 'La fiammella esita: riprova.'); }
-      })
-      .catch(e => {
-        btnAncora.disabled = false;
-        alert('La fiammella non risponde: ' + e.message);
-      });
-  };
   m.classList.remove('nascosto');
 }
 
