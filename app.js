@@ -34,6 +34,16 @@
 // altrimenti il rientro silenzioso non riconosceva l'anima.
 
 
+// V8.38 — IL CIELO INCERTO: secondo giorno di test bocciato, la lezione più
+// importante: Carlo a casa sua (Rovigo) e il telefono che giura "Pare che tu
+// sia a Bologna". Lo stivale era innocente (verificato punto per punto: San
+// Pio e tutti i dintorni dicono Rovigo, e per dire Bologna il telefono deve
+// riportare una posizione a oltre 30 km da casa sua): era il GPS che, in casa,
+// risponde col Wi-Fi e sbaglia di decine di km. Da ora la bussola diffida:
+// se il telefono stesso dichiara un'incertezza oltre 10 km, la porta non si
+// propone e non si cambia, e il sussurro lo dice chiaro. L'incertezza è
+// coords.accuracy, vive solo sul telefono come tutto il resto.
+
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l\'ago grande punta il luogo NEL MONDO REALE:
@@ -136,6 +146,7 @@ const TESTI = {
     trovaPorta: "🧭 la bussola trova la porta",
     portaTrovata: "sussurra la bussola: {p} — conferma la porta, o cambiala",
     portaMuta: "la bussola non sente il cielo: scegli la porta a mano",
+    cieloIncerto: "il cielo è troppo incerto (±{km} km): scegli la porta a mano",
     tempoPasseggiata: "una passeggiata",
     tempoCammino: "un bel cammino",
     tempoPellegrinaggio: "pellegrinaggio: gran camminata",
@@ -204,6 +215,7 @@ const TESTI = {
     trovaPorta: "🧭 let the compass find the gate",
     portaTrovata: "the compass whispers: {p} — confirm the gate, or change it",
     portaMuta: "the compass cannot hear the sky: pick the gate by hand",
+    cieloIncerto: "the sky is too unsure (±{km} km): pick the gate by hand",
     tempoPasseggiata: "a stroll",
     tempoCammino: "a fair walk",
     tempoPellegrinaggio: "a pilgrimage: a grand walk",
@@ -496,6 +508,9 @@ function autoPorta() {
   if (!seq || !Array.isArray(seq) || seq.length !== 4 || seq.some(function (el) { return !el; })) return; // senza parola non si cambia porta
   const password = seq.join('-');
   navigator.geolocation.getCurrentPosition(function (pos) {
+    // V8.38: stessa diffidenza dello scrigno: il cielo incerto non cambia porte.
+    const acc = (pos.coords && typeof pos.coords.accuracy === 'number' && !isNaN(pos.coords.accuracy)) ? pos.coords.accuracy : null;
+    if (acc === null || acc > 10000) return;
     const porta = trovaProvincia(pos.coords.latitude, pos.coords.longitude);
     if (!porta || porta === utente.provincia) return;
     fetch(API + '/api/register', {
@@ -1031,6 +1046,7 @@ function aggiornaSussurro(stato, porta) {
   if (!s) return;
   if (stato === 'trovata') s.textContent = t('portaTrovata').replace('{p}', porta);
   else if (stato === 'muta') s.textContent = t('portaMuta');
+  else if (stato === 'incerto') s.textContent = t('cieloIncerto').replace('{km}', porta);
   else s.textContent = '';
 }
 
@@ -1042,8 +1058,18 @@ function localizzami() {
   aggiornaSussurro('', null); // si riparte col pulito mentre il cielo ascolta
   navigator.geolocation.getCurrentPosition(function (pos) {
     // la posizione VIVE in questa funzione e muore qui: pietra angolare
-    const porta = trovaProvincia(pos.coords.latitude, pos.coords.longitude);
+    // V8.38: il telefono dice anche QUANTO è incerto (accuracy, in metri).
+    // Se l'incertezza supera i 10 km, il cielo non vale niente: in casa il
+    // GPS spesso risponde col Wi-Fi e sbaglia di decine di km (Carlo a
+    // Rovigo si è visto proporre Bologna). Meglio il silenzio che la bugia.
+    const acc = (pos.coords && typeof pos.coords.accuracy === 'number' && !isNaN(pos.coords.accuracy)) ? pos.coords.accuracy : null;
     btn.disabled = false;
+    if (acc === null || acc > 10000) {
+      ultimaPortaTrovata = null;
+      aggiornaSussurro('incerto', acc === null ? '?' : Math.round(acc / 1000));
+      return;
+    }
+    const porta = trovaProvincia(pos.coords.latitude, pos.coords.longitude);
     if (!porta) { aggiornaSussurro('muta', null); return; }
     const sel = document.getElementById('provincia');
     if (sel) sel.value = porta;   // presente, non imposta: chi vuole un'altra porta la scegli
