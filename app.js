@@ -82,6 +82,17 @@
 // "Nuova anima" resta: l'anima è la parola del gioco per tutti, maschi
 // e femmine. (Idea di Carlo, 25/11 notte, quarto giro.)
 
+// V8.44 — LA BUSSOLA STA NELLO SCHERMO (26/11): guardata dal telefono vero
+// la bussola sforava i bordi laterali (il fattore di scala superava il vetro,
+// cornice e pietra finivano tagliate) e la colonna della notte, centrata
+// com'era, copriva la testa in alto e inchiodava sotto la nota della privacy
+// sopra i bottoni: scritte una sopra l'altra. Tre cure: il riquadro del
+// disegno lascia respirare l'alone delle pietre (overflow visibile), la
+// scala della bussola si misura sul vetro del telefono e si ricalcola a ogni
+// suo giro (mai piu' larga dello schermo meno l'aria dei lati), e la colonna
+// parte dall'alto e scorre fino in fondo, con la nota scesa in fondo al
+// flusso. (Segnalazione di Carlo, 26/11 pomeriggio, screenshot dal campo.)
+
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l\'ago grande punta il luogo NEL MONDO REALE:
@@ -1596,6 +1607,22 @@ async function apriCollezione() {
     alert('La collezione non risponde (server non raggiungibile): ' + e.message);
   }
 }
+
+// ===== V8.44: LA BUSSOLA STA NELLO SCHERMO =====
+// Il fattore dei fogli di stile resta quello che e', ma decide il vetro del
+// telefono: la bussola non e' mai piu' larga dello schermo meno l'aria dei
+// lati, cosi' la cornice e le pietre incastonate non finiscono mai fuori.
+function bussolaStaNelloSchermo() {
+  const wrap = document.querySelector('.bussola-wrap');
+  if (!wrap) return;
+  wrap.style.removeProperty('--k');
+  const k = parseFloat(getComputedStyle(wrap).getPropertyValue('--k'));
+  if (!k || !isFinite(k)) return;
+  const kMax = (window.innerWidth - 36) / 300;   // l'aria ai lati: 18px per lato
+  if (k > kMax) wrap.style.setProperty('--k', kMax.toFixed(3));
+}
+window.addEventListener('resize', bussolaStaNelloSchermo);
+bussolaStaNelloSchermo();
 
 // ===== IL CORVO =====
 
