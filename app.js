@@ -114,6 +114,15 @@
 // sicura). Dalla lista dell'icona sparisce la fila di PNG: resta l'SVG, che
 // il telefono scala come vuole. (Idea di Carlo, 26/11 sera.)
 
+// V8.47 — LA LANCETTA PUNTA IL NUOVO (26/11 sera): presa la pietra, il luogo gia'
+// visitato restava sotto la lancetta grande, e l'anima non sapeva dove andare.
+// Ora la grande punta SEMPRE un luogo nuovo da esplorare (il server non ripete
+// mai i gia' visitati), e accanto a lei nasce la SECONDA lancetta, quella del
+// ricordo: ago d'ambra che indica l'ultimo luogo dove la stella si e' posata.
+// La legenda dice la verita' come sempre: "La lancetta" finche' il ricordo non
+// c'e', "Le lancette" da che c'e'. E l'ago toccato smette di dire "undefined":
+// i detti degli aghi ora sono chiavi vere del dizionario. (Idea di Carlo, 26/11.)
+
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l\'ago grande punta il luogo NEL MONDO REALE:
@@ -196,9 +205,11 @@ const TESTI = {
     subDueCose: "tre cose bastano, poi la bussola gira",
     privacyIscrizione: "nessuna via da scegliere · nessun nome vero · nessuna email · la posizione non lascia mai il telefono",
     legendaTitolo: "La lancetta",
-    dettGrande: "luogo di potere più vicino",
+    legendaTitoloDue: "Le lancette",
+    dettGrande: "il prossimo luogo da esplorare",
     dettMedia: "anima più vicina",
     dettPiccola: "seconda anima",
+    dettEsplorato: "luogo già esplorato",
     visita: "✨ Il luogo è raggiunto",
     collezione: "la collezione — le stelle raccolte",
     piazza: "la piazza — le voci di tutte le anime",
@@ -228,6 +239,7 @@ const TESTI = {
     dettoGrande: "il luogo di potere",
     dettoMedia: "l\'anima più vicina",
     dettoPiccola: "la seconda anima",
+    dettoEsplorato: "il luogo già esplorato",
     portaCaption: " — girati finché l\'ago entra nella porta",
     cerchio: "sei nel cerchio del luogo — la stella può posarsi",
     kmLuogo: " km al luogo · segui la lancetta",
@@ -274,9 +286,11 @@ const TESTI = {
     subDueCose: "three things are enough, then the compass turns",
     privacyIscrizione: "no road to choose · no real name · no email · the position never leaves your phone",
     legendaTitolo: "The needle",
-    dettGrande: "nearest place of power",
+    legendaTitoloDue: "The needles",
+    dettGrande: "the next place to explore",
     dettMedia: "nearest soul",
     dettPiccola: "second soul",
+    dettEsplorato: "already explored place",
     visita: "✨ The place is reached",
     collezione: "the collection — stars gathered",
     piazza: "the square — voices of all souls",
@@ -306,6 +320,7 @@ const TESTI = {
     dettoGrande: "the place of power",
     dettoMedia: "the nearest soul",
     dettoPiccola: "the second soul",
+    dettoEsplorato: "the explored place",
     portaCaption: " — turn until the needle enters the door",
     cerchio: "you are inside the place\'s circle — the star can settle",
     kmLuogo: " km to the place · follow the needle",
@@ -364,11 +379,12 @@ function applicaLingua() {
   set('.privacy', 'privacyIscrizione');
 
   // legenda
-  set('.legenda-titolo', 'legendaTitolo');
+  aggiornaTitoloLegenda();   // V8.47: "La lancetta" o "Le lancette", come le vede l'anima
   if (typeof aggiornaLivelloCollana === 'function') aggiornaLivelloCollana();
   set('.legenda-item[data-tipo="grande"] .dett', 'dettGrande');
   set('.legenda-item[data-tipo="media"] .dett', 'dettMedia');
   set('.legenda-item[data-tipo="piccola"] .dett', 'dettPiccola');
+  set('.legenda-item[data-tipo="esplorato"] .dett', 'dettEsplorato');
 
   // bottoni
   const sveglia = document.getElementById('btn-sveglia');
@@ -636,9 +652,10 @@ function aggiornaLancette(l, totale) {
   const itemG = document.querySelector('.legenda-item[data-tipo="grande"]');
   const itemM = document.querySelector('.legenda-item[data-tipo="media"]');
   const itemP = document.querySelector('.legenda-item[data-tipo="piccola"]');
+  const itemE = document.querySelector('.legenda-item[data-tipo="esplorato"]');   // V8.47: la riga del ricordo
   const btnVisita = document.getElementById('btn-visita');
 
-  INFO_AGO.grande = null; INFO_AGO.media = null; INFO_AGO.piccola = null;
+  INFO_AGO.grande = null; INFO_AGO.media = null; INFO_AGO.piccola = null; INFO_AGO.esplorato = null;
 
   // GRANDE: il luogo di potere (POI)
   if (l.grande) {
@@ -667,6 +684,24 @@ function aggiornaLancette(l, totale) {
     if (dlLuogo) dlLuogo.textContent = '';
     if (btnVisita) btnVisita.disabled = true;
   }
+
+  // ESPLORATO (V8.47): il luogo dove l'anima ha gia' posato la stella. La
+  // lancetta grande non lo punta piu': il ricordo ha la sua, d'ambra.
+  if (l.esplorato) {
+    let angolo = l.esplorato.angolo;
+    if (BVERA.pos && l.esplorato.lat != null && l.esplorato.lon != null) {
+      angolo = rottaVera(BVERA.pos.lat, BVERA.pos.lon, l.esplorato.lat, l.esplorato.lon);
+    }
+    puntaLancetta('esplorato', angolo);
+    itemE.style.display = '';
+    itemE.querySelector('.nome').textContent = l.esplorato.nome;
+    itemE.querySelector('.dett').textContent = t('dettEsplorato');
+    INFO_AGO.esplorato = { nome: l.esplorato.nome };
+  } else {
+    itemE.style.display = 'none';
+    spegniLancetta('esplorato');
+  }
+  aggiornaTitoloLegenda();
 
   // MEDIA: l\'anima più vicina (destinataria del corvo)
   if (l.media) {
@@ -706,13 +741,13 @@ function aggiornaLancette(l, totale) {
 // ===== TOCCA L\'AGO (V8.8): chi stai puntando? =====
 // Tocchi un ago (o la sua riga in legenda): lui si presenta nella didascalia,
 // gli altri due si abbassano. Lo tocchi ancora e tutto torna com\'era.
-const INFO_AGO = { grande:null, media:null, piccola:null };
+const INFO_AGO = { grande:null, media:null, piccola:null, esplorato:null }; // V8.47: anche il ricordo
 let agoSelezionato = null;
-const COLORI_AGO = { grande:'#d98a6a', media:'#7cc9a2', piccola:'#8ab0e0' };
-const DETTI_AGO  = { grande:'il luogo di potere', media:'l\'anima più vicina', piccola:'la seconda anima' };
+const COLORI_AGO = { grande:'#d98a6a', media:'#7cc9a2', piccola:'#8ab0e0', esplorato:'#b89a5e' }; // V8.47: l'ambra del ricordo
+const DETTI_AGO  = { grande:'dettoGrande', media:'dettMedia', piccola:'dettPiccola', esplorato:'dettoEsplorato' }; // V8.47: chiavi vere: prima l'ago toccato diceva "undefined"
 
 function selezionaAgo(tipo) {
-  if (tipo === 'media' || tipo === 'piccola') return; // anime vicine: in futuro
+  if (tipo !== 'grande' && tipo !== 'esplorato') return; // V8.47: si presentano il luogo nuovo e il ricordo
   if (!tipo) return;
   agoSelezionato = (agoSelezionato === tipo) ? null : tipo;
   document.querySelectorAll('.legenda-item').forEach(i =>
@@ -722,13 +757,22 @@ function selezionaAgo(tipo) {
 }
 
 function aggiornaVisibilitaAghi() {
-  ['grande','media','piccola'].forEach(tipo => {
+  ['grande','media','piccola','esplorato'].forEach(tipo => {
     const el = document.querySelector('.lancetta.' + tipo);
     if (!el) return;
     const presente = VIVA.aghi[tipo] && VIVA.aghi[tipo].bersaglio != null;
     if (agoSelezionato) el.style.opacity = (tipo === agoSelezionato) ? '1' : '0.12';
     else el.style.opacity = presente ? '1' : '0.1';
   });
+}
+
+// V8.47 — IL TITOLO DELLA LEGENDA DICE LA VERITA': "La lancetta" finche' c'e'
+// solo il luogo nuovo, "Le lancette" da che il ricordo ha la sua ambra.
+function aggiornaTitoloLegenda() {
+  const lt = document.querySelector('.legenda-titolo');
+  if (!lt) return;
+  const itemE = document.querySelector('.legenda-item[data-tipo="esplorato"]');
+  lt.textContent = t(itemE && itemE.style.display !== 'none' ? 'legendaTitoloDue' : 'legendaTitolo');
 }
 
 function aggiornaCaption() {
@@ -766,8 +810,8 @@ const VIVA = { avviata:false, ferma:false, tPrec:null, aghi:{} };
 function avviaBussolaViva() {
   if (VIVA.avviata) return;
   VIVA.avviata = true;
-  const partenza = { grande:-50, media:40, piccola:160 }; // gli angoli disegnati nel CSS
-  ['grande','media','piccola'].forEach(tipo => {
+  const partenza = { grande:-50, media:40, piccola:160, esplorato:210 }; // gli angoli disegnati nel CSS
+  ['grande','media','piccola','esplorato'].forEach(tipo => {
     const el = document.querySelector('.lancetta.' + tipo);
     if (!el) return;
     VIVA.aghi[tipo] = {
@@ -1428,6 +1472,7 @@ function checkIn() {
         }
         mostraStella(data.nome, data.stelle, data.custode, poiCorrente.id);
         caricaCollana(poiCorrente.id); // la pietra si incastona ora
+        caricaLancette(); // V8.47: la grande si gira verso il prossimo luogo, il ricordo resta
       })
       .catch(e => {
         btn.disabled = false;
