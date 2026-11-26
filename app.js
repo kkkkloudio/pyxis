@@ -93,6 +93,17 @@
 // parte dall'alto e scorre fino in fondo, con la nota scesa in fondo al
 // flusso. (Segnalazione di Carlo, 26/11 pomeriggio, screenshot dal campo.)
 
+// V8.45 — NESSUNA PIETRA DIETRO LA PORTA (26/11 sera): la cura del quinto giro
+// aveva ristretto la bussola per farla stare nel vetro, e dal vivo sembrava
+// spentina: Carlo la vuole di nuovo GRANDE. La scala torna a occupare quasi
+// tutto il vetro (aria di 10px per lato, i margini del telefono si stringono
+// da 14 a 10): sono gli aloni delle pietre a guadagnare i pochi pixel che
+// mancano, non il vetro a tagliarli. E la prima pietra nasceva esattamente
+// DIETRO LA PORTA d'ottone (il giro della collana partiva a mezzogiorno,
+// dove sta il triangolo): ora il giro parte accanto alla porta (ore 1
+// circa) e nessuna pietra, a nessuna raccolta, puo' mai finire nella
+// finestra della porta. (Segnalazione di Carlo, 26/11 sera, sesto giro.)
+
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l\'ago grande punta il luogo NEL MONDO REALE:
@@ -1556,7 +1567,10 @@ function disegnaCollana(nuovaPietra) {
   const N = COLLANA.gemme.length;
   for (let i = 0; i < N; i++) {
     const S = COLLANA.gemme[i];
-    const ang = (-90 + i * 360 / N) * Math.PI / 180;
+    let gradi = -60 + i * 360 / N;               // V8.45: il giro parte accanto alla porta, non sotto
+    gradi = ((gradi % 360) + 360) % 360;           // porta d'ottone a ore 12 (270 su 0-360)
+    if (Math.abs(gradi - 270) < 16) gradi += 26;   // mai una pietra dietro la porta
+    const ang = gradi * Math.PI / 180;
     const x = 150 + Math.cos(ang) * 138.2;
     const y = 150 + Math.sin(ang) * 138.2;
     const glu = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -1618,7 +1632,7 @@ function bussolaStaNelloSchermo() {
   wrap.style.removeProperty('--k');
   const k = parseFloat(getComputedStyle(wrap).getPropertyValue('--k'));
   if (!k || !isFinite(k)) return;
-  const kMax = (window.innerWidth - 36) / 300;   // l'aria ai lati: 18px per lato
+  const kMax = (window.innerWidth - 20) / 300;   // V8.45: aria di 10px per lato, il resto del vetro e' della bussola
   if (k > kMax) wrap.style.setProperty('--k', kMax.toFixed(3));
 }
 window.addEventListener('resize', bussolaStaNelloSchermo);
