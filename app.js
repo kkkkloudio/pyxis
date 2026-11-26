@@ -104,6 +104,16 @@
 // circa) e nessuna pietra, a nessuna raccolta, puo' mai finire nella
 // finestra della porta. (Segnalazione di Carlo, 26/11 sera, sesto giro.)
 
+// V8.46 — L'ICONA SUL TELEFONO (26/11 sera): chi aggiungeva Pyxis alla home
+// di Android si trovava la lettera bianca improvisata dal browser, perche'
+// index.html non collegava MAI il manifest che pure vive nel repo. Ora il
+// manifest e' dichiarato nell'head, e con lui l'icona NUOVA disegnata nella
+// notte di Pyxis: bussola d'ottone, gemma rossa della lancetta e porta in
+// alto, la stessa per tutte le anime, vettoriale e adatta anche alla
+// mascheratura circolare di Android (tutto il disegno dentro la zona
+// sicura). Dalla lista dell'icona sparisce la fila di PNG: resta l'SVG, che
+// il telefono scala come vuole. (Idea di Carlo, 26/11 sera.)
+
 // (V6: molle e attrito) — gli aghi cercano, sforano, si assestano, tremano.
 // (grande=POI, media=prima anima, piccola=seconda)
 // V8.8: sul telefono con i sensori, l\'ago grande punta il luogo NEL MONDO REALE:
