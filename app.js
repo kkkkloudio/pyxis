@@ -589,6 +589,7 @@ aggiornaPietre();
 function mostraBussola() {
   document.getElementById('schermata-iscrizione').classList.remove('attiva');
   document.getElementById('schermata-bussola').classList.add('attiva');
+  bussolaTornaSu(); // V8.48: si apre sempre dal cielo, mai da una pagina rimasta a meta'
   document.getElementById('sottotitolo-utente').textContent =
     utente.nome + ' · ' + utente.provincia;
   avviaBussolaViva(); // gli aghi prendono vita appena lo scrigno si apre
@@ -1681,13 +1682,26 @@ async function apriCollezione() {
 // Il fattore dei fogli di stile resta quello che e', ma decide il vetro del
 // telefono: la bussola non e' mai piu' larga dello schermo meno l'aria dei
 // lati, cosi' la cornice e le pietre incastonate non finiscono mai fuori.
+// V8.48 — LA BUSSOLA STA AL CENTRO: Carlo apre l'app e la bussola e'
+// schiacciata contro il cielo: titolo e porta d'ottone fuori vista, la
+// pagina era rimasta scorsa in basso. Due cure: chi apre la bussola
+// riporta sempre il vetro al principio (bussolaTornaSu), e il fattore
+// guarda anche l'ALTEZZA del vetro, non solo la larghezza: su schermi
+// corti il quadrante si stringe quel che serve, cosi' il cielo, il
+// titolo, la porta e la caption restano tutti nel primo sguardo.
+function bussolaTornaSu() {
+  const vetro = document.querySelector('.screen');
+  if (vetro) vetro.scrollTop = 0;   // mai partire con la testa fuori dal vetro
+}
 function bussolaStaNelloSchermo() {
   const wrap = document.querySelector('.bussola-wrap');
   if (!wrap) return;
   wrap.style.removeProperty('--k');
   const k = parseFloat(getComputedStyle(wrap).getPropertyValue('--k'));
   if (!k || !isFinite(k)) return;
-  const kMax = (window.innerWidth - 20) / 300;   // V8.45: aria di 10px per lato, il resto del vetro e' della bussola
+  const kMaxLargo = (window.innerWidth - 20) / 300;   // V8.45: aria di 10px per lato, il resto del vetro e' della bussola
+  const kMaxAlto = (window.innerHeight - 264) / 316;   // V8.48: sopra il quadrante stanno il cielo (56), titolo e sottotitolo (55), l'aria della porta (18); sotto, la caption con la sveglia e la carta (135); 316 = 300 di quadrante + 16 della porta che pende
+  const kMax = Math.max(0.5, Math.min(kMaxLargo, kMaxAlto));   // mai sotto mezzo: meglio una bussola piccola che una testa tagliata
   if (k > kMax) wrap.style.setProperty('--k', kMax.toFixed(3));
 }
 window.addEventListener('resize', bussolaStaNelloSchermo);
