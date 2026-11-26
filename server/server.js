@@ -58,6 +58,16 @@
 //        di là (Carlo a Modena vedeva ancora la Rotonda di Rovigo).
 //        Nessuna posizione Coinvolta: resta una porta dichiarata, come sempre.
 
+// V8.47 — LA LANCETTA PUNTA IL NUOVO (26/11 sera): presa la pietra, il luogo gia'
+// visitato non deve piu' influenzare la lancetta principale: l'anima si ritrovava
+// la bussola che continuava a indicare il posto gia' spogliato, senza sapere dove
+// andare. Ora GRANDE sceglie il prossimo luogo DA ESPLORARE della provincia (mai
+// gia' visitato: prima quello in evidenza, poi l'ordine stabile), e se la provincia
+// non ha piu' segreti l'ago tace. Con lei nasce la SECONDA lancetta, quella del
+// ricordo: indica l'ultimo luogo dove l'anima ha posato la stella. Pietra angolare
+// intatta: si legge solo la tabella visite, che il server gia' conosce dai check-in.
+// Nessuna posizione entra o esce, come sempre.
+
 const http = require('http');
 const { DatabaseSync } = require('node:sqlite');
 const crypto = require('crypto');
@@ -752,7 +762,8 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ---- GET /api/lancette?provincia=X&id=TUO ----
-  // Restituisce le 3 lancette: GRANDE=luogo di potere (POI), MEDIA=prima anima, PICCOLA=seconda anima
+  // Restituisce le lancette: GRANDE=prossimo luogo da esplorare (mai gia' visitato),
+  // ESPLORATO=ultimo luogo con la stella posata (V8.47), MEDIA=prima anima, PICCOLA=seconda anima
   if (path === '/api/lancette' && req.method === 'GET') {
     const provincia = url.searchParams.get('provincia');
     const mioId = url.searchParams.get('id');
@@ -769,10 +780,22 @@ const server = http.createServer(async (req, res) => {
       ORDER BY p.online_da ASC
     `).all(provincia, mioId || '', viva);
 
-    // Il luogo di potere della provincia: quello messo in evidenza, altrimenti
-    // il primo in ordine stabile. lat/lon servono al TELEFONO per il confronto
-    // del check-in: sono coordinate di luoghi pubblici, non la posizione dell\'utente.
-    const poi = db.prepare('SELECT id, nome, descrizione, provincia, lat, lon FROM poi WHERE provincia = ? ORDER BY evidenza DESC, id LIMIT 1').get(provincia);
+    // V8.47 — LA LANCETTA PUNTA IL NUOVO: la grande sceglie il prossimo luogo
+    // DA ESPLORARE della provincia (mai gia' visitato: prima quello in evidenza,
+    // poi l'ordine stabile). lat/lon servono al TELEFONO per il confronto del
+    // check-in: coordinate di luoghi pubblici, mai la posizione dell'utente.
+    // E accanto l'ULTIMO luogo gia' esplorato: la lancetta del ricordo.
+    const poi = db.prepare(`
+      SELECT id, nome, descrizione, provincia, lat, lon FROM poi
+      WHERE provincia = ? AND id NOT IN (SELECT poi_id FROM visite WHERE utente_id = ?)
+      ORDER BY evidenza DESC, id LIMIT 1
+    `).get(provincia, mioId || '');
+    const esplorato = db.prepare(`
+      SELECT p.id, p.nome, p.descrizione, p.provincia, p.lat, p.lon
+      FROM visite v JOIN poi p ON p.id = v.poi_id
+      WHERE v.utente_id = ?
+      ORDER BY v.visitato_il DESC LIMIT 1
+    `).get(mioId || '');
 
     // La rotta della lancetta grande: dal capoluogo della mia provincia
     // verso il luogo di potere. Luoghi pubblici, zero posizioni di persone.
@@ -780,6 +803,9 @@ const server = http.createServer(async (req, res) => {
     const angoloLuogo = (poi && mioRif && poi.lat != null && poi.lon != null)
       ? rotta(mioRif[0], mioRif[1], poi.lat, poi.lon)
       : 0; // geografia non ancora mappata: il luogo batte a nord
+    const angoloEsplorato = (esplorato && mioRif && esplorato.lat != null && esplorato.lon != null)
+      ? rotta(mioRif[0], mioRif[1], esplorato.lat, esplorato.lon)
+      : 0; // V8.47: il ricordo batte a nord finche' la geografia non e' mappata
 
     // Le anime: le più vicine ovunque (distanza tra capoluoghi, non tra persone).
     // Stessa provincia = distanza zero = nessuna rotta possibile: angolo d\'albergo.
@@ -804,6 +830,7 @@ const server = http.createServer(async (req, res) => {
       provincia,
       lancette: {
         grande: poi ? { ...poi, angolo: Math.round(angoloLuogo), tipo: 'poi' } : null,
+        esplorato: esplorato ? { ...esplorato, angolo: Math.round(angoloEsplorato), tipo: 'poi' } : null,
         media: conDistanza[0] ? { id: conDistanza[0].id, nome: conDistanza[0].nome, tipo: conDistanza[0].tipo, angolo: Math.round(angoloAnima(conDistanza[0], 90)) } : null,
         piccola: conDistanza[1] ? { id: conDistanza[1].id, nome: conDistanza[1].nome, tipo: conDistanza[1].tipo, angolo: Math.round(angoloAnima(conDistanza[1], 200)) } : null,
       },

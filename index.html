@@ -157,6 +157,8 @@
   .lancetta.grande { transform:rotate(-50deg); z-index:6; }
   .lancetta.media  { transform:rotate(40deg);  z-index:5; }
   .lancetta.piccola{ transform:rotate(160deg); z-index:7; }
+  .lancetta.esplorato { transform:rotate(210deg); z-index:5; }   /* V8.47: la lancetta del ricordo */
+  .lancetta.esplorato::after { height:calc(var(--k) * 100px); }
   .ago { position:absolute; bottom:-1px; border-radius:2px; pointer-events:none; }
   .gemma { pointer-events:none; }
   .ago-grande {
@@ -177,7 +179,13 @@
     clip-path:polygon(50% 0,90% 9%,78% 84%,50% 100%,22% 84%,10% 9%);
     filter:drop-shadow(0 0 2px rgba(0,0,0,.9)) drop-shadow(0 0 4px rgba(63,127,217,.35));
   }
-  /* perlin d'argilla in punta: granato (luogo di potere), smeraldo (anima vicina), zaffiro (seconda anima) */
+  .ago-esplorato {
+    left:calc(var(--k) * -3px); width:calc(var(--k) * 6px); height:calc(var(--k) * 84px); opacity:.9;
+    background:linear-gradient(to top,#4a3812 0%,#b89a5e 70%,#e8cd85 100%);
+    clip-path:polygon(50% 0,90% 9%,78% 84%,50% 100%,22% 84%,10% 9%);
+    filter:drop-shadow(0 0 2px rgba(0,0,0,.9)) drop-shadow(0 0 4px rgba(232,205,133,.35));
+  }
+  /* perlin d'argilla in punta: granato (luogo di potere), ambra del ricordo (gia' esplorato), smeraldo (anima vicina), zaffiro (seconda anima) */
   .gemma {
     position:absolute; border-radius:50%;
     border:1px solid #241a10;
@@ -196,6 +204,11 @@
   .gemma-piccola {
     left:calc(var(--k) * -5px); bottom:calc(var(--k) * 66px); width:calc(var(--k) * 11px); height:calc(var(--k) * 11px);
     background:radial-gradient(circle at 35% 30%, #7c9ec9, #3a5f9e 55%, #1c2c4e 100%);
+    box-shadow:inset 0 -1px 2px rgba(0,0,0,.35);
+  }
+  .gemma-esplorato {
+    left:calc(var(--k) * -5px); bottom:calc(var(--k) * 78px); width:calc(var(--k) * 11px); height:calc(var(--k) * 11px);
+    background:radial-gradient(circle at 35% 30%, #e8cd85, #b89a5e 55%, #3a2410 100%);
     box-shadow:inset 0 -1px 2px rgba(0,0,0,.35);
   }
   .perno {
@@ -361,6 +374,11 @@
   .barra.piccola {
     height:16px;
     background:linear-gradient(to top,#16305e,#3f7fd9 70%,#a8cdf2);
+    clip-path:polygon(50% 0,86% 10%,70% 100%,30% 100%,14% 10%);
+  }
+  .barra.esplorato {
+    height:20px;
+    background:linear-gradient(to top,#4a3812,#b89a5e 70%,#e8cd85);
     clip-path:polygon(50% 0,86% 10%,70% 100%,30% 100%,14% 10%);
   }
   .legenda-item .testo { flex:1; }
@@ -792,6 +810,7 @@
           <div class="lancetta piccola nascosta" data-tipo="piccola" style="display:none"><div class="ago ago-piccola"></div><div class="gemma gemma-piccola"></div></div>
           <div class="lancetta media nascosta" data-tipo="media" style="display:none"><div class="ago ago-media"></div><div class="gemma gemma-media"></div></div>
           <div class="lancetta grande" data-tipo="grande"><div class="ago ago-grande"></div><div class="gemma gemma-grande"></div></div>
+          <div class="lancetta esplorato" data-tipo="esplorato"><div class="ago ago-esplorato"></div><div class="gemma gemma-esplorato"></div></div>
           <div class="perno"></div>
           <div class="porta"></div>
           <div id="carta-rotta" aria-hidden="true"></div>
@@ -809,7 +828,14 @@
             <div class="barra grande"></div>
             <div class="testo">
               <div class="nome">Il Luogo di Potere</div>
-              <div class="dett">luogo di potere più vicino</div>
+              <div class="dett">il prossimo luogo da esplorare</div>
+            </div>
+          </div>
+          <div class="legenda-item nascosta" data-tipo="esplorato" style="display:none">
+            <div class="barra esplorato"></div>
+            <div class="testo">
+              <div class="nome">Il Luogo Già Esplorato</div>
+              <div class="dett">luogo già esplorato</div>
             </div>
           </div>
           <div class="legenda-item nascosta" data-tipo="media" style="display:none">
